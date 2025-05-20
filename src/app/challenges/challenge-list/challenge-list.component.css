@@ -1,0 +1,72 @@
+
+.challenge-list-container {
+  max-width: 1200px;
+  margin: 30px auto; /* Más margen */
+  padding: 25px; /* Más padding */
+  background-color: #f8f9fa; /* Un fondo muy sutil para la sección */
+  border-radius: 12px; /* Bordes redondeados para el contenedor general */
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre icono y título */
+  margin-bottom: 35px; /* Más espacio */
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dee2e6; /* Borde más sutil */
+}
+
+.list-header h1 {
+  font-size: 2.4em; /* Título más grande */
+  color: #2c3e50; /* Color oscuro principal */
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.list-header h1 mat-icon {
+  font-size: 1.3em; /* Icono del título un poco más grande */
+  margin-right: 12px;
+  color: #007bff; /* Color primario, asegúrate que coincida con tu tema */
+}
+
+/* Indicador de carga, mensajes de error y estado vacío */
+.loading-indicator, .empty-state, .error-message {
+  text-align: center;
+  padding: 50px 20px; /* Más padding para estos estados */
+  color: #6c757d; /* Un gris más suave */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Más espacio entre icono y texto */
+  border-radius: 8px; /* Bordes para estos contenedores */
+  background-color: #fff; /* Fondo blanco para destacar */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Sombra sutil */
+  margin: 20px 0;
+}
+.loading-indicator p, .empty-state p { font-size: 1.2em; line-height: 1.6; }
+
+.error-message {
+  background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;
+}
+.error-message mat-icon { font-size: 1.8em; } /* Icono de error más grande */
+
+.empty-state .empty-icon {
+  font-size: 5em; /* Icono de estado vacío más grande */
+  color: #adb5bd; /* Un gris aún más suave */
+  margin-bottom: 10px;
+}
+
+/* Grid de desafíos */
+.challenges-grid {
+  display: grid;
+  /* Usar minmax para responsividad y auto-fill para llenar el espacio */
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); /* Ajusta minmax para el tamaño deseado de las tarjetas */
+  gap: 30px; /* Espacio entre tarjetas */
+}
+
+/* Estilos para cuando solo hay una tarjeta, para centrarla (opcional) */
+.challenges-grid:has(app-challenge-card:only-child) {
+  /* grid-template-columns: minmax(340px, 500px); /* O un ancho fijo/máximo */
+  /* justify-content: center; */
+}

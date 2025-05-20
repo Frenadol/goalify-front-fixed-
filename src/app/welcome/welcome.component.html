@@ -1,0 +1,68 @@
+<div class="page-container"> <!-- Contenedor principal añadido -->
+  <div class="welcome-page-wrapper">
+    <div class="welcome-container card-style"> <!-- Puedes renombrar card-style si los estilos del dashboard son muy diferentes -->
+      <header class="welcome-header"> <!-- Mantenemos el saludo original -->
+        <h1>¡Bienvenido a Goalify, {{ userDisplayName }}!</h1>
+        <p class="welcome-message">Has iniciado sesión correctamente. ¡Es genial tenerte aquí!</p>
+      </header>
+
+      <!-- Sección de acciones del Dashboard integrada -->
+      <section class="dashboard-actions-integrated">
+        <p class="dashboard-intro-text">Desde aquí puedes empezar a gestionar tus metas y hábitos:</p>
+
+        <div class="actions-grid"> <!-- Contenedor para la cuadrícula de acciones -->
+          <div class="action-card" (click)="navigateTo('/habits/new')">
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">add_task</span>
+            </div>
+            <h3 class="action-card-title">Crear Hábito</h3>
+            <p class="action-card-description">Define un nuevo hábito para mejorar tu rutina.</p>
+          </div>
+
+          <div class="action-card" (click)="navigateTo('/habits')">
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">checklist</span>
+            </div>
+            <h3 class="action-card-title">Mis Hábitos</h3>
+            <p class="action-card-description">Visualiza y gestiona tus hábitos actuales.</p>
+          </div>
+
+          <!-- NUEVA TARJETA PARA MIS DESAFÍOS -->
+          <div class="action-card" (click)="navigateTo('/my-challenges')">
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">emoji_events</span> <!-- Icono de desafíos -->
+            </div>
+            <h3 class="action-card-title">Mis Desafíos</h3>
+            <p class="action-card-description">Consulta los desafíos en los que participas.</p>
+          </div>
+          <!-- FIN NUEVA TARJETA -->
+
+          <div class="action-card" (click)="navigateTo('/challenges')"> <!-- Esta es la lista general de desafíos -->
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">workspace_premium</span> <!-- Icono diferente para explorar -->
+            </div>
+            <h3 class="action-card-title">Explorar Desafíos</h3>
+            <p class="action-card-description">Descubre y únete a nuevos desafíos.</p>
+          </div>
+
+          <div class="action-card" (click)="navigateTo('/app/progress')">
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">trending_up</span>
+            </div>
+            <h3 class="action-card-title">Mi Progreso</h3>
+            <p class="action-card-description">Revisa tus estadísticas y avances.</p>
+          </div>
+
+          <div class="action-card" (click)="navigateTo('/user-profile')">
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">settings</span>
+            </div>
+            <h3 class="action-card-title">Mi Perfil</h3>
+            <p class="action-card-description">Ajusta tus preferencias y perfil.</p>
+          </div>
+        </div> <!-- Fin de actions-grid -->
+
+      </section>
+    </div>
+  </div>
+</div> <!-- Fin del contenedor principal -->

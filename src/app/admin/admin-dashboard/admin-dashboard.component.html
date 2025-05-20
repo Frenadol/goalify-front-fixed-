@@ -1,0 +1,44 @@
+<div class="page-container"> <!-- Contenedor principal añadido -->
+  <div class="admin-dashboard-container">
+    <header class="admin-header">
+      <h1>Panel de Administrador</h1>
+      <p>Bienvenido. Desde aquí puedes gestionar la aplicación.</p>
+    </header>
+
+    <section class="admin-actions-grid">
+      <div class="admin-action-card" routerLink="/admin/users" title="Ver y modificar la lista de todos los usuarios, asignar o revocar roles de administrador y eliminar cuentas.">
+        <div class="admin-action-card-icon">
+          <span class="material-icons-outlined">manage_accounts</span>
+        </div>
+        <h3 class="admin-action-card-title">Gestionar Usuarios</h3>
+        <p class="admin-action-card-description">Administra los usuarios, sus roles y permisos.</p>
+      </div>
+
+      <div class="admin-action-card" routerLink="/admin/challenges" title="Ver, editar y eliminar desafíos existentes, o crear nuevos.">
+        <div class="admin-action-card-icon">
+          <span class="material-icons-outlined">emoji_events</span>
+        </div>
+        <h3 class="admin-action-card-title">Gestionar Desafíos</h3>
+        <p class="admin-action-card-description">Administra todos los desafíos de la plataforma.</p>
+      </div>
+
+      <!-- NUEVA TARJETA PARA ASIGNACIÓN ALEATORIA -->
+      <div class="admin-action-card" (click)="triggerRandomAssignment()" title="Asigna automáticamente un desafío aleatorio a un usuario aleatorio. ¡Ideal para sorpresas!">
+        <div class="admin-action-card-icon">
+          <span class="material-icons-outlined">casino</span> <!-- Icono de aleatoriedad -->
+        </div>
+        <h3 class="admin-action-card-title">Asignación Aleatoria</h3>
+        <p class="admin-action-card-description">Asigna un desafío al azar a un usuario.</p>
+        <div *ngIf="isAssigningRandom" class="card-spinner-container">
+          <mat-spinner diameter="30"></mat-spinner>
+        </div>
+      </div>
+      <!-- FIN NUEVA TARJETA -->
+
+    </section>
+
+    <footer class="admin-footer">
+      <button (click)="logout()" class="btn btn-danger">Cerrar Sesión</button>
+    </footer>
+  </div>
+</div> <!-- Fin del contenedor principal -->

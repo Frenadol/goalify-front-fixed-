@@ -1,0 +1,43 @@
+.full-width-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.flex-field {
+  flex: 1;
+}
+
+.dialog-error-message {
+  color: red; /* O tu variable de color de error */
+  background-color: #ffebee; /* Un fondo rojo claro */
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+}
+
+.dialog-error-message mat-icon {
+  font-size: 1.2em;
+}
+
+.button-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Asegúrate de que el contenido del diálogo pueda hacer scroll si es muy largo */
+div[mat-dialog-content] {
+  max-height: 70vh; /* Ajusta según necesites */
+  overflow-y: auto;
+}

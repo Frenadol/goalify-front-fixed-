@@ -1,0 +1,197 @@
+.landing-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif; /* O la fuente que prefieras */
+  color: #333;
+  background-color: #f4f7f6; /* Fondo suave como en register */
+}
+
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo-text {
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #007bff; /* Azul primario */
+  margin: 0;
+}
+
+.landing-nav .btn {
+  margin-left: 15px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.landing-nav .btn-primary {
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+
+.landing-nav .btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.landing-nav .btn-secondary {
+  background-color: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.landing-nav .btn-secondary:hover {
+  background-color: #e9ecef; /* Un gris muy claro */
+  transform: translateY(-2px);
+}
+
+.landing-main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.hero-section {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 800px;
+  margin-bottom: 40px;
+}
+
+.hero-text-content h2 {
+  font-size: 2.8em;
+  font-weight: 700;
+  color: #2c3e50; /* Título oscuro como en register */
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.hero-text-content p {
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.btn-large {
+  padding: 15px 30px;
+  font-size: 1.1em;
+  border-radius: 30px;
+}
+
+.features-section {
+  width: 100%;
+  max-width: 1000px;
+  padding: 40px 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2em;
+  color: #2c3e50;
+  margin-bottom: 40px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 20px;
+}
+
+.feature-icon {
+  font-size: 3em; /* Ajusta el tamaño del icono */
+  color: #007bff; /* Color primario para los iconos */
+  margin-bottom: 15px;
+}
+
+.feature-item h4 {
+  font-size: 1.4em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.feature-item p {
+  font-size: 0.95em;
+  color: #666;
+  line-height: 1.5;
+}
+
+.landing-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #2c3e50; /* Footer oscuro */
+  color: #f4f7f6; /* Texto claro en footer */
+  font-size: 0.9em;
+}
+
+/* Estilos generales para botones (puedes moverlos a styles.css si son globales) */
+.btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px; /* Ajusta según tu diseño */
+  padding: 12px 24px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Animaciones */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hero-text-content {
+  /* ... tus otros estilos para hero-text-content ... */
+  animation: fadeInScale 0.6s ease-out forwards;
+}
+
+.feature-item {
+  /* ... tus otros estilos para feature-item ... */
+  opacity: 0; /* Empieza invisible para la animación */
+  animation: fadeInScale 0.5s ease-out forwards;
+}
+
+/* Para aplicar un retraso a cada item de feature si quieres que aparezcan secuencialmente */
+.features-grid .feature-item:nth-child(1) { animation-delay: 0.2s; }
+.features-grid .feature-item:nth-child(2) { animation-delay: 0.4s; }
+.features-grid .feature-item:nth-child(3) { animation-delay: 0.6s; }

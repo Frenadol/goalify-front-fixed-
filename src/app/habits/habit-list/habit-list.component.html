@@ -1,0 +1,50 @@
+<!-- filepath: src/app/habits/habit-list/habit-list.component.html -->
+<div class="page-container"> <!-- Contenedor principal añadido -->
+  <div class="habit-list-container">
+    <div class="header-actions">
+      <h2>Mis Hábitos</h2>
+      <button *ngIf="authService.currentUser | async" routerLink="/habits/new" class="btn btn-primary add-habit-btn">
+        <span class="material-icons-outlined">add_circle_outline</span> Crear Nuevo Hábito
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <p>Cargando hábitos...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && habits.length === 0" class="empty-state">
+      <p>Aún no tienes hábitos. ¡Crea uno para empezar!</p>
+      <span class="material-icons-outlined empty-icon">checklist_rtl</span>
+    </div>
+
+    <div *ngIf="!isLoading && habits.length > 0" class="habits-grid">
+      <div *ngFor="let habit of habits" class="habit-card card-style">
+        <div class="habit-card-image-container">
+          <img [src]="getHabitImageUrl(habit.nombre)" [alt]="habit.nombre" class="habit-image">
+        </div>
+        <div class="habit-card-content">
+          <h3>{{ habit.nombre }}</h3>
+          <p class="description">{{ habit.descripcion || 'Sin descripción.' }}</p>
+          <div class="details">
+            <p><span class="material-icons-outlined">event_repeat</span> Frecuencia: {{ habit.frecuencia | titlecase }}</p>
+            <p *ngIf="habit.horaProgramada"><span class="material-icons-outlined">schedule</span> Hora: {{ habit.horaProgramada | date:'HH:mm' }}</p>
+            <p><span class="material-icons-outlined">military_tech</span> Puntos: {{ habit.puntosRecompensa }}</p>
+            <p><span class="material-icons-outlined">flag</span> Estado: <span class="status" [ngClass]="habit.estado">{{ habit.estado | titlecase }}</span></p>
+          </div>
+          <div class="actions">
+            <button [routerLink]="['/habits/edit', habit.id]" class="btn btn-secondary btn-sm">
+              <span class="material-icons-outlined">edit</span> Editar
+            </button>
+            <button (click)="deleteHabit(habit.id)" class="btn btn-danger btn-sm">
+              <span class="material-icons-outlined">delete</span> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- Fin del contenedor principal -->

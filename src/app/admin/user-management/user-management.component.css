@@ -1,0 +1,403 @@
+.user-management-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.user-management-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 2em;
+}
+
+.loading-spinner, .no-users {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1em;
+  color: #666;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.user-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Grid responsive */
+  gap: 25px; /* Espacio entre tarjetas */
+  margin-top: 20px;
+}
+
+.user-card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px; /* Bordes más redondeados */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08); /* Sombra más pronunciada */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.user-card:hover {
+  transform: translateY(-5px); /* Ligero efecto al pasar el mouse */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+
+.user-card.is-admin-card {
+  border-left: 5px solid #007bff; /* Borde distintivo para admins */
+}
+
+.user-card-header {
+  padding: 20px 15px; /* Más padding vertical */
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0; /* Borde más suave */
+  background-color: #fdfdfd;
+}
+
+.user-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.user-name {
+  font-size: 1.3em; /* Un poco más grande */
+  color: #2c3e50; /* Color de texto más oscuro */
+  margin: 0 0 5px 0;
+  font-weight: 600;
+}
+
+.current-admin-tag {
+  font-size: 0.75em;
+  color: #28a745;
+  font-weight: normal;
+  vertical-align: middle;
+  margin-left: 5px;
+  background-color: #e9f7ef;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.user-email {
+  font-size: 0.9em;
+  color: #7f8c8d; /* Color de email más suave */
+  margin: 0;
+  word-break: break-all;
+}
+
+.user-card-body {
+  padding: 15px 20px; /* Más padding horizontal */
+  font-size: 0.95em;
+  color: #34495e;
+  flex-grow: 1;
+}
+
+.user-card-body p {
+  margin: 0 0 10px 0; /* Más espacio entre párrafos */
+}
+
+.user-card-body p strong {
+  color: #2c3e50;
+  margin-right: 5px;
+}
+
+.status-admin {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.status-user {
+  color: #555;
+}
+
+.user-card-actions {
+  padding: 15px 20px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f8f9fa;
+}
+
+.btn { /* Estilo base para botones, si no lo tienes global */
+  padding: 8px 12px;
+  font-size: 0.9em;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  font-weight: 500;
+}
+
+.btn-action {
+  width: 100%;
+}
+
+.btn-make-admin {
+  background-color: #17a2b8; /* Color info para "Hacer Admin" */
+  color: white;
+}
+.btn-make-admin:hover {
+  background-color: #138496;
+}
+
+.btn-remove-admin {
+  background-color: #ffc107; /* Color warning para "Quitar Admin" */
+  color: #212529;
+}
+.btn-remove-admin:hover {
+  background-color: #e0a800;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Estilos para el Modal de Detalles del Usuario (Revisados/Nuevos) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65); /* Un poco más oscuro quizás */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Asegura que esté por encima de otros elementos */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content.user-details-modal { /* Clase específica para este modal */
+  background-color: #fff;
+  padding: 0; /* Quitamos el padding general para controlar el layout interno */
+  border-radius: 12px; /* Bordes más redondeados */
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  width: 100%;
+  max-width: 750px; /* Ancho máximo del modal, ajusta según necesites */
+  max-height: 90vh;
+  display: flex; /* Para el botón de cerrar y el layout principal */
+  flex-direction: column;
+  position: relative;
+  animation: fadeInModal 0.3s ease-out;
+  overflow: hidden; /* Para que el layout interno no desborde el border-radius */
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: rgba(0,0,0,0.1);
+  border: none;
+  font-size: 1.5rem; /* Ajustado */
+  color: #fff; /* Color que contraste con el fondo del botón */
+  cursor: pointer;
+  line-height: 1;
+  padding: 5px 8px; /* Para hacerlo un poco más grande */
+  border-radius: 50%;
+  z-index: 10; /* Por encima del contenido del modal */
+  transition: background-color 0.2s ease;
+}
+.modal-close-button:hover {
+  background-color: rgba(0,0,0,0.2);
+  color: #eee;
+}
+
+.modal-loading-spinner {
+  text-align: center;
+  padding: 60px 20px; /* Más padding para el spinner */
+  font-size: 1.2em;
+  color: #555;
+  min-height: 300px; /* Para que el modal no colapse mientras carga */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-body-layout {
+  display: flex;
+  width: 100%;
+  flex-grow: 1; /* Para que ocupe el espacio disponible si el modal tiene altura fija */
+}
+
+.modal-profile-picture-column {
+  width: 40%; /* Ancho de la columna izquierda, ajusta según prefieras */
+  min-width: 280px; /* Ancho mínimo para que no se comprima demasiado */
+  background-color: #f0f4f8; /* Un color de fondo suave para la columna de la imagen */
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid #e0e0e0; /* Separador sutil */
+}
+
+.modal-profile-avatar-large {
+  width: 180px; /* Tamaño de la imagen de perfil grande */
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 5px solid #ffffff; /* Borde blanco alrededor del avatar */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.modal-profile-name {
+  font-size: 1.7em; /* Tamaño del nombre */
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.modal-profile-email {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 15px;
+  word-break: break-all;
+}
+
+.modal-user-role { /* Ya tenías estilos para esto, asegúrate que se vean bien aquí */
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: auto; /* Empuja el rol hacia abajo si hay espacio */
+}
+.modal-user-role.status-admin { background-color: #e7f3ff; color: #007bff; }
+.modal-user-role.status-user { background-color: #f0f0f0; color: #555; }
+
+
+.modal-user-details-column {
+  width: 60%; /* Ancho de la columna derecha */
+  padding: 30px 25px;
+  overflow-y: auto; /* Scroll si el contenido es muy largo */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-user-details-column h4 {
+  font-size: 1.3em;
+  color: #007bff;
+  margin-top: 0;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #007bff;
+  display: inline-block;
+}
+
+.details-grid {
+  display: grid;
+  /* grid-template-columns: 1fr;  Una columna para los detalles aquí */
+  /* Si quieres dos columnas dentro de la sección de detalles: */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 20px;
+  margin-bottom: 20px;
+}
+
+.details-grid p {
+  margin: 0; /* Quita el margen por defecto del p */
+  padding: 10px 12px;
+  font-size: 0.95em;
+  color: #444;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border-left: 3px solid #007bff; /* Un acento de color */
+  line-height: 1.5;
+}
+.details-grid p strong { color: #333; margin-right: 5px; }
+
+.biography-section {
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+.biography-section h4 { /* Hereda estilos de h4 de arriba, pero puedes sobreescribir si es necesario */
+  margin-bottom: 10px;
+}
+.biography-section p {
+  font-size: 0.95em;
+  color: #555;
+  line-height: 1.6;
+  background-color: #fdfdfd;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.modal-actions {
+  margin-top: auto; /* Empuja las acciones al final de la columna si hay espacio */
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 12px; /* Espacio entre botones */
+  justify-content: flex-end; /* Alinea botones a la derecha */
+}
+
+.modal-actions .btn {
+  /* Los botones ya tienen estilos base, aquí puedes ajustar si es necesario para el modal */
+  padding: 10px 18px;
+  font-size: 0.95em;
+}
+
+/* Media query para pantallas más pequeñas */
+@media (max-width: 768px) {
+  .modal-body-layout {
+    flex-direction: column; /* Apila las columnas en pantallas pequeñas */
+  }
+  .modal-profile-picture-column,
+  .modal-user-details-column {
+    width: 100%;
+    border-right: none; /* Quita el borde si se apilan */
+  }
+  .modal-profile-picture-column {
+    border-bottom: 1px solid #e0e0e0; /* Añade borde inferior si se apilan */
+    min-width: auto; /* Resetea el min-width */
+    padding: 25px;
+  }
+  .modal-user-details-column {
+    padding: 25px;
+  }
+  .modal-profile-avatar-large {
+    width: 120px;
+    height: 120px;
+  }
+  .modal-actions {
+    flex-direction: column; /* Botones uno debajo del otro */
+  }
+  .modal-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,137 @@
+.main-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px; /* Padding horizontal */
+  height: var(--navbar-height);
+  background-color: var(--user-card-background); /* Fondo blanco por defecto para usuarios */
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1020; /* Alto z-index para estar por encima de otros elementos */
+  transition: background-color var(--transition-speed-normal) var(--transition-easing),
+              color var(--transition-speed-normal) var(--transition-easing);
+}
+
+/* Estilos específicos para la navbar de admin (aplicados mediante body.admin-view en styles.css) */
+body.admin-view .main-navbar {
+  background-color: var(--admin-primary);
+  color: var(--admin-text-on-primary);
+  border-bottom-color: var(--admin-primary-dark);
+}
+
+.nav-logo a {
+  font-size: 1.75em; /* Ligeramente más pequeño */
+  font-weight: 700;
+  color: var(--user-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-logo a .material-icons-outlined { /* Si quieres un icono en el logo */
+  font-size: 1.2em;
+}
+
+body.admin-view .nav-logo a {
+  color: var(--admin-text-on-primary); /* O un color de acento admin */
+}
+body.admin-view .nav-logo a:hover {
+  color: var(--admin-accent);
+}
+
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacio reducido entre enlaces */
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: var(--color-text-secondary); /* Color de texto más suave por defecto */
+  font-weight: 500;
+  padding: 10px 15px; /* Padding generoso para clics fáciles */
+  border-radius: var(--border-radius-md);
+  transition: color var(--transition-speed-fast) var(--transition-easing),
+              background-color var(--transition-speed-fast) var(--transition-easing);
+  display: inline-block; /* Para que el padding funcione correctamente */
+  position: relative; /* Para el pseudo-elemento ::after */
+}
+.nav-links li a::after { /* Indicador sutil para el enlace activo/hover */
+ content: '';
+ position: absolute;
+ bottom: 0;
+ left: 50%;
+ transform: translateX(-50%);
+ width: 0;
+ height: 3px;
+ background-color: var(--user-primary);
+ transition: width var(--transition-speed-normal) var(--transition-easing);
+}
+
+
+.nav-links li a:hover {
+  color: var(--user-primary);
+  background-color: transparent; /* Evitar cambio de fondo, usar el ::after */
+  text-decoration: none;
+}
+.nav-links li a:hover::after,
+.nav-links li a.active::after {
+   width: 70%; /* Ancho del indicador */
+}
+
+.nav-links li a.active {
+  font-weight: 600;
+  color: var(--user-primary);
+  background-color: transparent;
+}
+
+/* Estilos para enlaces de navbar de admin */
+body.admin-view .nav-links li a {
+  color: var(--admin-text-on-primary);
+  opacity: 0.8;
+}
+body.admin-view .nav-links li a:hover {
+  opacity: 1;
+  color: var(--admin-accent); /* Color de acento para admin en hover */
+  background-color: rgba(255,255,255,0.05); /* Fondo muy sutil */
+}
+body.admin-view .nav-links li a.active {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--admin-accent); /* Color de acento para admin en activo */
+  background-color: rgba(0,0,0,0.1);
+}
+body.admin-view .nav-links li a::after {
+   background-color: var(--admin-accent);
+}
+
+
+.user-profile-nav-container {
+  /* Los estilos del user-profile.component se encargarán de esto,
+     pero asegúrate que se alineen bien con la navbar */
+}
+
+/* Contenedor principal de la página, para aplicar padding global */
+.main-content-area {
+  padding-top: var(--navbar-height); /* Para que el contenido no quede debajo de la navbar sticky */
+}
+.main-content-area > .page-container { /* Aplicar el padding del page-container al primer hijo */
+   padding-top: 30px; /* Espacio adicional después de la navbar */
+   padding-bottom: 30px;
+}
+
+/* Estilo para el app-root si es necesario */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Asegurar que la app ocupe toda la altura */
+}
+.main-content-area {
+  flex-grow: 1; /* Hacer que el área de contenido crezca para empujar el footer (si tienes uno) */
+}

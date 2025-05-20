@@ -1,0 +1,21 @@
+<div class="user-profile-wrapper"> <!-- Contenedor general -->
+  <!-- Este div solo se muestra si hay un currentUser, gracias al *ngIf en app.component.html -->
+  <div class="user-profile-container" *ngIf="currentUser">
+    <div class="profile-clickable-area" (click)="onProfileClick()">
+      <img [src]="userAvatar" alt="User Avatar" class="avatar">
+      <span class="username">{{ userDisplayName }}</span>
+      <span class="dropdown-arrow" [class.open]="showMenu">&#9662;</span>
+    </div>
+
+    <div class="profile-menu" *ngIf="showMenu">
+      <ul>
+        <li><a (click)="logout()">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Si no hay usuario, mostrar enlace de Iniciar Sesión -->
+  <div *ngIf="!currentUser" class="login-prompt-profile">
+    <a routerLink="/login">Iniciar Sesión</a>
+  </div>
+</div>

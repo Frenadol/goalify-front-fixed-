@@ -1,0 +1,237 @@
+/* filepath: src/app/habits/habit-list/habit-list.component.css */
+.habit-list-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.list-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.loading-indicator, .error-message, .empty-state {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1em;
+  color: #555;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+}
+
+.habits {
+  list-style: none;
+  padding: 0;
+}
+
+.habit-item.card-style {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.habit-item.card-style:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.habit-info h3 {
+  margin: 0 0 5px 0;
+  color: #007bff;
+}
+
+.habit-info .description {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.habit-info .details span {
+  font-size: 0.85em;
+  color: #444;
+  margin-right: 10px;
+  background-color: #f0f0f0;
+  padding: 3px 7px;
+  border-radius: 4px;
+}
+
+.habit-actions button {
+  margin-left: 10px;
+}
+
+.btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover { background-color: #0056b3; }
+.btn-danger { background-color: #dc3545; color: white; }
+.btn-danger:hover { background-color: #c82333; }
+.btn-sm { padding: 5px 10px; font-size: 0.9em; }
+
+.habit-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.habit-card-image-container {
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.habit-image {
+  max-width: 100px;
+  max-height: 100px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.habit-card-content {
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.habit-card-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.4em;
+  color: #333;
+}
+
+.habit-card-content .description {
+  font-size: 0.95em;
+  color: #555;
+  margin-bottom: 15px;
+  flex-grow: 1;
+  line-height: 1.5;
+}
+
+.details p {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.details .material-icons-outlined {
+  margin-right: 8px;
+  font-size: 1.1em;
+  color: #007bff;
+}
+
+.status {
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+}
+.status.activo { background-color: #28a745; }
+.status.inactivo { background-color: #6c757d; }
+.status.completado_hoy { background-color: #17a2b8; }
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.actions .btn-sm {
+  padding: 6px 10px;
+  font-size: 0.85em;
+}
+
+.actions .btn-sm .material-icons-outlined {
+  font-size: 1.1em;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding-top: 20px;
+}
+
+.card-style {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-style:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-actions h2 {
+  margin: 0;
+  font-size: 1.8em;
+  color: #2c3e50;
+}
+
+.header-actions .btn-primary .material-icons-outlined {
+  margin-right: 6px;
+  vertical-align: bottom;
+}
+
+.header-actions .btn.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-actions .btn.btn-primary .material-icons-outlined {
+  font-size: 1.25em;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #777;
+}
+
+.empty-state .empty-icon {
+  font-size: 4em;
+  margin-top: 15px;
+  color: #ccc;
+}

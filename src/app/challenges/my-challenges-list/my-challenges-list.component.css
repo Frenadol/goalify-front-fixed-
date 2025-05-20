@@ -1,0 +1,87 @@
+.my-challenges-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 35px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.list-header h1 {
+  font-size: 2.4em;
+  color: #2c3e50;
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.list-header h1 mat-icon {
+  font-size: 1.3em;
+  margin-right: 12px;
+  color: #007bff; /* O tu color primario */
+}
+
+.loading-indicator, .empty-state, .error-message {
+  text-align: center;
+  padding: 50px 20px;
+  color: #6c757d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin: 20px 0;
+}
+
+.loading-indicator p, .empty-state p {
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}
+
+.error-message mat-icon {
+  font-size: 1.8em;
+}
+
+.empty-state .empty-icon {
+  font-size: 5em;
+  color: #adb5bd;
+  margin-bottom: 10px;
+}
+
+.empty-state a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.empty-state a:hover {
+  text-decoration: underline;
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 30px;
+}
+
+/* Estilo opcional para diferenciar las tarjetas en esta vista si es necesario */
+.user-challenge-card {
+  /* Podrías añadir un borde o algo sutil si quieres */
+  /* border-left: 4px solid #28a745; */ /* Ejemplo de un borde verde */
+}

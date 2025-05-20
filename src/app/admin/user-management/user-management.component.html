@@ -1,0 +1,88 @@
+<div class="page-container"> <!-- Contenedor principal añadido -->
+  <div class="user-management-container">
+    <h2>Gestión de Usuarios</h2>
+
+    <div *ngIf="isLoading" class="loading-spinner">Cargando usuarios...</div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <div *ngIf="!isLoading && !errorMessage && users.length === 0" class="no-users">
+      No hay usuarios para mostrar.
+    </div>
+
+    <div class="user-cards-grid" *ngIf="!isLoading && !errorMessage && users.length > 0">
+      <div class="user-card" *ngFor="let user of users" [class.is-admin-card]="user.esAdministrador" (click)="openUserDetailsModal(user)">
+        <div class="user-card-header">
+          <img [src]="user.avatarUrl || 'assets/img/default-avatar.png'" (error)="onImageError($event)" alt="Avatar de {{ user.name }}" class="user-avatar">
+          <h3 class="user-name">{{ user.name }} <span *ngIf="user.id === currentAdminId" class="current-admin-tag">(Tú)</span></h3>
+          <p class="user-email">{{ user.email }}</p>
+        </div>
+        <div class="user-card-body">
+          <p><strong>ID:</strong> {{ user.id }}</p>
+          <p><strong>Rango:</strong> {{ user.rango || 'No especificado' }}</p>
+          <p><strong>Admin:</strong> <span [ngClass]="{'status-admin': user.esAdministrador, 'status-user': !user.esAdministrador}">{{ user.esAdministrador ? 'Sí' : 'No' }}</span></p>
+        </div>
+        <div class="user-card-actions">
+          <button
+            (click)="onToggleAdminStatus(user); $event.stopPropagation()"
+            [disabled]="user.id === currentAdminId"
+            [ngClass]="{'btn-make-admin': !user.esAdministrador, 'btn-remove-admin': user.esAdministrador}"
+            class="btn btn-action">
+            {{ user.esAdministrador ? 'Quitar Admin' : 'Hacer Admin' }}
+          </button>
+          <button
+            (click)="onDeleteUser(user); $event.stopPropagation()"
+            class="btn btn-danger btn-action"
+            [disabled]="user.id === currentAdminId">
+            Eliminar Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Detalles del Usuario -->
+    <div class="modal-overlay" *ngIf="selectedUserForDetails || isLoadingUserDetails" (click)="closeUserDetailsModal()">
+      <div class="modal-content user-details-modal" (click)="$event.stopPropagation()">
+        <button class="modal-close-button" (click)="closeUserDetailsModal()" aria-label="Cerrar modal">&times;</button>
+
+        <div *ngIf="isLoadingUserDetails && !selectedUserForDetails" class="modal-loading-spinner">Cargando detalles...</div>
+
+        <ng-container *ngIf="selectedUserForDetails">
+          <div class="modal-body-layout">
+            <!-- Columna Izquierda: Foto de Perfil -->
+            <div class="modal-profile-picture-column">
+              <img [src]="selectedUserForDetails.avatarUrl || defaultAvatar" (error)="onImageError($event)" alt="Avatar de {{ selectedUserForDetails.name }}" class="modal-profile-avatar-large">
+              <h2 class="modal-profile-name">{{ selectedUserForDetails.name }}</h2>
+              <p class="modal-profile-email">{{ selectedUserForDetails.email }}</p>
+              <span class="modal-user-role" [ngClass]="{'status-admin': selectedUserForDetails.esAdministrador, 'status-user': !selectedUserForDetails.esAdministrador}">
+                {{ selectedUserForDetails.esAdministrador ? 'Administrador' : 'Usuario' }}
+              </span>
+            </div>
+
+            <!-- Columna Derecha: Detalles del Usuario -->
+            <div class="modal-user-details-column">
+              <h4>Detalles de la Cuenta</h4>
+              <div class="details-grid">
+                <p><strong>ID:</strong> {{ selectedUserForDetails.id }}</p>
+                <p><strong>Rango:</strong> {{ selectedUserForDetails.rango || 'No especificado' }}</p>
+                <p><strong>Puntos Totales:</strong> {{ selectedUserForDetails.puntosTotales || 0 }}</p>
+                <p><strong>Nivel:</strong> {{ selectedUserForDetails.nivel || 1 }}</p>
+                <p><strong>Registrado:</strong> {{ selectedUserForDetails.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p><strong>Último Ingreso:</strong> {{ selectedUserForDetails.fechaUltimoIngreso | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p><strong>Última Actualización:</strong> {{ selectedUserForDetails.ultimaActualizacion | date:'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+
+              <div *ngIf="selectedUserForDetails.biografia" class="biography-section">
+                <h4>Biografía</h4>
+                <p>{{ selectedUserForDetails.biografia }}</p>
+              </div>
+
+              <div class="modal-actions">
+                <!-- Acciones adicionales del modal si son necesarias -->
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div> <!-- Fin del contenedor principal -->

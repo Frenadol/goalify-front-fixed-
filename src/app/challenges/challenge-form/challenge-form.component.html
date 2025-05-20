@@ -1,0 +1,131 @@
+<div class="page-container">
+  <div class="challenge-form-container card-style">
+    <header class="form-header">
+      <mat-icon class="form-header-icon">{{ isEditMode ? 'edit_note' : 'add_circle_outline' }}</mat-icon>
+      <h2 class="form-title">{{ isEditMode ? 'Editar Desafío' : 'Crear Nuevo Desafío' }}</h2>
+    </header>
+
+    <div *ngIf="isLoading && !successMessage && !errorMessage" class="loading-indicator">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>{{ isEditMode ? 'Cargando datos...' : (isLoading ? 'Guardando...' : 'Procesando...') }}</p>
+    </div>
+
+    <div *ngIf="successMessage" class="form-message success">
+      <mat-icon>check_circle</mat-icon> {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage && !successMessage" class="form-message error global-error">
+      <mat-icon>error_outline</mat-icon> {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="challengeForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading || (isEditMode && challengeForm.get('nombre')?.value)">
+
+      <mat-form-field appearance="outline" class="full-width-field"> <!-- Se eliminó la clase 'name-field-spacing' -->
+        <mat-label>Nombre del Desafío</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ej: Correr 5km en una semana" required>
+        <mat-error *ngIf="challengeForm.get('nombre')?.hasError('required')">El nombre es requerido.</mat-error>
+        <mat-error *ngIf="challengeForm.get('nombre')?.hasError('maxlength')">Máximo 255 caracteres.</mat-error>
+      </mat-form-field>
+
+      <!-- Div espaciador añadido -->
+      <div class="field-vertical-spacer"></div>
+
+      <mat-form-field appearance="outline" class="full-width-field">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion" rows="4" placeholder="Describe los detalles y reglas del desafío..."></textarea>
+      </mat-form-field>
+
+      <div class="form-section image-upload-section">
+        <div class="image-input-controls">
+          <h3 class="image-section-title">Imagen del Desafío</h3>
+          <p class="image-section-subtitle">Sube una imagen representativa (opcional).</p>
+          <input type="file" id="challengeImageFile" #fileUpload (change)="onFileSelected($event)" accept="image/*" class="file-input-hidden">
+          <button mat-stroked-button type="button" (click)="fileUpload.click()" class="upload-button">
+            <mat-icon>cloud_upload</mat-icon>
+            <span>{{ selectedFileName ? 'Cambiar Archivo' : 'Seleccionar Archivo' }}</span>
+          </button>
+          <mat-hint *ngIf="selectedFileName" class="selected-file-name">{{ selectedFileName }}</mat-hint>
+          <mat-hint *ngIf="!selectedFileName && isEditMode && existingImageUrl" class="existing-image-hint">
+            Se conservará la imagen actual si no seleccionas una nueva.
+          </mat-hint>
+        </div>
+
+        <div *ngIf="imagePreview || existingImageUrl" class="image-preview-area">
+          <p class="preview-label">
+            {{ selectedFileName && imagePreview ? 'Nueva Imagen:' : (existingImageUrl ? 'Imagen Actual:' : 'Vista Previa:') }}
+          </p>
+          <img [src]="imagePreview || existingImageUrl" alt="Vista previa de la imagen" class="image-preview">
+        </div>
+        <div *ngIf="!imagePreview && !existingImageUrl" class="image-preview-placeholder">
+            <mat-icon class="placeholder-icon">image</mat-icon>
+            <p>Sin imagen seleccionada</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-field">
+          <mat-label>Puntos de Recompensa</mat-label>
+          <input matInput type="number" formControlName="puntosRecompensa" placeholder="Ej: 100" required>
+          <mat-error *ngIf="challengeForm.get('puntosRecompensa')?.hasError('required')">Los puntos son requeridos.</mat-error>
+          <mat-error *ngIf="challengeForm.get('puntosRecompensa')?.hasError('min')">Los puntos deben ser 0 o más.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-field">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="categoria" required>
+            <mat-option *ngFor="let cat of categoriaOptions" [value]="cat">{{cat}}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="challengeForm.get('categoria')?.hasError('required')">La categoría es requerida.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row date-range-fields">
+        <mat-form-field appearance="outline" class="flex-field">
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" required>
+          <mat-hint>DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+          <mat-error *ngIf="challengeForm.get('fechaInicio')?.hasError('required')">La fecha de inicio es requerida.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-field">
+          <mat-label>Fecha de Fin</mat-label>
+          <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" required>
+          <mat-hint>DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+          <mat-error *ngIf="challengeForm.get('fechaFin')?.hasError('required')">La fecha de fin es requerida.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-field">
+          <mat-label>Tipo de Desafío</mat-label>
+          <mat-select formControlName="tipo" required>
+            <mat-option *ngFor="let tipoOpt of tipoOptions" [value]="tipoOpt">{{tipoOpt | titlecase}}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="challengeForm.get('tipo')?.hasError('required')">El tipo es requerido.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-field">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado" required>
+            <mat-option *ngFor="let estadoOpt of estadoOptions" [value]="estadoOpt">{{estadoOpt | titlecase}}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="challengeForm.get('estado')?.hasError('required')">El estado es requerido.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="router.navigate(['/admin/challenges'])" [disabled]="isLoading">
+          <mat-icon>cancel</mat-icon> Cancelar
+        </button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="challengeForm.invalid || isLoading">
+          <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add_circle' }}</mat-icon>
+          <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+          {{ isLoading ? (isEditMode ? 'Guardando...' : 'Creando...') : (isEditMode ? 'Guardar Cambios' : 'Crear Desafío') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

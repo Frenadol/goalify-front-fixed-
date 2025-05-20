@@ -1,0 +1,311 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Importaciones de fuentes (ya las tienes en index.html, pero es bueno recordarlo) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined');
+
+/* Variables CSS Globales */
+:root {
+  /* Fuentes */
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Roboto', sans-serif;
+
+  /* Colores Base (Neutrales) */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-light-gray: #f8f9fa;
+  --color-medium-gray: #e9ecef;
+  --color-dark-gray: #6c757d;
+  --color-text-primary: #212529;
+  --color-text-secondary: #495057;
+
+  /* Tema Principal (Usuario) */
+  --user-primary: #007bff;
+  --user-primary-dark: #0056b3;
+  --user-primary-light: #58a6ff;
+  --user-secondary: #6c757d;
+  --user-accent: #28a745;
+  --user-danger: #dc3545;
+  --user-warning: #ffc107;
+  --user-info: #17a2b8;
+  --user-background: #f4f7f6;
+  --user-card-background: var(--color-white);
+  --user-text-on-primary: var(--color-white);
+  --user-text-on-accent: var(--color-white);
+
+  /* Tema Administrador */
+  --admin-primary: #343a40;
+  --admin-primary-dark: #23272b;
+  --admin-primary-light: #495057;
+  --admin-secondary: #007bff; /* Azul para acciones principales de admin */
+  --admin-accent: #fd7e14;    /* Naranja para énfasis en admin */
+  --admin-danger: #c82333;
+  --admin-warning: #e0a800;
+  --admin-info: #138496;
+  --admin-background: #e9ecef;
+  --admin-card-background: var(--color-white);
+  --admin-text-on-primary: var(--color-white);
+  --admin-text-primary: #212529;
+
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.075);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.12);
+
+  /* Bordes */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-color: var(--color-medium-gray);
+
+  /* Transiciones */
+  --transition-speed-fast: 0.15s;
+  --transition-speed-normal: 0.25s;
+  --transition-speed-slow: 0.4s;
+  --transition-easing: ease-in-out;
+
+  /* Tamaños de Navbar y Sidebar (ejemplos) */
+  --navbar-height: 64px;
+}
+
+/* Estilos base para el body */
+body {
+  font-family: var(--font-primary);
+  color: var(--color-text-primary);
+  background-color: var(--user-background); /* Fondo por defecto (usuario) */
+  margin: 0;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px; /* Base font size */
+}
+
+/* Clases para aplicar al body según el tipo de vista */
+body.user-view {
+  background-color: var(--user-background);
+}
+body.admin-view {
+  background-color: var(--admin-background);
+}
+
+/* Estilos generales para enlaces */
+a {
+  color: var(--user-primary);
+  text-decoration: none;
+  transition: color var(--transition-speed-fast) var(--transition-easing);
+}
+a:hover {
+  color: var(--user-primary-dark);
+  text-decoration: none; /* A menudo se prefiere no subrayar en hover para un look moderno */
+}
+body.admin-view a {
+  color: var(--admin-secondary);
+}
+body.admin-view a:hover {
+  color: var(--admin-primary-dark);
+}
+
+/* Estilos para tarjetas (base) */
+.card-style {
+  background-color: var(--user-card-background);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-speed-normal) var(--transition-easing),
+              box-shadow var(--transition-speed-normal) var(--transition-easing);
+  overflow: hidden;
+  padding: 20px; /* Padding general para las tarjetas */
+}
+.card-style:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+body.admin-view .card-style {
+  background-color: var(--admin-card-background);
+  border: 1px solid var(--border-color); /* Un borde sutil para admin cards */
+}
+
+/* Utilidades de animación */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn { animation: fadeIn var(--transition-speed-slow) var(--transition-easing) forwards; }
+.animate-fadeInUp { animation: fadeInUp var(--transition-speed-slow) var(--transition-easing) forwards; }
+.animate-fadeInScale { animation: fadeInScale var(--transition-speed-slow) var(--transition-easing) forwards; }
+
+/* Estilos para Material Components (ajustes generales) */
+.mat-mdc-form-field-subscript-wrapper {
+  min-height: 1.25em; /* Ajustar altura de mensajes de error/hint */
+  margin-top: 4px;
+}
+.mat-mdc-form-field {
+  font-family: var(--font-secondary) !important; /* Usar Roboto para formularios por legibilidad */
+}
+.mat-mdc-button {
+  border-radius: var(--border-radius-md) !important;
+  font-family: var(--font-primary) !important;
+  letter-spacing: 0.25px !important;
+  padding: 8px 16px !important; /* Ajustar padding */
+  font-weight: 500 !important;
+  text-transform: none !important; /* Evitar mayúsculas automáticas */
+  transition: background-color var(--transition-speed-fast) var(--transition-easing),
+              box-shadow var(--transition-speed-fast) var(--transition-easing) !important;
+}
+.mat-mdc-button:hover {
+   box-shadow: var(--shadow-sm) !important;
+}
+
+/* Botones Primarios (Usuario) */
+.mat-mdc-raised-button.mat-primary, .mat-mdc-fab.mat-primary, .mat-mdc-mini-fab.mat-primary {
+  background-color: var(--user-primary) !important;
+  color: var(--user-text-on-primary) !important;
+}
+.mat-mdc-raised-button.mat-primary:hover, .mat-mdc-fab.mat-primary:hover, .mat-mdc-mini-fab.mat-primary:hover {
+  background-color: var(--user-primary-dark) !important;
+}
+
+/* Botones de Acento (Usuario) */
+.mat-mdc-raised-button.mat-accent, .mat-mdc-fab.mat-accent, .mat-mdc-mini-fab.mat-accent {
+  background-color: var(--user-accent) !important;
+  color: var(--user-text-on-accent) !important;
+}
+.mat-mdc-raised-button.mat-accent:hover, .mat-mdc-fab.mat-accent:hover, .mat-mdc-mini-fab.mat-accent:hover {
+  background-color: darkgreen !important; /* Un verde más oscuro */
+}
+
+/* Botones Primarios (Admin) */
+body.admin-view .mat-mdc-raised-button.mat-primary,
+body.admin-view .mat-mdc-fab.mat-primary,
+body.admin-view .mat-mdc-mini-fab.mat-primary {
+  background-color: var(--admin-secondary) !important; /* Usar el azul como primario en admin */
+  color: var(--admin-text-on-primary) !important;
+}
+body.admin-view .mat-mdc-raised-button.mat-primary:hover,
+body.admin-view .mat-mdc-fab.mat-primary:hover,
+body.admin-view .mat-mdc-mini-fab.mat-primary:hover {
+  background-color: var(--admin-primary-dark) !important; /* Un azul más oscuro */
+}
+
+/* Botones de Acento (Admin) */
+body.admin-view .mat-mdc-raised-button.mat-accent,
+body.admin-view .mat-mdc-fab.mat-accent,
+body.admin-view .mat-mdc-mini-fab.mat-accent {
+  background-color: var(--admin-accent) !important;
+  color: var(--color-white) !important;
+}
+ body.admin-view .mat-mdc-raised-button.mat-accent:hover,
+ body.admin-view .mat-mdc-fab.mat-accent:hover,
+ body.admin-view .mat-mdc-mini-fab.mat-accent:hover {
+  background-color: #e66a00 !important; /* Naranja más oscuro */
+}
+
+
+/* Contenedor principal de la aplicación */
+.page-container { /* Renombrado de .container para evitar conflictos con Bootstrap si se usa */
+  padding: 25px;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Estilos para scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-light-gray);
+  border-radius: var(--border-radius-sm);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-gray);
+  border-radius: var(--border-radius-sm);
+  border: 2px solid var(--color-light-gray); /* Espacio alrededor del thumb */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Títulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  color: var(--color-text-primary);
+  margin-top: 0;
+  margin-bottom: 0.75rem; /* Espaciado consistente */
+  font-weight: 600; /* Un poco más de peso */
+}
+h1 { font-size: 2.25rem; line-height: 1.2; }
+h2 { font-size: 1.8rem; line-height: 1.25; }
+h3 { font-size: 1.5rem; line-height: 1.3; }
+
+body.admin-view h1, body.admin-view h2, body.admin-view h3 {
+  color: var(--admin-text-primary);
+}
+
+/* Clases de utilidad para espaciado (ejemplos) */
+.mt-1 { margin-top: 0.5rem !important; }
+.mb-1 { margin-bottom: 0.5rem !important; }
+.mt-2 { margin-top: 1rem !important; }
+.mb-2 { margin-bottom: 1rem !important; }
+.mt-3 { margin-top: 1.5rem !important; }
+.mb-3 { margin-bottom: 1.5rem !important; }
+.p-1 { padding: 0.5rem !important; }
+.pb-1 { padding-bottom: 0.5rem !important; }
+/* ... y así sucesivamente */
+
+/* Para centrar contenido */
+  .text-center {
+ text-align: center;
+  }
+  .d-flex {
+ display: flex;
+  }
+  .justify-content-center {
+ justify-content: center;
+  }
+  .align-items-center {
+ align-items: center;
+  }
+  .flex-column {
+ flex-direction: column;
+  }
+  .gap-1 { gap: 0.5rem; }
+  .gap-2 { gap: 1rem; }
+  .gap-3 { gap: 1.5rem; }
+
+  /* Iconos de Material */
+  .material-icons, .material-icons-outlined {
+ vertical-align: middle; /* Mejor alineación con texto */
+  }
+
+/* Estilos para los snackbars (notificaciones) */
+.snackbar-success {
+  background-color: #4CAF50; /* Verde para éxito */
+  color: white;
+}
+
+.snackbar-success .mat-mdc-button.mat-mdc-snack-bar-action { /* Estilo para el botón de acción en snackbar de éxito */
+  color: white;
+}
+
+.snackbar-error {
+  background-color: #f44336; /* Rojo para error */
+  color: white;
+}
+
+.snackbar-error .mat-mdc-button.mat-mdc-snack-bar-action { /* Estilo para el botón de acción en snackbar de error */
+  color: white;
+}

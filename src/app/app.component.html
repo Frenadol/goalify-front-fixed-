@@ -1,0 +1,49 @@
+<nav class="main-navbar">
+  <ul class="nav-links">
+    <!-- Enlace de Inicio Condicional -->
+    <ng-container *ngIf="authService.currentUser | async as user; else homeLinkNotLoggedIn">
+      <li *ngIf="user.esAdministrador">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+      </li>
+      <li *ngIf="!user.esAdministrador">
+        <a routerLink="/welcome" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+      </li>
+    </ng-container>
+    <ng-template #homeLinkNotLoggedIn>
+      <li>
+        <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+      </li>
+    </ng-template>
+
+    <!-- Mostrar Registro e Iniciar Sesión solo si el usuario NO está logueado -->
+    <ng-container *ngIf="!(authService.currentUser | async)">
+      <li>
+        <a routerLink="/register" routerLinkActive="active">Registro</a>
+      </li>
+      <li>
+        <a routerLink="/login" routerLinkActive="active">Iniciar Sesión</a>
+      </li>
+    </ng-container>
+
+    <!-- Enlaces para usuarios logueados -->
+    <ng-container *ngIf="authService.currentUser | async as user">
+      <li>
+        <a routerLink="/habits" routerLinkActive="active">Mis Hábitos</a>
+      </li>
+      <li> <!-- NUEVO ENLACE PARA DESAFÍOS -->
+        <a routerLink="/challenges" routerLinkActive="active">Desafíos</a>
+      </li>
+    </ng-container>
+
+  </ul>
+
+  <!-- El perfil de usuario solo se muestra si el usuario ESTÁ logueado -->
+  <div class="user-profile-nav-container" *ngIf="authService.currentUser | async">
+    <app-user-profile></app-user-profile>
+  </div>
+</nav>
+
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
+

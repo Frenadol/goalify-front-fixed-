@@ -1,0 +1,49 @@
+<div class="landing-page-wrapper">
+  <header class="landing-header">
+    <div class="logo-container">
+      <!-- Puedes poner tu logo aquí si tienes uno, o simplemente el nombre -->
+      <h1 class="logo-text">Goalify</h1>
+    </div>
+    <nav class="landing-nav">
+      <button class="btn btn-secondary" (click)="navigateTo('/login')">Iniciar Sesión</button>
+      <button class="btn btn-primary" (click)="navigateTo('/register')">Registrarse</button>
+    </nav>
+  </header>
+
+  <main class="landing-main-content">
+    <section class="hero-section">
+      <div class="hero-text-content">
+        <h2>Alcanza Tus Metas, Un Hábito a la Vez</h2>
+        <p>Goalify te ayuda a construir hábitos positivos y a seguir tu progreso hacia una vida más productiva y satisfactoria.</p>
+        <button class="btn btn-primary btn-large" (click)="navigateTo('/register')">¡Empieza Ahora!</button>
+      </div>
+      <!-- Podrías añadir una imagen simple o ilustración aquí más adelante si quieres -->
+      <!-- <div class="hero-image-placeholder"></div> -->
+    </section>
+
+    <section class="features-section">
+      <h3 class="section-title">¿Por qué Goalify?</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="material-icons-outlined feature-icon">track_changes</span>
+          <h4>Seguimiento Fácil</h4>
+          <p>Registra tus hábitos y visualiza tu progreso de forma intuitiva.</p>
+        </div>
+        <div class="feature-item">
+          <span class="material-icons-outlined feature-icon">emoji_events</span>
+          <h4>Motivación Constante</h4>
+          <p>Gana puntos y alcanza nuevos niveles a medida que cumples tus metas.</p>
+        </div>
+        <div class="feature-item">
+          <span class="material-icons-outlined feature-icon">lightbulb</span>
+          <h4>Descubre y Crece</h4>
+          <p>Define objetivos claros y transforma tu rutina diaria.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <p>&copy; {{ currentYear }} Goalify. Todos los derechos reservados.</p>
+  </footer>
+</div>

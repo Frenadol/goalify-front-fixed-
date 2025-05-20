@@ -1,0 +1,146 @@
+/* Estilos generales para la página de bienvenida */
+.welcome-page-wrapper { /* Este será el contenedor principal de tu página de bienvenida */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height)); /* Ocupar el espacio restante */
+  padding: var(--navbar-height) 15px 30px 15px; /* Padding superior igual a la navbar, más padding general */
+  box-sizing: border-box; /* Para que el padding no aumente el tamaño total */
+  animation: fadeIn var(--transition-speed-slow) var(--transition-easing);
+}
+
+.welcome-container {
+  text-align: center;
+  background-color: var(--user-card-background);
+  padding: 30px 40px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 800px;
+  width: 100%;
+  margin-bottom: 40px;
+  animation: fadeInScale 0.6s var(--transition-easing) 0.1s forwards;
+}
+
+.welcome-container h1 {
+  font-size: 2.8rem;
+  color: var(--user-primary);
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.welcome-container p {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 25px;
+  line-height: 1.7;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 1200px; /* Ajusta según necesites */
+}
+
+.action-card {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-md);
+  padding: 25px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-speed-normal) var(--transition-easing),
+              box-shadow var(--transition-speed-normal) var(--transition-easing),
+              border-color var(--transition-speed-normal) var(--transition-easing);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  border: 1px solid var(--border-color);
+  animation: fadeInUp 0.5s var(--transition-easing) forwards;
+  min-height: 220px; /* Altura mínima para consistencia */
+}
+
+.actions-grid .action-card:nth-child(1) { animation-delay: 0.2s; }
+.actions-grid .action-card:nth-child(2) { animation-delay: 0.3s; }
+.actions-grid .action-card:nth-child(3) { animation-delay: 0.4s; }
+
+
+.action-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--user-primary);
+}
+
+.action-card-icon .material-icons-outlined {
+  font-size: 48px;
+  color: var(--user-primary);
+  margin-bottom: 15px;
+  transition: transform var(--transition-speed-normal) var(--transition-easing);
+}
+.action-card:hover .action-card-icon .material-icons-outlined {
+  transform: scale(1.1);
+}
+
+.action-card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.action-card-description {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  flex-grow: 1; /* Para que la descripción ocupe espacio si los títulos son cortos */
+}
+
+/* Botón dentro de la tarjeta de acción, si lo necesitas */
+.action-card .mat-mdc-button {
+  margin-top: auto; /* Empujar el botón hacia abajo */
+  padding-top: 15px; /* Espacio antes del botón */
+}
+
+/* Estilos para botones si los usas en el footer (opcional) */
+.welcome-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 1em;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  border: none;
+  min-width: 200px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+}
+
+@media (min-width: 576px) {
+  .welcome-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+}

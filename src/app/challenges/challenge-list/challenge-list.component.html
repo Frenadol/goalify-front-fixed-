@@ -1,0 +1,48 @@
+<div class="page-container"> <!-- Contenedor principal añadido -->
+  <div class="challenge-list-container">
+    <header class="list-header">
+      <h1>
+        <mat-icon>emoji_events</mat-icon>
+        <!-- Título dinámico basado en si es admin -->
+        {{ isAdmin ? 'Gestionar Desafíos' : 'Desafíos Disponibles' }}
+      </h1>
+      <!-- BOTÓN PARA CREAR DESAFÍO (solo admins) -->
+      <button *ngIf="isAdmin" mat-raised-button color="primary" routerLink="/admin/challenges/new" class="create-challenge-btn">
+        <mat-icon>add_circle_outline</mat-icon> Crear Nuevo Desafío
+      </button>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando desafíos...</p>
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="error-message">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button mat-stroked-button color="warn" (click)="loadChallengesAndUserStatus()">Intentar de nuevo</button>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && displayedChallenges.length === 0" class="empty-state">
+      <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
+      <p>¡Vaya! Parece que no hay desafíos {{ isAdmin ? 'creados actualmente' : 'activos en este momento' }}.</p>
+      <!-- Mensaje específico para admin si no hay desafíos -->
+      <button *ngIf="isAdmin" mat-flat-button color="accent" routerLink="/admin/challenges/new">
+        <mat-icon>add</mat-icon> Crea el primer desafío
+      </button>
+      <!-- Mensaje para usuarios normales -->
+      <p *ngIf="!isAdmin">Vuelve más tarde o contacta a un administrador si crees que esto es un error.</p>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && displayedChallenges.length > 0" class="challenges-grid">
+      <app-challenge-card
+        *ngFor="let challenge of displayedChallenges"
+        [challenge]="challenge"
+        [isJoined]="isUserJoined(challenge.id)"
+        (challengeJoined)="handleChallengeJoined($event)"
+        (challengeLeft)="handleChallengeLeft($event)"
+        (challengeDeleted)="handleChallengeDeleted($event)">
+      </app-challenge-card>
+    </div>
+  </div>
+</div> <!-- Fin del contenedor principal -->

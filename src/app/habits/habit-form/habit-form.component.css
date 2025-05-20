@@ -1,0 +1,273 @@
+/* filepath: src/app/habits/habit-form/habit-form.component.css */
+.habit-form-container.card-style {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 25px 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.habit-form-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-weight: 600;
+}
+
+.loading-indicator, .error-message, .success-message {
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  font-size: 0.95em;
+}
+.loading-indicator { color: #555; }
+.error-message { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+.success-message { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.invalid-feedback {
+  display: block; /* Asegura que se muestre */
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 4px;
+}
+
+.form-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover { background-color: #0056b3; }
+.btn-primary:disabled { background-color: #a0cfff; cursor: not-allowed; }
+
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #545b62; }
+.btn-secondary:disabled { background-color: #b0b6bc; cursor: not-allowed; }
+
+.predefined-habits-section {
+  margin-bottom: 20px;
+}
+
+.predefined-habits-section label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #333;
+}
+
+.predefined-habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Ajusta minmax según el tamaño deseado */
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.predefined-habit-card {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.predefined-habit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.predefined-habit-card.selected {
+  border-color: #007bff; /* O tu color primario */
+  background-color: #e7f3ff; /* Un fondo suave para el seleccionado */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.habit-card-image {
+  width: 60px; /* Ajusta el tamaño */
+  height: 60px; /* Ajusta el tamaño */
+  object-fit: contain; /* o 'cover' según prefieras */
+  margin-bottom: 8px;
+  border-radius: 4px; /* Si quieres redondear las imágenes */
+}
+
+.habit-card-name {
+  font-size: 0.9em;
+  color: #333;
+  font-weight: 500;
+  margin: 0;
+}
+
+.selected-habit-image-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.selected-habit-preview-image {
+  max-width: 150px; /* Ajusta el tamaño */
+  max-height: 150px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  padding: 5px;
+  background-color: #fff;
+}
+
+.error-message {
+  color: #dc3545; /* Rojo para errores */
+  font-size: 0.875em;
+  margin-top: 5px;
+}
+
+.global-error {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.habit-form-container {
+  max-width: 650px; /* Ajusta el ancho máximo si es necesario */
+  margin: 20px auto;
+  padding: 25px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.habit-form-container h2 {
+  text-align: center;
+  color: #2c3e50; /* Color oscuro para el título */
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-group input[type="text"],
+.form-group input[type="time"],
+.form-group input[type="number"], /* Si añades puntos */
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1em;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  width: 100%;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.full-width-field {
+  width: 100%;
+}
+
+/* Ajustes para el header del formulario si usas MatIcon */
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Opcional, si quieres el icono y título centrados juntos */
+  gap: 10px; /* Espacio entre el icono y el título */
+  margin-bottom: 25px; /* Mantiene el margen inferior que tenías en h2 */
+}
+
+.form-header-icon {
+  font-size: 2em; /* Ajusta el tamaño del icono */
+  color: #007bff; /* O el color que prefieras */
+}
+
+.form-title {
+  margin: 0; /* Quita el margen por defecto de h2 si lo tenía */
+  color: #333;
+  font-weight: 600;
+  font-size: 1.75em; /* Ajusta si es necesario */
+}
+
+.form-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 10px; /* Espacio entre botones */
+}
