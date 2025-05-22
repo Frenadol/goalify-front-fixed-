@@ -9,6 +9,7 @@
 
     <div class="profile-menu" *ngIf="showMenu">
       <ul>
+        <li><a routerLink="/user-profile" (click)="showMenu = false">Mi Perfil y Estadísticas</a></li> <!-- MODIFICADO/AÑADIDO -->
         <li><a (click)="logout()">Cerrar Sesión</a></li>
       </ul>
     </div>

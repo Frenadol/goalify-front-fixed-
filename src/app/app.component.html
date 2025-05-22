@@ -30,8 +30,12 @@
       <li>
         <a routerLink="/habits" routerLinkActive="active">Mis Hábitos</a>
       </li>
-      <li> <!-- NUEVO ENLACE PARA DESAFÍOS -->
+      <li> <!-- ENLACE PARA DESAFÍOS GENERALES -->
         <a routerLink="/challenges" routerLinkActive="active">Desafíos</a>
+      </li>
+      <!-- NUEVO ENLACE PARA "MIS DESAFÍOS" (solo usuarios no admin) -->
+      <li *ngIf="!user.esAdministrador">
+        <a routerLink="/my-challenges" routerLinkActive="active">Mis Desafíos</a>
       </li>
     </ng-container>
 

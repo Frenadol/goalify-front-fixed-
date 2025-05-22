@@ -1,0 +1,108 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh; /* Límite de altura para el diálogo */
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--user-primary); /* O tu color primario */
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color-light, #eee);
+}
+
+.title-icon {
+  font-size: 1.8rem;
+  height: 1.8rem;
+  width: 1.8rem;
+}
+
+.dialog-content {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  overflow-y: auto; /* Permitir scroll si el contenido es largo */
+}
+
+.challenge-details-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.challenge-image-container {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.challenge-image {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: var(--border-radius-md, 8px);
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
+}
+
+.challenge-info .description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary, #555);
+  margin-bottom: 20px;
+  white-space: pre-wrap; /* Para respetar saltos de línea en la descripción */
+}
+
+.info-section, .user-participation-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.user-participation-section h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-color-lighter, #f0f0f0);
+  padding-bottom: 8px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.info-item mat-icon {
+  color: var(--user-primary-dark, #0056b3);
+  opacity: 0.8;
+}
+
+.info-item strong {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.status-tag {
+  padding: 4px 10px;
+  border-radius: var(--border-radius-sm, 4px);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+/* Clases de estado (debes tenerlas definidas en user-profile-details.component.css o globalmente) */
+.status-tag.status-inscrito { background-color: var(--user-primary-light, #e0efff); color: var(--user-primary-dark, #0056b3); border-color: var(--user-primary, #007bff); }
+.status-tag.status-en_progreso { background-color: #fff3cd; color: #856404; border-color: #ffeeba; } /* Amarillo/Info */
+.status-tag.status-completado { background-color: #d4edda; color: #155724; border-color: #c3e6cb; } /* Verde/Success */
+.status-tag.status-fallido { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; } /* Rojo/Danger */
+.status-tag.status-pendiente { background-color: #e2e3e5; color: #383d41; border-color: #d6d8db; } /* Gris/Secondary */
+
+
+mat-dialog-actions {
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color-light, #eee);
+}

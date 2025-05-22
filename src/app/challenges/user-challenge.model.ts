@@ -7,8 +7,9 @@ export interface UserChallenge {
   fechaInscripcion?: string | Date; // La fecha en que el usuario se unió
   estadoParticipacion: string; // Ej: 'INSCRITO', 'EN_PROGRESO', 'COMPLETADO', 'FALLIDO'
 
-  // Opcional: Si tu endpoint de "mis desafíos" devuelve los detalles completos del desafío anidados,
-  // podrías incluirlo aquí para facilitar el acceso en el frontend.
-  // Si no, obtendrás los detalles del desafío por separado si es necesario.
-  // desafio?: Challenge;
+  // Propiedades del DTO para facilitar el uso en la UI
+  nombreDesafio?: string;
+  descripcionDesafio?: string;
+  puntosDesafio?: number;
+  fechaCompletado?: string | Date | null; // Añadido para la plantilla
 }

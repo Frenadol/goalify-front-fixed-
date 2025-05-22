@@ -293,19 +293,176 @@ body.admin-view h1, body.admin-view h2, body.admin-view h3 {
 
 /* Estilos para los snackbars (notificaciones) */
 .snackbar-success {
-  background-color: #4CAF50; /* Verde para éxito */
-  color: white;
-}
-
-.snackbar-success .mat-mdc-button.mat-mdc-snack-bar-action { /* Estilo para el botón de acción en snackbar de éxito */
+  background-color: #4CAF50; /* Verde */
   color: white;
 }
 
 .snackbar-error {
-  background-color: #f44336; /* Rojo para error */
+  background-color: #f44336; /* Rojo */
   color: white;
 }
 
-.snackbar-error .mat-mdc-button.mat-mdc-snack-bar-action { /* Estilo para el botón de acción en snackbar de error */
+.snackbar-info {
+  background-color: #2196F3; /* Azul o el color que prefieras */
   color: white;
+}
+
+/* Estilos base para el snackbar personalizado */
+.custom-snackbar {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  padding: 14px 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.custom-snackbar.snackbar-info {
+  background-color: #2196F3; /* Azul Material */
+  color: white;
+}
+
+.custom-snackbar .mdc-snackbar__label {
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.custom-snackbar .mdc-button__label {
+  color: white !important;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.custom-snackbar .mat-mdc-snack-bar-action {
+  margin-left: 16px !important;
+}
+
+/* Animación de entrada: deslizamiento desde la derecha */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.custom-snackbar.slide-in-right {
+  animation-name: slideInFromRight;
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation-fill-mode: forwards;
+}
+
+/* >>> NUEVO: Animación de salida: deslizamiento hacia la derecha <<< */
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(110%); /* Mover completamente fuera de la pantalla a la derecha */
+    opacity: 0;
+  }
+}
+
+/* Aplicar la animación de salida cuando el snackbar se está cerrando */
+/* Esto se aplicará tanto al timeout como al clic en la acción '✖' */
+.custom-snackbar.mdc-snackbar--closing {
+  animation-name: slideOutToRight !important; /* Usar !important para asegurar que sobrescribe la animación por defecto */
+  animation-duration: 0.4s !important;        /* Duración de la animación de salida */
+  animation-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045) !important; /* Curva de aceleración para salida */
+  /* animation-fill-mode: forwards; /* No es estrictamente necesario para la salida ya que el elemento se elimina */
+}
+/* >>> FIN NUEVA ANIMACIÓN DE SALIDA <<< */
+
+/* Estilos para Snackbar Personalizados */
+.custom-snackbar {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  padding: 14px 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.custom-snackbar.snackbar-info {
+  background-color: #2196F3; /* Azul Material */
+  color: white;
+}
+
+.custom-snackbar .mdc-snackbar__label {
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.custom-snackbar .mdc-button__label {
+  color: white !important;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.custom-snackbar .mat-mdc-snack-bar-action {
+  margin-left: 16px !important;
+}
+
+.custom-snackbar.slide-in-right {
+  animation-name: slideInFromRight;
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(110%); /* Mover completamente fuera de la pantalla a la derecha */
+    opacity: 0;
+  }
+}
+
+.custom-snackbar.mdc-snackbar--closing {
+  animation-name: slideOutToRight !important; /* Usar !important para asegurar que sobrescribe la animación por defecto */
+  animation-duration: 0.4s !important;        /* Duración de la animación de salida */
+  animation-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045) !important; /* Curva de aceleración para salida */
+  /* animation-fill-mode: forwards; /* No es estrictamente necesario para la salida ya que el elemento se elimina */
+}
+
+/* >>> NUEVOS ESTILOS PARA SNACKBAR DE ÉXITO Y ERROR <<< */
+.snackbar-success .mdc-snackbar__surface {
+  background-color: var(--color-success, #28a745) !important; /* Verde para éxito */
+  color: var(--color-white, #fff) !important;
+}
+
+.snackbar-success .mdc-snackbar__label {
+  color: var(--color-white, #fff) !important;
+}
+
+.snackbar-success .mdc-button .mdc-button__label { /* Para el botón de acción si lo tienes */
+  color: var(--color-white, #fff) !important;
+  opacity: 0.9;
+}
+
+.snackbar-error .mdc-snackbar__surface {
+  background-color: var(--color-danger, #dc3545) !important; /* Rojo para error */
+  color: var(--color-white, #fff) !important;
+}
+
+.snackbar-error .mdc-snackbar__label {
+  color: var(--color-white, #fff) !important;
+}
+
+.snackbar-error .mdc-button .mdc-button__label {
+  color: var(--color-white, #fff) !important;
+  opacity: 0.9;
+}
+/* >>> FIN NUEVOS ESTILOS SNACKBAR <<< */
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  border-radius: 8px;
 }

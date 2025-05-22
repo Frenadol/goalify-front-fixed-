@@ -1,0 +1,346 @@
+/* filepath: c:\Users\Fernando\Downloads\Goalify-frontend-main (1)\Goalify-frontend-main\src\app\user-profile-details\user-profile-details.component.css */
+.page-container {
+  padding: 20px;
+  background-color: var(--page-background, #f4f7f6);
+  min-height: calc(100vh - var(--navbar-height, 60px));
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Alinea la tarjeta arriba */
+}
+
+.profile-details-wrapper {
+  width: 100%;
+  max-width: 700px; /* Ancho máximo de la tarjeta de perfil */
+  margin-top: 30px;
+}
+
+.loading-indicator, .error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  background-color: var(--user-card-background);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.loading-indicator p {
+  margin-top: 15px;
+  font-size: 1.1em;
+}
+
+.error-message mat-icon {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.profile-card {
+  background-color: var(--user-card-background);
+  /* Añade cualquier otro estilo general para la tarjeta aquí si es necesario */
+}
+
+.profile-card-header {
+  display: flex; /* Asegura el layout flex */
+  align-items: center; /* Alinea verticalmente el avatar y el nombre */
+  padding: 20px; /* Ajusta el padding si es necesario */
+  /* Elimina cualquier flex-direction: column que pudieras tener aquí */
+}
+
+/* Estilos para la imagen del avatar en la cabecera */
+.profile-avatar-img {
+  width: 60px; /* Tamaño del avatar */
+  height: 60px;
+  border-radius: 50%; /* Hace la imagen redonda */
+  object-fit: cover; /* Asegura que la imagen cubra el espacio sin distorsionarse */
+  margin-right: 16px; /* Espacio entre el avatar y el nombre */
+  border: 2px solid var(--border-color, #e0e0e0); /* Un borde sutil */
+}
+
+/* Estilos para el nombre del usuario en la cabecera */
+.profile-name {
+  font-size: 1.6em; /* Ajusta el tamaño del nombre */
+  font-weight: 500;
+  margin: 0; /* Elimina márgenes por defecto si los tuviera */
+  color: var(--color-text-primary);
+}
+
+.profile-email {
+  /* Este selector ya no es necesario para la cabecera, pero lo dejo por si lo usas en otro lado */
+  font-size: 0.9em;
+  color: var(--color-text-secondary);
+}
+
+.profile-card-content {
+  padding: 25px 30px;
+}
+
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--background-light, #f8f9fa);
+  padding: 15px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color-light, #eef2f5);
+}
+
+.info-icon {
+  color: var(--user-primary);
+  margin-right: 12px;
+  font-size: 1.6em;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-right: 8px;
+}
+
+.info-value {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.biography-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color-light, #eef2f5);
+}
+
+.bio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.bio-header h4 {
+  font-size: 1.3em;
+  color: var(--user-primary);
+  margin: 0; /* Ajustado */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.bio-header h4 mat-icon {
+  margin-right: 8px;
+}
+
+.edit-bio-button {
+  color: var(--user-primary);
+}
+
+.bio-text {
+  font-size: 1em;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  white-space: pre-wrap; /* Para respetar saltos de línea en la biografía */
+  padding: 5px 0;
+}
+
+.bio-text-placeholder {
+  font-style: italic;
+  color: var(--color-text-hint);
+}
+
+.add-bio-link {
+  color: var(--user-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 5px;
+}
+.add-bio-link:hover {
+  color: var(--user-primary-dark);
+}
+
+.bio-edit-area {
+  margin-top: 15px;
+}
+
+.bio-edit-area .full-width-field {
+  width: 100%;
+}
+
+.bio-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.button-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Animación (opcional, ya la tienes en styles.css global) */
+.animate-fadeInScale {
+  animation: fadeInScale 0.6s var(--transition-easing) forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Estilos para la Sección de Desafíos del Usuario --- */
+.user-challenges-section {
+  margin-top: 25px;
+  padding-top: 20px;
+}
+
+.user-challenges-section .section-title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-challenges-section .section-title mat-icon {
+  color: var(--user-primary); /* O un color temático */
+}
+
+
+.challenges-loading, .challenges-empty, .challenges-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 15px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  border: 1px dashed var(--border-color-light, #ddd);
+  border-radius: var(--border-radius-md, 8px);
+  margin-top: 10px;
+}
+.challenges-loading p, .challenges-empty p, .challenges-error p {
+  margin-top: 10px;
+  font-size: 1rem;
+}
+.empty-icon-large {
+  font-size: 3rem;
+  height: 3rem;
+  width: 3rem;
+  color: var(--border-color, #ccc);
+  margin-bottom: 10px;
+}
+.challenges-error mat-icon {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+.challenges-empty a[mat-stroked-button] {
+  margin-top: 15px;
+}
+
+
+.challenges-list {
+  padding-top: 0; /* Remover padding si MatList lo añade por defecto */
+}
+
+.challenge-list-item {
+  border-bottom: 1px solid var(--border-color-lighter, #f0f0f0);
+  padding: 15px 10px !important; /* Aumentar padding */
+  transition: background-color 0.2s ease-in-out;
+}
+.challenge-list-item:last-child {
+  border-bottom: none;
+}
+
+.challenge-list-item.interactive-item {
+  cursor: pointer;
+}
+.challenge-list-item.interactive-item:hover {
+  background-color: var(--background-hover-light, #f9f9f9);
+}
+
+.challenge-list-item.completed {
+  /* Podrías añadir un estilo sutil para los completados, como un fondo ligeramente diferente */
+  /* background-color: #f5fff5; */
+}
+.challenge-list-item.completed .challenge-item-title {
+  /* color: var(--color-text-secondary); */
+  /* text-decoration: line-through; */ /* Opcional */
+}
+
+
+.challenge-item-icon {
+  margin-right: 15px !important; /* Espacio para el icono */
+  color: var(--user-primary-dark); /* Color por defecto para el icono */
+  font-size: 1.8rem !important; /* Tamaño del icono */
+  width: 1.8rem !important;
+  height: 1.8rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.challenge-list-item.completed .challenge-item-icon {
+  color: var(--color-success, #28a745);
+}
+.challenge-item-icon.status-inscrito { color: var(--user-primary, #007bff); }
+.challenge-item-icon.status-en_progreso { color: #ffc107; } /* Amarillo/Info */
+/* Otros estados si los tienes */
+
+
+.challenge-item-title {
+  font-weight: 500;
+  font-size: 1.1rem; /* Más grande */
+  color: var(--color-text-primary);
+  margin-bottom: 4px; /* Espacio debajo del título */
+}
+
+.challenge-item-info {
+  font-size: 0.85rem; /* Más pequeño */
+  color: var(--color-text-secondary);
+  display: flex;
+  justify-content: space-between; /* Para alinear el tag de estado a la derecha */
+  align-items: center;
+  width: 100%;
+}
+
+.status-tag {
+  padding: 3px 8px;
+  border-radius: var(--border-radius-sm, 4px);
+  font-size: 0.75rem; /* Más pequeño */
+  font-weight: 500;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  margin-left: 10px; /* Espacio a la izquierda del tag */
+}
+
+/* Define colores para los tags de estado (puedes moverlos a un archivo global si se usan en más sitios) */
+.status-tag.status-inscrito { background-color: var(--user-primary-light, #e0efff); color: var(--user-primary-dark, #0056b3); border-color: var(--user-primary, #007bff); }
+.status-tag.status-en_progreso { background-color: #fff3cd; color: #856404; border-color: #ffeeba; } /* Amarillo/Info */
+.status-tag.status-completado { background-color: #d4edda; color: #155724; border-color: #c3e6cb; } /* Verde/Success */
+.status-tag.status-fallido { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; } /* Rojo/Danger */
+.status-tag.status-pendiente { background-color: #e2e3e5; color: #383d41; border-color: #d6d8db; } /* Gris/Secondary */
+
+
+.chevron-icon {
+  color: var(--border-color, #ccc);
+  transition: transform 0.2s ease-in-out;
+}
+.challenge-list-item.interactive-item:hover .chevron-icon {
+  transform: translateX(3px);
+  color: var(--user-primary);
+}
+
+/* Estilos para el panel del diálogo si usaste panelClass */
+/* .challenge-detail-dialog-panel .mat-dialog-container { ... } */

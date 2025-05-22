@@ -138,6 +138,21 @@ mat-card-content {
   font-size: 1.2em;
 }
 
+.already-joined-button, .already-completed-button {
+  border-style: dashed !important;
+  opacity: 0.8;
+  pointer-events: none; /* No interactuable */
+}
+
+.already-completed-button {
+  color: var(--color-success, green) !important; /* O un color de éxito de tu tema */
+  border-color: var(--color-success-light, lightgreen) !important;
+}
+
+.already-completed-button mat-icon {
+  color: var(--color-success, green) !important;
+}
+
 .already-joined-button {
   cursor: default;
 }

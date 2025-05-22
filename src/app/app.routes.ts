@@ -7,6 +7,7 @@ import { AuthGuard } from './auth.guard';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { adminGuard } from './admin/admin.guard';
 import { UserManagementComponent } from './admin/user-management/user-management.component';
+import { UserProfileDetailsComponent } from './user-profile-details/user-profile-details.component'; // <-- IMPORTA EL NUEVO COMPONENTE
 
 // Importar rutas de admin para desafíos
 import { adminChallengeRoutes } from './challenges/challenges-routing.module';
@@ -37,7 +38,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { path: 'welcome', component: WelcomeComponent, canActivate: [AuthGuard] },
-
+  { // NUEVA RUTA PARA EL PERFIL DETALLADO DEL USUARIO
+    path: 'user-profile', // Esta es la ruta que ya usas en welcome.component.html
+    component: UserProfileDetailsComponent,
+    canActivate: [AuthGuard]
+  },
   {
     path: 'admin',
     canActivate: [AuthGuard, adminGuard],

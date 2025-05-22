@@ -18,10 +18,19 @@
 }
 
 .loading-indicator, .error-message, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  margin-top: 20px;
   text-align: center;
-  padding: 20px;
+  border-radius: 8px;
+}
+
+.loading-indicator p, .error-message p, .empty-state p {
+  margin-top: 15px;
   font-size: 1.1em;
-  color: #555;
 }
 
 .error-message {
@@ -94,119 +103,188 @@
 .habit-card {
   display: flex;
   flex-direction: column;
+  transition: box-shadow 0.3s ease, height 0.3s ease-out; /* Añadir transición de altura */
+  overflow: hidden; /* Para que la animación de altura funcione bien */
 }
 
-.habit-card-image-container {
-  width: 100%;
-  text-align: center;
-  padding: 10px 0;
+.habit-card.completed-today-card {
+  background-color: #e8f5e9; /* Un verde muy claro para indicar completado */
+  border-left: 5px solid var(--color-success, green);
 }
 
-.habit-image {
-  max-width: 100px;
-  max-height: 100px;
-  height: auto;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.habit-card-content {
-  padding: 15px;
-  flex-grow: 1;
+/* Estilos para la cabecera clickeable */
+.habit-card-header-clickable {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent; /* Borde inicial transparente */
+  transition: background-color 0.2s ease;
 }
 
-.habit-card-content h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.4em;
-  color: #333;
+.habit-card.expanded-card .habit-card-header-clickable {
+  border-bottom-color: #e0e0e0; /* Borde visible cuando está expandido */
 }
 
-.habit-card-content .description {
-  font-size: 0.95em;
+.habit-card-header-clickable:hover {
+  background-color: rgba(0,0,0,0.03);
+}
+
+.habit-card-image-container-condensed {
+  width: 50px; /* Tamaño fijo para la imagen condensada */
+  height: 50px;
+  margin-right: 16px;
+  flex-shrink: 0; /* Para que no se encoja */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%; /* Hacerla redonda */
+  background-color: #f0f0f0; /* Fondo para imágenes transparentes */
+}
+
+.habit-image-condensed {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover; /* o 'contain' si prefieres */
+}
+
+.habit-card-title-condensed {
+  flex-grow: 1;
+}
+
+.habit-card-title-condensed h3 {
+  margin: 0;
+  font-size: 1.15em; /* Ajustar tamaño */
+  font-weight: 500; /* Ajustar peso */
+  color: var(--user-primary-dark, #333);
+}
+
+.expand-icon {
+  color: var(--color-text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.habit-card.expanded-card .expand-icon {
+  transform: rotate(180deg);
+}
+
+
+/* Contenido colapsable */
+.habit-card-collapsible-content {
+  /* La animación se maneja con Angular, pero podemos añadir transiciones si usamos clases CSS */
+  overflow: hidden; /* Importante para la animación de altura si se hace con CSS puro */
+  /* max-height: 0; */ /* Para animación CSS, pero *ngIf es más simple */
+  /* transition: max-height 0.4s ease-out, padding 0.4s ease-out; */
+  /* padding-top: 0; */
+  /* padding-bottom: 0; */
+}
+
+.habit-card.expanded-card .habit-card-collapsible-content {
+  /* max-height: 1000px; */ /* Un valor suficientemente grande */
+  /* padding-top: 15px; */
+  /* padding-bottom: 15px; */
+}
+
+
+.habit-card-content-details {
+  padding: 15px 16px 5px 16px; /* Ajustar padding */
+}
+
+.habit-card-content-details .description {
+  font-size: 0.9em;
   color: #555;
   margin-bottom: 15px;
-  flex-grow: 1;
-  line-height: 1.5;
+  /* min-height: 40px; */ /* Ya no es tan necesario si está colapsado */
+}
+
+.details {
+  font-size: 0.85em;
+  color: #444;
 }
 
 .details p {
   display: flex;
   align-items: center;
-  font-size: 0.9em;
-  color: #444;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
-.details .material-icons-outlined {
-  margin-right: 8px;
-  font-size: 1.1em;
-  color: #007bff;
+.details mat-icon {
+  font-size: 1.1rem;
+  color: var(--user-primary);
 }
 
 .status {
-  font-weight: bold;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
   color: white;
+  font-weight: 500;
+  font-size: 0.8em;
 }
-.status.activo { background-color: #28a745; }
-.status.inactivo { background-color: #6c757d; }
-.status.completado_hoy { background-color: #17a2b8; }
+.status.activo { background-color: var(--color-success-dark, #28a745); }
+.status.inactivo { background-color: var(--color-text-secondary, #6c757d); }
 
 .actions {
-  margin-top: 15px;
+  padding: 8px 16px 12px 16px; /* Ajustar padding */
   display: flex;
-  gap: 10px;
   justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  /* border-top: 1px solid #e9ecef; */ /* El borde superior ahora está en el header clickeable */
 }
 
-.actions .btn-sm {
-  padding: 6px 10px;
-  font-size: 0.85em;
+.actions .complete-button, .actions .already-completed-button {
+  min-width: 120px; /* Ajustar ancho */
 }
 
-.actions .btn-sm .material-icons-outlined {
-  font-size: 1.1em;
-  vertical-align: middle;
-  margin-right: 4px;
+.actions .button-spinner {
+  margin-right: 8px;
 }
 
-.habits-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding-top: 20px;
+.completed-today-text {
+  color: var(--user-primary, #007bff);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.completed-today-text mat-icon {
+  font-size: 1.2rem;
 }
 
-.card-style {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.already-completed-button mat-icon {
+  margin-right: 6px;
 }
 
-.card-style:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+.add-habit-btn mat-icon {
+  margin-right: 6px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #777;
+}
+
+.empty-state .empty-icon {
+  font-size: 4em;
+  margin-top: 15px;
+  color: #adb5bd;
 }
 
 .header-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #dee2e6;
 }
-
 .header-actions h2 {
   margin: 0;
   font-size: 1.8em;
-  color: #2c3e50;
+  color: var(--color-text-primary);
 }
 
 .header-actions .btn-primary .material-icons-outlined {
@@ -222,16 +300,4 @@
 
 .header-actions .btn.btn-primary .material-icons-outlined {
   font-size: 1.25em;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: #777;
-}
-
-.empty-state .empty-icon {
-  font-size: 4em;
-  margin-top: 15px;
-  color: #ccc;
 }
