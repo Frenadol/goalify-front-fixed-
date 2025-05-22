@@ -2,14 +2,14 @@ import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular
 import { Subscription } from 'rxjs';
 import { AuthService, User } from '../auth.service';
 import { CommonModule } from '@angular/common';
-// import { RouterLink } from '@angular/router'; // Descomenta si usas routerLink en la plantilla de este componente
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
   imports: [
     CommonModule,
-    // RouterLink // Descomenta si usas routerLink
+    RouterModule
   ],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
@@ -17,27 +17,30 @@ import { CommonModule } from '@angular/common';
 export class UserProfileComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   private userSubscription: Subscription | undefined;
-  private defaultAvatarUrl = 'assets/default-avatar.png'; // Asegúrate que esta imagen exista
-
-  showMenu = false;
+  defaultAvatarUrl = 'assets/img/default-avatar.png'; // Asegúrate que esta imagen exista en esta ruta
+  showMenu: boolean = false;
 
   constructor(private authService: AuthService, private elementRef: ElementRef) { }
 
   ngOnInit(): void {
     this.userSubscription = this.authService.currentUser.subscribe((user: User | null) => {
       this.currentUser = user;
-      if (!user) { // Si el usuario se desloguea o no hay usuario, ocultar el menú
+      console.log('UserProfileComponent (Navbar) - currentUser (debería tener fotoPerfil):', JSON.stringify(user, null, 2));
+      if (!user) {
         this.showMenu = false;
       }
     });
   }
 
   get userDisplayName(): string {
-    return this.currentUser?.name || 'Usuario';
+    return this.currentUser?.nombre || 'Usuario';
   }
 
   get userAvatar(): string {
-    return this.currentUser?.avatarUrl || this.defaultAvatarUrl;
+    // CAMBIO AQUÍ: usar fotoPerfil
+    return (this.currentUser?.fotoPerfil && this.currentUser.fotoPerfil.trim() !== '')
+           ? this.currentUser.fotoPerfil
+           : this.defaultAvatarUrl;
   }
 
   onProfileClick(): void {
@@ -55,7 +58,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
-    // this.showMenu = false; // Ya se maneja en la suscripción de ngOnInit cuando el usuario cambia a null
   }
 
   ngOnDestroy(): void {

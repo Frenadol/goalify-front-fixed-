@@ -31,13 +31,18 @@ import { RouterModule } from '@angular/router';
 export class ChallengeCardComponent {
   @Input() challenge!: Challenge;
   @Input() isJoined: boolean = false;
+  @Input() userChallengeStatus?: string; // Ej: 'INSCRITO', 'COMPLETADO', 'EN_PROGRESO'
+  @Input() canBeCompleted: boolean = false; // Para mostrar el botón "Completar"
+
   @Output() challengeJoined = new EventEmitter<number>();
   @Output() challengeLeft = new EventEmitter<number>();
   @Output() challengeDeleted = new EventEmitter<number>();
+  @Output() completeChallengeClicked = new EventEmitter<number>(); // Nuevo Output
 
   isJoining: boolean = false;
   isLeaving: boolean = false;
   isDeleting: boolean = false;
+  isCompletingAction: boolean = false; // Para el spinner del botón completar
   actionError: string | null = null;
   isAdmin: boolean = false;
 
@@ -124,5 +129,16 @@ export class ChallengeCardComponent {
         console.error('Error al eliminar el desafío:', err);
       }
     });
+  }
+
+  onCompleteChallenge(): void {
+    if (!this.challenge || typeof this.challenge.id === 'undefined' || this.isCompletingAction) {
+      return;
+    }
+    this.completeChallengeClicked.emit(this.challenge.id);
+  }
+
+  get canShowCompleteButton(): boolean {
+    return this.canBeCompleted && this.isJoined && this.userChallengeStatus !== 'COMPLETADO' && !this.isAdmin;
   }
 }

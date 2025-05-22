@@ -5,12 +5,17 @@ export interface Habit {
   nombre: string;
   descripcion?: string;
   frecuencia: string; // 'DIARIO', 'SEMANAL', etc.
-  horaProgramada?: string; // formato HH:mm o null
+  horaProgramada?: string | null; // Asegúrate que el backend lo maneje como string o null
   puntosRecompensa: number;
   estado: string; // 'activo', 'inactivo'
   fechaCreacion?: Date;
   ultimaActualizacion?: Date;
-  // Otros campos que puedas tener, como rachaActual, etc.
+  fechaUltimaCompletacion?: string | Date | null; // Añadido: El backend podría enviar esto
+  rachaActual?: number; // Añadido: El backend podría enviar esto
+  // Campos para la UI
+  isCompletingAction?: boolean;
+  isCompletedToday?: boolean; // Lo calcularemos o el backend lo enviará
+  isExpanded?: boolean; // <--- AÑADIR ESTA LÍNEA
 }
 
 export interface PredefinedHabit {

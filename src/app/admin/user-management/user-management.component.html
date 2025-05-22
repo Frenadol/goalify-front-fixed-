@@ -12,8 +12,9 @@
     <div class="user-cards-grid" *ngIf="!isLoading && !errorMessage && users.length > 0">
       <div class="user-card" *ngFor="let user of users" [class.is-admin-card]="user.esAdministrador" (click)="openUserDetailsModal(user)">
         <div class="user-card-header">
-          <img [src]="user.avatarUrl || 'assets/img/default-avatar.png'" (error)="onImageError($event)" alt="Avatar de {{ user.name }}" class="user-avatar">
-          <h3 class="user-name">{{ user.name }} <span *ngIf="user.id === currentAdminId" class="current-admin-tag">(Tú)</span></h3>
+          <!-- CAMBIO AQUÍ: de defaultAvatarUrl a defaultAvatar -->
+          <img [src]="user.fotoPerfil || defaultAvatar" (error)="onImageError($event)" alt="Avatar de {{ user.nombre }}" class="user-avatar">
+          <h3 class="user-name">{{ user.nombre }} <span *ngIf="user.id === currentAdminId" class="current-admin-tag">(Tú)</span></h3>
           <p class="user-email">{{ user.email }}</p>
         </div>
         <div class="user-card-body">
@@ -50,11 +51,12 @@
           <div class="modal-body-layout">
             <!-- Columna Izquierda: Foto de Perfil -->
             <div class="modal-profile-picture-column">
-              <img [src]="selectedUserForDetails.avatarUrl || defaultAvatar" (error)="onImageError($event)" alt="Avatar de {{ selectedUserForDetails.name }}" class="modal-profile-avatar-large">
-              <h2 class="modal-profile-name">{{ selectedUserForDetails.name }}</h2>
+              <!-- CAMBIO AQUÍ: de defaultAvatarUrl a defaultAvatar -->
+              <img [src]="selectedUserForDetails.fotoPerfil || defaultAvatar" (error)="onImageError($event)" alt="Avatar de {{ selectedUserForDetails.nombre }}" class="modal-profile-avatar-large">
+              <h3 class="modal-profile-name">{{ selectedUserForDetails.nombre }}</h3>
               <p class="modal-profile-email">{{ selectedUserForDetails.email }}</p>
-              <span class="modal-user-role" [ngClass]="{'status-admin': selectedUserForDetails.esAdministrador, 'status-user': !selectedUserForDetails.esAdministrador}">
-                {{ selectedUserForDetails.esAdministrador ? 'Administrador' : 'Usuario' }}
+              <span class="modal-user-role" [class.status-admin]="selectedUserForDetails.esAdministrador" [class.status-user]="!selectedUserForDetails.esAdministrador">
+                {{ selectedUserForDetails.esAdministrador ? 'Administrador' : 'Usuario Estándar' }}
               </span>
             </div>
 

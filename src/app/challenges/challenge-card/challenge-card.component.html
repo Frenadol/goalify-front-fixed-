@@ -28,15 +28,33 @@
     </ng-container>
 
     <ng-container *ngIf="isJoined && !isAdmin">
-      <button mat-stroked-button color="warn" (click)="leaveChallenge()" [disabled]="isLeaving" matTooltip="Abandonar este desafío">
+      <!-- Botón Completar Desafío -->
+      <button *ngIf="canShowCompleteButton"
+              mat-flat-button color="accent"
+              (click)="onCompleteChallenge()"
+              [disabled]="isCompletingAction"
+              matTooltip="Marcar este desafío como completado">
+        <mat-spinner *ngIf="isCompletingAction" diameter="20" class="button-spinner"></mat-spinner>
+        <mat-icon *ngIf="!isCompletingAction">check_circle_outline</mat-icon>
+        <span *ngIf="!isCompletingAction">Completar</span>
+        <span *ngIf="isCompletingAction">Completando...</span>
+      </button>
+
+      <!-- Botón Ya Completado (si aplica) -->
+      <button *ngIf="userChallengeStatus === 'COMPLETADO'" mat-stroked-button disabled class="already-completed-button">
+        <mat-icon>check_circle</mat-icon>
+        Completado
+      </button>
+
+      <button *ngIf="userChallengeStatus !== 'COMPLETADO'"
+              mat-stroked-button color="warn"
+              (click)="leaveChallenge()"
+              [disabled]="isLeaving"
+              matTooltip="Abandonar este desafío">
         <mat-spinner *ngIf="isLeaving" diameter="20" class="button-spinner"></mat-spinner>
         <mat-icon *ngIf="!isLeaving">exit_to_app</mat-icon>
         <span *ngIf="!isLeaving">Abandonar</span>
         <span *ngIf="isLeaving">Abandonando...</span>
-      </button>
-      <button mat-flat-button color="accent" disabled class="already-joined-button">
-        <mat-icon>check_circle</mat-icon>
-        ¡Participando!
       </button>
     </ng-container>
 

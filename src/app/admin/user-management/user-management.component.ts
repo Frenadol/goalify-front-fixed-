@@ -61,25 +61,23 @@ export class UserManagementComponent implements OnInit {
   openUserDetailsModal(userFromCard: User): void {
     if (!userFromCard.id) {
       console.error('No se puede abrir detalles para usuario sin ID');
-      this.errorMessage = 'No se puede mostrar detalles: ID de usuario no encontrado.'; // Mensaje para el usuario
-      return;
+      // Considera mostrar un mensaje al usuario aquí también
+      return; // Añadido return para evitar continuar si no hay ID
     }
-    console.log('Abriendo detalles para el usuario:', userFromCard.name, userFromCard.id); // Log para depuración
-    this.selectedUserForDetails = null; // Limpia el usuario anterior para evitar mostrar datos viejos brevemente
+    console.log('Abriendo detalles para el usuario:', userFromCard.nombre, userFromCard.id); // Log para depuración
+    this.selectedUserForDetails = null; // Limpia el usuario anterior
     this.isLoadingUserDetails = true;
 
     this.adminService.getUserDetails(userFromCard.id).subscribe({
       next: (detailedUser) => {
-        console.log('Detalles del usuario recibidos:', detailedUser); // Log para depuración
         this.selectedUserForDetails = detailedUser;
         this.isLoadingUserDetails = false;
       },
       error: (err) => {
-        console.error('Error al cargar detalles del usuario:', err);
-        this.errorMessage = `Error al cargar detalles para ${userFromCard.name}: ${err.message || 'Error desconocido.'}`;
-        // Opcional: mostrar el usuario con los datos que ya tienes de la lista como fallback
-        // this.selectedUserForDetails = userFromCard;
+        console.error(`Error al obtener detalles para ${userFromCard.nombre}: ${err.message || 'Error desconocido'}`);
+        this.errorMessage = `No se pudieron cargar los detalles para ${userFromCard.nombre}.`; // Actualiza el mensaje de error
         this.isLoadingUserDetails = false;
+        // Considera cerrar el modal o mostrar el error dentro del modal
       }
     });
   }
@@ -96,23 +94,23 @@ export class UserManagementComponent implements OnInit {
       alert('No puedes cambiar tu propio estado de administrador.');
       return;
     }
-    if (!user.id) return;
+    if (!user.id) { // Comprobación de nulidad para user.id
+      console.error('ID de usuario indefinido, no se puede cambiar el estado de admin.');
+      this.errorMessage = 'Error: ID de usuario no válido.';
+      return;
+    }
 
     this.adminService.toggleAdminStatus(user.id).subscribe({
       next: (updatedUser) => {
         const index = this.users.findIndex(u => u.id === updatedUser.id);
         if (index !== -1) {
-          this.users[index] = { ...this.users[index], ...updatedUser };
+          this.users[index] = updatedUser;
         }
-        // Si el usuario del modal es el que se actualizó, actualiza también selectedUserForDetails
-        if (this.selectedUserForDetails && this.selectedUserForDetails.id === updatedUser.id) {
-          this.selectedUserForDetails = { ...this.selectedUserForDetails, ...updatedUser };
-        }
+        // Podrías añadir un snackbar de éxito aquí
       },
       error: (err) => {
-        this.errorMessage = `Error al cambiar estado de admin para ${user.name}.`;
+        this.errorMessage = `Error al cambiar estado de admin para ${user.nombre}.`;
         console.error(err);
-        alert(this.errorMessage);
       }
     });
   }
@@ -122,22 +120,24 @@ export class UserManagementComponent implements OnInit {
       alert('No puedes eliminar tu propia cuenta de administrador desde aquí.');
       return;
     }
-    if (!user.id) return;
+    if (!user.id) { // Comprobación de nulidad para user.id
+      console.error('ID de usuario indefinido, no se puede eliminar.');
+      this.errorMessage = 'Error: ID de usuario no válido.';
+      return;
+    }
 
-    if (confirm(`¿Estás seguro de que quieres eliminar al usuario ${user.name}? Esta acción no se puede deshacer.`)) {
+    if (confirm(`¿Estás seguro de que quieres eliminar al usuario ${user.nombre}? Esta acción no se puede deshacer.`)) {
       this.adminService.deleteUser(user.id).subscribe({
         next: () => {
           this.users = this.users.filter(u => u.id !== user.id);
-          alert(`Usuario ${user.name} eliminado correctamente.`);
-          // Si el usuario eliminado estaba en el modal, ciérralo
+          alert(`Usuario ${user.nombre} eliminado correctamente.`);
           if (this.selectedUserForDetails && this.selectedUserForDetails.id === user.id) {
-            this.closeUserDetailsModal();
+            this.closeUserDetailsModal(); // Cierra el modal si el usuario eliminado estaba siendo visualizado
           }
         },
         error: (err) => {
-          this.errorMessage = `Error al eliminar al usuario ${user.name}.`;
+          this.errorMessage = `Error al eliminar al usuario ${user.nombre}.`;
           console.error(err);
-          alert(this.errorMessage);
         }
       });
     }

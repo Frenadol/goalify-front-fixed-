@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Challenge, ChallengeFormData } from './challenge.model';
-import { UserChallenge } from './user-challenge.model';
+import { UserChallenge } from './user-challenge.model'; // Asegúrate que esta importación esté
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChallengeService {
   private apiUrl = 'http://localhost:8080/challenges';
-  private userChallengesApiUrl = 'http://localhost:8080/user-challenges';
+  private userChallengesApiUrl = 'http://localhost:8080/user-challenges'; // URL para operaciones de UsuarioDesafio
 
   constructor(private http: HttpClient) { }
 
@@ -72,19 +72,38 @@ export class ChallengeService {
    * @returns Un observable con un array de UserChallenge.
    */
   getMyJoinedChallenges(): Observable<UserChallenge[]> {
-    // Ajusta el endpoint según tu API. Ejemplo: GET /user-challenges/my o GET /users/me/challenges
+    // Este endpoint debe existir en tu UserChallengeController y devolver los desafíos del usuario autenticado
     return this.http.get<UserChallenge[]>(`${this.userChallengesApiUrl}/mychallenges`).pipe(
-      map(userChallenges => userChallenges.map(uc => ({
-        ...uc,
-        fechaInscripcion: uc.fechaInscripcion ? new Date(uc.fechaInscripcion) : undefined
-      }))),
       catchError(this.handleError)
     );
   }
 
   // NUEVO MÉTODO para abandonar un desafío
   leaveChallenge(challengeId: number): Observable<void> {
+    // Este endpoint debe existir en tu UserChallengeController
     return this.http.delete<void>(`${this.userChallengesApiUrl}/leave/${challengeId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // --- NUEVO MÉTODO PARA COMPLETAR UN DESAFÍO ---
+  /**
+   * Marca un desafío como completado por el usuario actual.
+   * @param challengeId El ID del desafío que el usuario ha completado.
+   * @returns Un observable con el UserChallenge actualizado o un mensaje de éxito.
+   */
+  completeUserChallenge(challengeId: number): Observable<UserChallenge> { // O el tipo de respuesta que devuelva tu backend
+    // El endpoint podría ser algo como: POST /user-challenges/{challengeId}/complete
+    // El backend se encargará de identificar al usuario a través del token JWT.
+    return this.http.post<UserChallenge>(`${this.userChallengesApiUrl}/${challengeId}/complete`, {}).pipe(
+      catchError(this.handleError)
+    );
+  }
+  // --- FIN DEL NUEVO MÉTODO ---
+
+  // NUEVO MÉTODO para obtener desafíos completados por el usuario
+  getCompletedUserChallenges(): Observable<UserChallenge[]> {
+    return this.http.get<UserChallenge[]>(`${this.userChallengesApiUrl}/completed`).pipe(
       catchError(this.handleError)
     );
   }
@@ -101,24 +120,16 @@ export class ChallengeService {
       errorMessage = `Error del cliente: ${error.error.message}`;
     } else {
       if (error.status === 0) {
-        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión o que el servidor esté en línea.';
-      } else if (error.status === 403) {
-        errorMessage = 'No tienes permiso para realizar esta acción.';
-      } else if (error.status === 404) {
-        errorMessage = 'No se encontró el recurso.';
-      } else if (error.error && typeof error.error === 'string' && error.error.length < 200) {
-        errorMessage = error.error; // Mensaje de error simple del backend
+        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.';
+      } else if (error.error && typeof error.error === 'string' && error.error.length > 0 && error.error.length < 300) {
+        errorMessage = error.error;
       } else if (error.error && error.error.message) {
-        errorMessage = error.error.message; // Mensaje de error estructurado del backend
+        errorMessage = error.error.message;
       } else {
-        errorMessage = `Error del servidor: ${error.status}. ${error.message || 'Inténtalo de nuevo más tarde.'}`;
+        errorMessage = `Error del servidor: ${error.status}. ${error.message || 'Por favor, contacta al soporte.'}`;
       }
-      console.error(
-        `Backend retornó código ${error.status}, ` +
-        `cuerpo del error: ${JSON.stringify(error.error)}`,
-        `Mensaje final: ${errorMessage}`
-      );
     }
+    console.error('Error en ChallengeService:', errorMessage, error);
     return throwError(() => new Error(errorMessage));
   }
 }

@@ -1,35 +1,37 @@
 <div class="page-container"> <!-- Contenedor principal añadido -->
   <div class="my-challenges-container">
-    <header class="list-header">
-      <h1>
-        <mat-icon>military_tech</mat-icon> <!-- O un icono que represente "mis logros/desafíos" -->
-        Mis Desafíos Inscritos
-      </h1>
-    </header>
+    <div class="page-header">
+      <h1>Mis Desafíos</h1>
+      <p>Aquí puedes ver y gestionar los desafíos en los que estás participando.</p>
+    </div>
 
     <div *ngIf="isLoading" class="loading-indicator">
-      <mat-spinner diameter="50"></mat-spinner>
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
       <p>Cargando tus desafíos...</p>
     </div>
 
     <div *ngIf="!isLoading && errorMessage" class="error-message">
-      <mat-icon>error_outline</mat-icon>
+      <mat-icon color="warn">error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button mat-stroked-button color="warn" (click)="loadUserJoinedChallenges()">Intentar de nuevo</button>
+      <button mat-stroked-button (click)="loadUserJoinedChallenges()">Reintentar</button>
     </div>
 
-    <div *ngIf="!isLoading && !errorMessage && userJoinedChallengesDetails.length === 0" class="empty-state">
-      <span class="material-icons-outlined empty-icon">sentiment_neutral</span>
-      <p>Aún no te has unido a ningún desafío.</p>
-      <p>¡<a routerLink="/challenges">Explora los desafíos disponibles</a> y participa!</p>
+    <div *ngIf="!isLoading && !errorMessage && userChallengeItems.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">emoji_events</mat-icon>
+      <h2>Aún no te has unido a ningún desafío</h2>
+      <p>¡Es un buen momento para explorar y encontrar tu próximo reto!</p>
+      <a mat-flat-button color="primary" routerLink="/challenges">Explorar Desafíos</a>
     </div>
 
-    <div *ngIf="!isLoading && !errorMessage && userJoinedChallengesDetails.length > 0" class="challenges-grid">
+    <div *ngIf="!isLoading && !errorMessage && userChallengeItems.length > 0" class="challenges-grid">
       <app-challenge-card
-        *ngFor="let challenge of userJoinedChallengesDetails"
-        [challenge]="challenge"
+        *ngFor="let item of userChallengeItems"
+        [challenge]="item.challenge"
         [isJoined]="true"
+        [userChallengeStatus]="item.userChallenge.estadoParticipacion"
+        [canBeCompleted]="true"
         (challengeLeft)="handleChallengeLeft($event)"
+        (completeChallengeClicked)="handleCompleteChallengeRequest(item)"
         class="user-challenge-card">
       </app-challenge-card>
     </div>
