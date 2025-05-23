@@ -1,8 +1,32 @@
 <div class="page-container"> <!-- Contenedor principal añadido -->
   <div class="my-challenges-container">
-    <div class="page-header">
-      <h1>Mis Desafíos</h1>
-      <p>Aquí puedes ver y gestionar los desafíos en los que estás participando.</p>
+    <header class="list-header">
+      <h2>Mis Desafíos</h2>
+      <!-- Puedes añadir un botón para ir a la lista de desafíos disponibles si es necesario -->
+      <!-- <button mat-stroked-button color="primary" (click)="navigateToBrowseChallenges()">
+        <mat-icon>search</mat-icon>
+        Explorar Desafíos
+      </button> -->
+    </header>
+    <p class="sub-header">Aquí puedes ver y gestionar los desafíos en los que estás participando.</p>
+
+    <div class="filters-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar por nombre</mat-label>
+        <input matInput type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" placeholder="Ej: Correr 5km">
+        <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm=''; applyFilters()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filtrar por estado</mat-label>
+        <mat-select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+          <mat-option *ngFor="let filter of filterOptions" [value]="filter.value">
+            {{filter.viewValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
 
     <div *ngIf="isLoading" class="loading-indicator">
@@ -16,23 +40,21 @@
       <button mat-stroked-button (click)="loadUserJoinedChallenges()">Reintentar</button>
     </div>
 
-    <div *ngIf="!isLoading && !errorMessage && userChallengeItems.length === 0" class="empty-state">
-      <mat-icon class="empty-icon">emoji_events</mat-icon>
-      <h2>Aún no te has unido a ningún desafío</h2>
-      <p>¡Es un buen momento para explorar y encontrar tu próximo reto!</p>
-      <a mat-flat-button color="primary" routerLink="/challenges">Explorar Desafíos</a>
+    <div *ngIf="!isLoading && filteredChallenges.length === 0 && !errorMessage" class="empty-state">
+      <mat-icon class="empty-icon">search_off</mat-icon> <!-- CAMBIA 'home' DE NUEVO AL ICONO ORIGINAL -->
+      <p>No se encontraron desafíos que coincidan con tu búsqueda o filtro.</p>
+      <p *ngIf="allMyChallenges.length > 0">Intenta ajustar los filtros o el término de búsqueda.</p>
+      <p *ngIf="allMyChallenges.length === 0">Parece que aún no te has unido a ningún desafío.</p>
     </div>
 
-    <div *ngIf="!isLoading && !errorMessage && userChallengeItems.length > 0" class="challenges-grid">
+    <div class="challenges-grid" *ngIf="!isLoading && filteredChallenges.length > 0">
       <app-challenge-card
-        *ngFor="let item of userChallengeItems"
-        [challenge]="item.challenge"
-        [isJoined]="true"
-        [userChallengeStatus]="item.userChallenge.estadoParticipacion"
-        [canBeCompleted]="true"
-        (challengeLeft)="handleChallengeLeft($event)"
-        (completeChallengeClicked)="handleCompleteChallengeRequest(item)"
-        class="user-challenge-card">
+        *ngFor="let challenge of filteredChallenges"
+        [challenge]="challenge.challengeOriginal"
+        [isUserChallenge]="true"
+        [userChallengeStatus]="challenge.estado"
+        (viewDetails)="openChallengeDetailsDialog(challenge)"
+        (completeChallengeClicked)="handleCompleteChallengeRequest(challenge)">
       </app-challenge-card>
     </div>
   </div>

@@ -263,14 +263,38 @@
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
-  color: #777;
+  padding: 40px 20px; /* Aumentado el padding */
+  color: var(--color-text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px; /* Espacio entre elementos */
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-surface-alt, #fff); /* Fondo blanco o muy claro */
+  box-shadow: var(--shadow-md);
+  margin: 20px 0;
+  animation: fadeInUp 0.5s var(--transition-easing) forwards;
 }
 
 .empty-state .empty-icon {
-  font-size: 4em;
-  margin-top: 15px;
-  color: #adb5bd;
+  font-size: 4.5rem; /* Tamaño grande para el icono */
+  color: var(--color-text-disabled); /* Un color suave */
+  margin-bottom: 10px; /* Espacio debajo del icono */
+  line-height: 1; /* Ajusta la altura de línea para que coincida con el tamaño del icono */
+  height: 4.5rem; /* AÑADIDO: Asegura que la altura sea igual al font-size */
+  width: 4.5rem; /* AÑADIDO: Asegura que el ancho sea igual al font-size */
+  display: inline-flex; /* AÑADIDO: Para que se comporte bien con alineaciones y dimensiones */
+  align-items: center; /* AÑADIDO: Centra el glifo del icono verticalmente */
+  justify-content: center; /* AÑADIDO: Centra el glifo del icono horizontalmente */
+}
+
+.empty-state p {
+  margin: 0;
+  color: #666;
+  font-size: 1em;
+  line-height: 1.4;
+  max-width: 300px;
+  width: 100%;
 }
 
 .header-actions {
@@ -300,4 +324,44 @@
 
 .header-actions .btn.btn-primary .material-icons-outlined {
   font-size: 1.25em;
+}
+
+/* Asegúrate de que el contenedor del icono tenga suficiente espacio */
+/* Reemplaza '.habit-icon-container' con la clase real del contenedor del icono problemático */
+.habit-icon-container {
+  display: flex; /* Ayuda a alinear y dimensionar correctamente */
+  align-items: center;
+  justify-content: center;
+  min-width: 24px; /* O el tamaño que necesite tu icono */
+  min-height: 24px; /* O el tamaño que necesite tu icono */
+  overflow: visible; /* Asegúrate de que no esté cortando el contenido */
+}
+
+/* O si el problema es directamente con el mat-icon */
+.habit-icon-container mat-icon {
+  font-size: 24px; /* Ajusta al tamaño deseado */
+  width: 24px; /* Ajusta al tamaño deseado */
+  height: 24px; /* Ajusta al tamaño deseado */
+  line-height: 24px; /* Ayuda a centrar verticalmente algunos iconos */
+}
+
+/* Si el icono está en un estado "vacío" o de "placeholder" como en la imagen */
+.empty-state-icon { /* Usa la clase real del icono en tu estado vacío */
+  font-size: 48px; /* O el tamaño que desees */
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
+  /* Si está cortado por arriba, verifica que no haya un padding negativo
+     o un margin superior en el contenedor padre que lo empuje hacia arriba */
+}
+
+/* Si el problema es un elemento específico que se ve en la imagen de "Mis Hábitos" */
+/* (el icono de la pluma/editar encima del texto "¡Felicidades!...") */
+.encabezado-habitos .icono-editar { /* Asumiendo clases hipotéticas */
+  font-size: 3rem; /* Aumenta el tamaño si es necesario */
+  height: auto;    /* Permite que la altura se ajuste al contenido */
+  width: auto;     /* Permite que el ancho se ajuste al contenido */
+  display: inline-block; /* O block, según el layout */
+  overflow: visible; /* Asegura que no se corte */
+  margin-bottom: 10px; /* Añade espacio si está muy pegado al texto de abajo */
 }

@@ -12,61 +12,61 @@
     </div>
 
     <div class="profile-container" *ngIf="currentUser; else loadingOrError">
-      <mat-card class="profile-card">
+      <mat-card class="profile-card" [style.backgroundColor]="profileDisplayPreferences.profileCardColor">
         <mat-card-header class="profile-card-header">
-          <!-- Avatar del usuario -->
-          <img mat-card-avatar 
-               [src]="currentUser.fotoPerfil || 'assets/images/default-avatar.png'" 
+          <img mat-card-avatar
+               [src]="currentUser.fotoPerfil || defaultAvatarUrl"
                (error)="onImageError($event)"
-               alt="Foto de perfil de {{currentUser.nombre}}" 
+               alt="Avatar de {{ currentUser.nombre }}"
+
                class="profile-avatar-img">
-          <!-- Nombre del usuario -->
           <mat-card-title class="profile-name">{{ currentUser.nombre }}</mat-card-title>
-          <!-- El subtítulo del email ha sido eliminado -->
+          <mat-card-subtitle class="profile-email" *ngIf="currentUser.email">{{ currentUser.email }}</mat-card-subtitle>
+          <!-- Icono de Ajustes -->
+          <button mat-icon-button class="profile-settings-button" (click)="toggleSettingsPanel()" matTooltip="Personalizar vista del perfil">
+            <mat-icon>settings</mat-icon>
+          </button>
         </mat-card-header>
 
         <mat-card-content class="profile-card-content">
           <div class="profile-stats-section">
             <h3 class="section-title">Mis Estadísticas</h3>
             <div class="profile-info-grid">
-              <div class="info-item">
+              <!-- Puntos Totales -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showPoints">
                 <mat-icon class="info-icon">star_outline</mat-icon>
                 <span class="info-label">Puntos Totales:</span>
                 <span class="info-value">{{ currentUser.puntosTotales || 0 }}</span>
               </div>
-              <div class="info-item">
-                <mat-icon class="info-icon">leaderboard</mat-icon>
+              <!-- Nivel -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showLevel">
+                <mat-icon class="info-icon">bar_chart</mat-icon>
                 <span class="info-label">Nivel:</span>
                 <span class="info-value">{{ currentUser.nivel || 1 }}</span>
               </div>
-              <div class="info-item">
+              <!-- Desafíos Completados -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showChallengesCompleted">
                 <mat-icon class="info-icon">emoji_events</mat-icon>
                 <span class="info-label">Desafíos Completados (Total):</span>
                 <span class="info-value">{{ currentUser.totalDesafiosCompletados || 0 }}</span>
               </div>
-              <!-- Estadísticas de Hábitos desde habitStats -->
-              <div *ngIf="habitStats" class="info-item">
-                <mat-icon class="info-icon">checklist_rtl</mat-icon>
+              <!-- Hábitos Completados Hoy -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showHabitsCompletedToday && habitStats">
+                <mat-icon class="info-icon">rule</mat-icon> <!-- Icono para hábitos completados hoy -->
                 <span class="info-label">Hábitos Completados Hoy:</span>
-                <span class="info-value">{{ habitStats.totalCompletionsToday || 0 }}</span>
+                <span class="info-value">{{ habitStats.totalCompletionsToday }}</span>
               </div>
-              <div *ngIf="habitStats" class="info-item">
-                <mat-icon class="info-icon">done_all</mat-icon>
+              <!-- Hábitos Completados (Total) -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showTotalHabitsCompleted && habitStats">
+                <mat-icon class="info-icon">done_all</mat-icon> <!-- Icono para hábitos totales -->
                 <span class="info-label">Hábitos Completados (Total):</span>
-                <span class="info-value">{{ habitStats.totalOverallCompletions || currentUser.totalHabitosCompletados || 0 }}</span>
+                <span class="info-value">{{ habitStats.totalOverallCompletions }}</span>
               </div>
-               <div *ngIf="habitStats" class="info-item">
-                <mat-icon class="info-icon">local_fire_department</mat-icon>
+              <!-- Mejor Racha -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showBestStreak && habitStats">
+                <mat-icon class="info-icon">local_fire_department</mat-icon> <!-- Icono para racha -->
                 <span class="info-label">Mejor Racha (Hábitos):</span>
-                <span class="info-value">{{ habitStats.longestStreakOverall || 0 }} días</span>
-              </div>
-              <div *ngIf="isLoadingHabitStats" class="info-item">
-                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-                <span class="info-label">Cargando stats de hábitos...</span>
-              </div>
-              <div *ngIf="habitStatsError" class="info-item error-text">
-                <mat-icon color="warn">warning</mat-icon>
-                <span class="info-label">{{ habitStatsError }}</span>
+                <span class="info-value">{{ habitStats.longestStreakOverall }} días</span>
               </div>
             </div>
           </div>
@@ -181,6 +181,37 @@
 
         </mat-card-content>
       </mat-card>
+
+      <!-- Panel de Ajustes (Overlay y Contenido) -->
+      <div class="settings-panel-overlay" *ngIf="showSettingsPanel" (click)="toggleSettingsPanel()"></div>
+      <div class="settings-panel card-style" *ngIf="showSettingsPanel" @fadeInScale>
+        <h3>Personalizar Estadísticas y Apariencia</h3>
+        <mat-divider></mat-divider>
+        <div class="settings-options">
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showPoints">Mostrar Puntos Totales</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showLevel">Mostrar Nivel</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showChallengesCompleted">Mostrar Desafíos Completados</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showHabitsCompletedToday">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showTotalHabitsCompleted">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showBestStreak">Mostrar Mejor Racha</mat-slide-toggle>
+
+          <div class="color-picker-setting">
+            <label for="profileCardColorPicker" class="color-picker-label">Color de fondo de la tarjeta:</label>
+            <input type="color" id="profileCardColorPicker" class="profile-color-input"
+                   [(ngModel)]="profileDisplayPreferences.profileCardColor">
+            <span class="color-preview" [style.backgroundColor]="profileDisplayPreferences.profileCardColor"></span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="settings-actions">
+          <button mat-stroked-button (click)="toggleSettingsPanel()">Cancelar</button>
+          <button mat-flat-button color="primary" (click)="saveDisplayPreferences()" [disabled]="isSavingBio">
+            <mat-spinner *ngIf="isSavingBio" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isSavingBio">Guardar</span>
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <ng-template #loadingOrError>

@@ -46,6 +46,7 @@
   display: flex; /* Asegura el layout flex */
   align-items: center; /* Alinea verticalmente el avatar y el nombre */
   padding: 20px; /* Ajusta el padding si es necesario */
+  position: relative; /* Para posicionar el botón de ajustes absolutamente dentro de él */
   /* Elimina cualquier flex-direction: column que pudieras tener aquí */
 }
 
@@ -256,9 +257,13 @@
 }
 
 .challenge-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  /* Es buena idea asegurar que los items de lista tengan un fondo explícito si están dentro de una tarjeta con color variable */
+  background-color: var(--color-surface, #fff); /* O el color de fondo que deban tener los items */
   border-bottom: 1px solid var(--border-color-lighter, #f0f0f0);
-  padding: 15px 10px !important; /* Aumentar padding */
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, transform 0.15s ease-out, box-shadow 0.2s ease-in-out;
 }
 .challenge-list-item:last-child {
   border-bottom: none;
@@ -267,80 +272,126 @@
 .challenge-list-item.interactive-item {
   cursor: pointer;
 }
+
 .challenge-list-item.interactive-item:hover {
-  background-color: var(--background-hover-light, #f9f9f9);
+  background-color: rgba(0, 0, 0, 0.1); /* Aumentada la opacidad para un gris más notable sobre fondos claros */
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.07);
 }
 
 .challenge-list-item.completed {
-  /* Podrías añadir un estilo sutil para los completados, como un fondo ligeramente diferente */
-  /* background-color: #f5fff5; */
-}
-.challenge-list-item.completed .challenge-item-title {
-  /* color: var(--color-text-secondary); */
-  /* text-decoration: line-through; */ /* Opcional */
+  /* background-color: var(--color-success-xlight, #e6ffed); */ /* Si quieres un fondo base diferente para completados */
 }
 
-
-.challenge-item-icon {
-  margin-right: 15px !important; /* Espacio para el icono */
-  color: var(--user-primary-dark); /* Color por defecto para el icono */
-  font-size: 1.8rem !important; /* Tamaño del icono */
-  width: 1.8rem !important;
-  height: 1.8rem !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.challenge-list-item.completed .challenge-item-icon {
-  color: var(--color-success, #28a745);
-}
-.challenge-item-icon.status-inscrito { color: var(--user-primary, #007bff); }
-.challenge-item-icon.status-en_progreso { color: #ffc107; } /* Amarillo/Info */
-/* Otros estados si los tienes */
-
-
-.challenge-item-title {
-  font-weight: 500;
-  font-size: 1.1rem; /* Más grande */
-  color: var(--color-text-primary);
-  margin-bottom: 4px; /* Espacio debajo del título */
+.challenge-list-item.completed.interactive-item:hover {
+  background-color: rgba(40, 167, 69, 0.2); /* Tinte verdoso un poco más opaco */
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.07);
 }
 
-.challenge-item-info {
-  font-size: 0.85rem; /* Más pequeño */
-  color: var(--color-text-secondary);
-  display: flex;
-  justify-content: space-between; /* Para alinear el tag de estado a la derecha */
-  align-items: center;
-  width: 100%;
-}
-
-.status-tag {
-  padding: 3px 8px;
-  border-radius: var(--border-radius-sm, 4px);
-  font-size: 0.75rem; /* Más pequeño */
-  font-weight: 500;
-  text-transform: uppercase;
-  border: 1px solid transparent;
-  margin-left: 10px; /* Espacio a la izquierda del tag */
-}
-
-/* Define colores para los tags de estado (puedes moverlos a un archivo global si se usan en más sitios) */
-.status-tag.status-inscrito { background-color: var(--user-primary-light, #e0efff); color: var(--user-primary-dark, #0056b3); border-color: var(--user-primary, #007bff); }
-.status-tag.status-en_progreso { background-color: #fff3cd; color: #856404; border-color: #ffeeba; } /* Amarillo/Info */
-.status-tag.status-completado { background-color: #d4edda; color: #155724; border-color: #c3e6cb; } /* Verde/Success */
-.status-tag.status-fallido { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; } /* Rojo/Danger */
-.status-tag.status-pendiente { background-color: #e2e3e5; color: #383d41; border-color: #d6d8db; } /* Gris/Secondary */
-
-
-.chevron-icon {
-  color: var(--border-color, #ccc);
-  transition: transform 0.2s ease-in-out;
-}
-.challenge-list-item.interactive-item:hover .chevron-icon {
-  transform: translateX(3px);
-  color: var(--user-primary);
-}
 
 /* Estilos para el panel del diálogo si usaste panelClass */
 /* .challenge-detail-dialog-panel .mat-dialog-container { ... } */
+
+/* Estilos para el botón de ajustes en la tarjeta de perfil */
+.profile-settings-button {
+  position: absolute;
+  top: 8px; /* Ajusta según sea necesario */
+  right: 8px; /* Ajusta según sea necesario */
+  color: var(--color-text-secondary);
+  z-index: 10; /* Para estar encima de otros elementos del header si es necesario */
+}
+
+.profile-settings-button:hover {
+  color: var(--user-primary, #007bff); /* O el color que prefieras al hacer hover */
+}
+
+/* --- Estilos para el Panel de Ajustes (Settings Panel) --- */
+.settings-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+  z-index: 1040; /* Asegurar que esté por encima de otros elementos pero debajo del panel */
+  animation: fadeIn 0.3s var(--transition-easing) forwards;
+}
+
+.settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 450px; /* Ancho máximo del panel */
+  background-color: var(--color-surface, #fff);
+  padding: 25px 30px;
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: var(--shadow-xl, 0 10px 30px rgba(0,0,0,0.2));
+  z-index: 1050; /* Por encima del overlay */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Espacio entre secciones del panel */
+}
+
+.settings-panel h3 {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Espacio entre cada mat-slide-toggle y el color picker */
+}
+
+.settings-options mat-slide-toggle {
+  width: 100%;
+  font-size: 0.95em;
+}
+
+.color-picker-setting {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre label, input y preview */
+  margin-top: 10px; /* Un poco de espacio extra arriba */
+}
+
+.color-picker-label {
+  font-size: 0.95em;
+  color: var(--color-text-secondary);
+  flex-shrink: 0; /* Para que no se encoja si el input es grande */
+}
+
+.profile-color-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 40px; /* Tamaño del input de color */
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: var(--border-radius-sm, 4px);
+  cursor: pointer;
+  padding: 0; /* Quitar padding interno del input type color */
+}
+
+/* Estilos para el selector de color de WebKit/Blink (Chrome, Edge, Opera) */
+.profile-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: var(--border-radius-sm, 4px);
+}
+.profile-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--border-radius-sm, 4px);
+}
+
+/* Estilos para el selector de color de Firefox */
+.profile-color-input::-moz-color-swatch {
+  border: none;
+  border-radius: var(--border-radius-sm, 4px);
+}

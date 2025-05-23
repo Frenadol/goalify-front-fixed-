@@ -1,88 +1,95 @@
 <div class="page-container">
   <div class="habit-list-container">
-    <div class="header-actions">
-      <h2>Mis Hábitos</h2>
-      <button *ngIf="authService.currentUser | async" mat-stroked-button color="primary" (click)="goToCreateHabitForm()" class="add-habit-btn">
-        <mat-icon>add_circle_outline</mat-icon> Crear Nuevo Hábito
+    <header class="list-header">
+      <div class="title-with-icon">
+        <mat-icon class="header-icon">checklist_rtl</mat-icon>
+        <h2>Mis Hábitos</h2>
+      </div>
+      <button mat-raised-button color="primary" (click)="navigateToCreate()" class="create-habit-button">
+        <mat-icon>add_circle_outline</mat-icon>
+        Crear Nuevo Hábito
       </button>
-    </div>
+    </header>
 
     <div *ngIf="isLoading && allHabits.length === 0" class="loading-indicator">
-      <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
-      <p>Cargando hábitos...</p>
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+      <p>Cargando tus hábitos...</p>
     </div>
 
     <div *ngIf="!isLoading && errorMessage" class="error-message">
-      <mat-icon color="warn">error_outline</mat-icon>
+      <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button mat-stroked-button (click)="loadHabits()">Reintentar</button>
+      <button mat-stroked-button color="primary" (click)="loadHabits()" *ngIf="errorMessage !== 'Debes iniciar sesión para ver tus hábitos.'">Reintentar</button>
     </div>
 
     <!-- Estado cuando no hay hábitos creados en absoluto -->
     <div *ngIf="!isLoading && !errorMessage && allHabits.length === 0" class="empty-state">
-      <mat-icon class="empty-icon">checklist_rtl</mat-icon>
-      <p>Aún no tienes hábitos. ¡Crea uno para empezar!</p>
+      <mat-icon class="empty-icon">playlist_add_check</mat-icon>
+      <p>Aún no has creado ningún hábito.</p>
+      <p>¡Empieza hoy mismo a construir la mejor versión de ti!</p>
+      <button mat-stroked-button color="primary" (click)="navigateToCreate()">Crear mi primer hábito</button>
     </div>
 
     <!-- Estado cuando hay hábitos, pero todos los de hoy están completados -->
-    <div *ngIf="!isLoading && !errorMessage && allHabits.length > 0 && displayedHabits.length === 0" class="empty-state">
-        <mat-icon class="empty-icon">task_alt</mat-icon>
-        <p>¡Felicidades! Has completado todos tus hábitos de hoy.</p>
-        <p>Vuelve mañana para continuar o <a (click)="goToCreateHabitForm()" class="link-like">crea un nuevo hábito</a>.</p>
+    <div *ngIf="showAllHabitsCompletedMessage" class="empty-state all-completed">
+      <mat-icon class="empty-icon">sentiment_very_satisfied</mat-icon>
+      <p>¡Felicidades! Has completado todos tus hábitos de hoy.</p>
+      <p>Sigue así y alcanzarás tus metas.</p>
     </div>
 
-    <div *ngIf="!isLoading && displayedHabits.length > 0" class="habits-grid">
-      <!-- Iterar sobre displayedHabits -->
-      <mat-card *ngFor="let habit of displayedHabits" class="habit-card" [class.expanded-card]="habit.isExpanded">
-        
-        <div class="habit-card-header-clickable" (click)="toggleHabitDetails(habit)">
-          <div class="habit-card-image-container-condensed">
-            <img [src]="getHabitImageUrl(habit.nombre)" [alt]="habit.nombre" class="habit-image-condensed">
-          </div>
-          <div class="habit-card-title-condensed">
-            <h3>{{ habit.nombre | titlecase }}</h3>
-          </div>
-          <mat-icon class="expand-icon">{{ habit.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
-        </div>
 
-        <div class="habit-card-collapsible-content" *ngIf="habit.isExpanded">
-          <mat-card-content class="habit-card-content-details">
-            <p class="description">{{ habit.descripcion || 'Sin descripción.' }}</p>
-            <div class="details">
-              <p><mat-icon>event_repeat</mat-icon> Frecuencia: {{ habit.frecuencia | titlecase }}</p>
-              <p *ngIf="habit.horaProgramada"><mat-icon>schedule</mat-icon> Hora: {{ habit.horaProgramada }}</p>
-              <p><mat-icon>star</mat-icon> Puntos: {{ habit.puntosRecompensa }}</p>
-              <p><mat-icon>info</mat-icon> Estado: <span class="status" [ngClass]="habit.estado">{{ habit.estado | titlecase }}</span></p>
-            </div>
-          </mat-card-content>
+    <div class="habits-grid" *ngIf="showHabitsGrid">
+      <mat-card *ngFor="let habit of displayedHabits"
+                class="habit-item card-style"
+                [class.expanded]="habit.isExpanded"
+                [class.completed-today-card]="habit.isCompletedToday === true">
 
-          <mat-card-actions class="actions">
-            <button mat-icon-button color="primary" (click)="navigateToEdit(habit.id)" matTooltip="Editar Hábito" [disabled]="habit.isCompletingAction">
-              <mat-icon>edit</mat-icon>
+        <mat-card-header (click)="toggleHabitDetails(habit)" class="habit-header habit-card-header-clickable">
+          <div mat-card-avatar class="habit-avatar">
+            <mat-icon>{{ getHabitIcon(habit.nombre) }}</mat-icon>
+          </div>
+          <mat-card-title>{{ habit.nombre | titlecase }}</mat-card-title>
+          <mat-card-subtitle>{{ habit.frecuencia | titlecase }}</mat-card-subtitle>
+          <span class="expand-icon">
+            <mat-icon>{{ habit.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </span>
+        </mat-card-header>
+
+        <mat-card-content *ngIf="habit.isExpanded" class="habit-card-collapsible-content">
+          <p class="description">{{ habit.descripcion || 'Este hábito no tiene descripción.' }}</p>
+          <div class="details">
+            <p *ngIf="habit.horaProgramada"><mat-icon>schedule</mat-icon> Hora: {{ habit.horaProgramada }}</p>
+            <p><mat-icon>star</mat-icon> Puntos: {{ habit.puntosRecompensa }}</p>
+            <p><mat-icon>sync</mat-icon> Racha actual: {{ habit.rachaActual || 0 }} días</p>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end" class="habit-actions">
+          <button mat-icon-button (click)="navigateToEdit(habit.id); $event.stopPropagation()" matTooltip="Editar hábito">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteHabit(habit.id); $event.stopPropagation()" matTooltip="Eliminar hábito">
+            <mat-icon>delete</mat-icon>
+          </button>
+
+          <ng-container *ngIf="habit.isCompletedToday === true">
+            <button mat-stroked-button disabled class="already-completed-button">
+              <mat-icon color="accent">check_circle</mat-icon>
+              Completado Hoy
             </button>
-            <button mat-icon-button color="warn" (click)="deleteHabit(habit.id)" matTooltip="Eliminar Hábito" [disabled]="habit.isCompletingAction">
-              <mat-icon>delete</mat-icon>
-            </button>
-            <!-- El botón de completar ahora usa confirmCompleteHabit -->
-            <button mat-stroked-button
-                    color="accent"
-                    class="complete-button"
-                    (click)="confirmCompleteHabit(habit)"
-                    [disabled]="habit.isCompletingAction || habit.isCompletedToday"
-                    *ngIf="habit.estado === 'activo'">
+          </ng-container>
+
+          <ng-container *ngIf="habit.isCompletedToday === false">
+            <button mat-stroked-button color="primary"
+                    (click)="confirmCompleteHabit(habit); $event.stopPropagation()"
+                    [disabled]="habit.isCompletingAction"
+                    class="complete-button">
               <mat-spinner *ngIf="habit.isCompletingAction" diameter="20" class="button-spinner"></mat-spinner>
-              <mat-icon *ngIf="!habit.isCompletingAction">check_circle_outline</mat-icon>
               <span *ngIf="!habit.isCompletingAction">Completar Hoy</span>
               <span *ngIf="habit.isCompletingAction">Completando...</span>
             </button>
-            <!-- Este botón ya no es necesario si los hábitos completados desaparecen -->
-            <!--
-            <button mat-stroked-button disabled *ngIf="habit.estado === 'activo' && habit.isCompletedToday" class="already-completed-button">
-              <mat-icon>check_circle</mat-icon> Completado Hoy
-            </button>
-            -->
-          </mat-card-actions>
-        </div>
+          </ng-container>
+        </mat-card-actions>
       </mat-card>
     </div>
   </div>
