@@ -1,16 +1,17 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Challenge } from '../challenge.model';
-import { ChallengeService } from '../challenge.service';
-import { AuthService } from '../../auth.service';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
+import { Challenge } from '../challenge.model';
+import { ChallengeService } from '../challenge.service';
+import { AuthService } from '../../auth.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-challenge-card',
@@ -31,18 +32,20 @@ import { RouterModule } from '@angular/router';
 export class ChallengeCardComponent {
   @Input() challenge!: Challenge;
   @Input() isJoined: boolean = false;
-  @Input() userChallengeStatus?: string; // Ej: 'INSCRITO', 'COMPLETADO', 'EN_PROGRESO'
-  @Input() canBeCompleted: boolean = false; // Para mostrar el botón "Completar"
+  @Input() userChallengeStatus?: string;
+  @Input() canBeCompleted: boolean = false;
+  @Input() isUserChallenge: boolean = false; // <--- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ EXACTAMENTE ASÍ Y SE HAYA GUARDADO EL ARCHIVO
 
   @Output() challengeJoined = new EventEmitter<number>();
   @Output() challengeLeft = new EventEmitter<number>();
   @Output() challengeDeleted = new EventEmitter<number>();
-  @Output() completeChallengeClicked = new EventEmitter<number>(); // Nuevo Output
+  @Output() completeChallengeClicked = new EventEmitter<number>(); // o EventEmitter<Challenge> si prefieres pasar el objeto entero
+  @Output() viewDetails = new EventEmitter<Challenge>(); // Si MyChallengesListComponent emite esto
 
   isJoining: boolean = false;
   isLeaving: boolean = false;
   isDeleting: boolean = false;
-  isCompletingAction: boolean = false; // Para el spinner del botón completar
+  isCompletingAction: boolean = false;
   actionError: string | null = null;
   isAdmin: boolean = false;
 
@@ -132,13 +135,24 @@ export class ChallengeCardComponent {
   }
 
   onCompleteChallenge(): void {
-    if (!this.challenge || typeof this.challenge.id === 'undefined' || this.isCompletingAction) {
+    if (!this.challenge || typeof this.challenge.id === 'undefined' || this.isCompletingAction || this.userChallengeStatus === 'COMPLETADO') {
+      console.warn('ChallengeCard: No se puede completar el desafío.', this.challenge, this.userChallengeStatus);
       return;
     }
-    this.completeChallengeClicked.emit(this.challenge.id);
+    // Asegúrate de emitir el ID del desafío o el objeto MyChallengeDisplayItem según lo que espere el manejador
+    this.completeChallengeClicked.emit(this.challenge.id); // Emite el ID del Challenge original
   }
 
   get canShowCompleteButton(): boolean {
     return this.canBeCompleted && this.isJoined && this.userChallengeStatus !== 'COMPLETADO' && !this.isAdmin;
+  }
+
+  // Método para emitir el evento viewDetails cuando se hace clic en la tarjeta (si es necesario)
+  onCardClick(): void {
+    if (this.isUserChallenge) { // Solo emitir si es una tarjeta de "Mis Desafíos"
+      this.viewDetails.emit(this.challenge);
+    }
+    // Si es una tarjeta de la lista general y quieres un comportamiento diferente al hacer clic,
+    // puedes añadir lógica aquí o manejarlo directamente en la plantilla de ChallengeListComponent.
   }
 }

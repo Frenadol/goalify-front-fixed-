@@ -1,37 +1,39 @@
-<mat-card class="challenge-mat-card" [class.joined-card]="isJoined">
+<mat-card class="challenge-mat-card" [class.joined-card]="isJoined" (click)="onCardClick()">
   <mat-card-header>
     <div mat-card-avatar class="challenge-avatar">
-      <!-- CAMBIO: Eliminada la referencia a challenge.icono -->
-      <mat-icon>emoji_events</mat-icon>
+      <mat-icon>{{ challenge?.categoria === 'Salud y Bienestar' ? 'favorite' : (challenge?.categoria === 'Aprendizaje' ? 'school' : 'emoji_events') }}</mat-icon>
     </div>
-    <mat-card-title>{{ challenge.nombre }}</mat-card-title>
-    <mat-card-subtitle>{{ challenge.categoria }}</mat-card-subtitle>
+    <mat-card-title>{{ challenge?.nombre || 'Nombre no disponible' }}</mat-card-title>
+    <mat-card-subtitle>{{ challenge?.categoria || 'Categoría no disponible' }}</mat-card-subtitle>
   </mat-card-header>
-  <!-- CAMBIO: de imagenUrl a imageUrl -->
-  <img mat-card-image *ngIf="challenge.imageUrl" [src]="challenge.imageUrl" alt="Imagen de {{ challenge.nombre }}">
+  <img mat-card-image *ngIf="challenge?.imageUrl" [src]="challenge.imageUrl" [alt]="challenge.nombre || 'Imagen del desafío'">
+  <div class="image-placeholder" *ngIf="!challenge?.imageUrl">
+    <mat-icon>image</mat-icon>
+    <span>Sin imagen</span>
+  </div>
   <mat-card-content>
-    <p class="challenge-description">{{ challenge.descripcion }}</p>
+    <p class="challenge-description">{{ challenge?.descripcion || 'Descripción no disponible' }}</p>
     <div class="challenge-details">
-      <!-- CAMBIO: Eliminada la línea de dificultad -->
-      <span><strong>Puntos:</strong> {{ challenge.puntosRecompensa }}</span>
-      <span *ngIf="challenge.fechaInicio"><strong>Inicio:</strong> {{ challenge.fechaInicio | date:'dd/MM/yyyy' }}</span>
-      <span *ngIf="challenge.fechaFin"><strong>Fin:</strong> {{ challenge.fechaFin | date:'dd/MM/yyyy' }}</span>
+      <div class="detail-item" *ngIf="challenge?.puntosRecompensa !== undefined">
+        <mat-icon>star_border</mat-icon>
+        <span><strong>Puntos:</strong> {{ challenge.puntosRecompensa }}</span>
+      </div>
+      <div class="detail-item" *ngIf="challenge?.fechaInicio">
+        <mat-icon>event</mat-icon>
+        <span><strong>Inicio:</strong> {{ challenge.fechaInicio | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <div class="detail-item" *ngIf="challenge?.fechaFin">
+        <mat-icon>event_busy</mat-icon>
+        <span><strong>Fin:</strong> {{ challenge.fechaFin | date:'dd/MM/yyyy' }}</span>
+      </div>
     </div>
   </mat-card-content>
-  <mat-card-actions class="challenge-actions">
-    <ng-container *ngIf="!isJoined && !isAdmin">
-      <button mat-flat-button color="primary" (click)="joinChallenge()" [disabled]="isJoining">
-        <mat-spinner *ngIf="isJoining" diameter="20" class="button-spinner"></mat-spinner>
-        <span *ngIf="!isJoining">¡Aceptar Desafío!</span>
-        <span *ngIf="isJoining">Uniéndote...</span>
-      </button>
-    </ng-container>
-
-    <ng-container *ngIf="isJoined && !isAdmin">
-      <!-- Botón Completar Desafío -->
-      <button *ngIf="canShowCompleteButton"
+  <mat-card-actions class="challenge-actions" *ngIf="challenge"> <!-- Solo mostrar acciones si challenge existe -->
+    <!-- Botones para usuarios no administradores -->
+    <ng-container *ngIf="!isAdmin">
+      <button *ngIf="isUserChallenge && userChallengeStatus !== 'COMPLETADO'"
               mat-flat-button color="accent"
-              (click)="onCompleteChallenge()"
+              (click)="onCompleteChallenge(); $event.stopPropagation()"
               [disabled]="isCompletingAction"
               matTooltip="Marcar este desafío como completado">
         <mat-spinner *ngIf="isCompletingAction" diameter="20" class="button-spinner"></mat-spinner>
@@ -40,33 +42,41 @@
         <span *ngIf="isCompletingAction">Completando...</span>
       </button>
 
-      <!-- Botón Ya Completado (si aplica) -->
-      <button *ngIf="userChallengeStatus === 'COMPLETADO'" mat-stroked-button disabled class="already-completed-button">
+      <button *ngIf="isUserChallenge && userChallengeStatus === 'COMPLETADO'" mat-stroked-button disabled class="already-completed-button">
         <mat-icon>check_circle</mat-icon>
         Completado
       </button>
 
-      <button *ngIf="userChallengeStatus !== 'COMPLETADO'"
+      <button *ngIf="!isUserChallenge && !isJoined"
+              mat-flat-button color="primary"
+              (click)="joinChallenge(); $event.stopPropagation()"
+              [disabled]="isJoining"
+              class="join-challenge-button">
+        <mat-spinner *ngIf="isJoining" diameter="20" class="button-spinner"></mat-spinner>
+        <mat-icon *ngIf="!isJoining">add_task</mat-icon>
+        <span *ngIf="!isJoining">¡Unirme!</span>
+        <span *ngIf="isJoining">Uniéndome...</span>
+      </button>
+
+      <button *ngIf="!isUserChallenge && isJoined"
               mat-stroked-button color="warn"
-              (click)="leaveChallenge()"
+              (click)="leaveChallenge(); $event.stopPropagation()"
               [disabled]="isLeaving"
-              matTooltip="Abandonar este desafío">
+              class="already-joined-button">
         <mat-spinner *ngIf="isLeaving" diameter="20" class="button-spinner"></mat-spinner>
         <mat-icon *ngIf="!isLeaving">exit_to_app</mat-icon>
         <span *ngIf="!isLeaving">Abandonar</span>
-        <span *ngIf="isLeaving">Abandonando...</span>
+        <span *ngIf="isLeaving">Saliendo...</span>
       </button>
     </ng-container>
 
-    <!-- BOTONES DE ADMINISTRADOR -->
+    <!-- Botones para administradores -->
     <ng-container *ngIf="isAdmin">
-      <!-- BOTÓN DE EDITAR (NUEVO) -->
-      <button mat-icon-button color="primary" [routerLink]="['/admin/challenges/edit', challenge.id]" matTooltip="Editar desafío (Admin)">
+      <button mat-icon-button color="primary" [routerLink]="['/admin/challenges/edit', challenge?.id]" (click)="$event.stopPropagation()" matTooltip="Editar desafío (Admin)">
         <mat-icon>edit</mat-icon>
       </button>
-      <button mat-icon-button color="warn" (click)="confirmDeleteChallenge()" [disabled]="isDeleting" matTooltip="Eliminar desafío (Admin)">
-        <mat-spinner *ngIf="isDeleting" diameter="20" class="button-spinner"></mat-spinner>
-        <mat-icon *ngIf="!isDeleting">delete_forever</mat-icon>
+      <button mat-icon-button color="warn" (click)="confirmDeleteChallenge(); $event.stopPropagation()" [disabled]="isDeleting" matTooltip="Eliminar desafío (Admin)">
+        <mat-icon>delete_forever</mat-icon>
       </button>
     </ng-container>
   </mat-card-actions>

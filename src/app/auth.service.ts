@@ -5,6 +5,25 @@ import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
+// Interfaz para las preferencias de perfil tal como vienen/van al backend
+export interface BackendUserProfilePreferences {
+  themeColor?: string;
+  showBio?: boolean;
+  showHabitStats?: boolean;
+  showCurrentChallenges?: boolean;
+  showCompletedChallenges?: boolean;
+  cardBackgroundColor?: string; // Este es el campo clave para el color de la tarjeta de perfil
+  cardTextColor?: string;
+  showEmailOnCard?: boolean;
+  showJoinDateOnCard?: boolean;
+  showPointsOnCard?: boolean;
+  showLevelOnCard?: boolean;
+  cardColor?: string; // Este es para las tarjetas de desafío, según tu DTO
+  showChallengeCategoryOnCard?: boolean;
+  showChallengePointsOnCard?: boolean;
+  showChallengeDatesOnCard?: boolean;
+}
+
 // Interfaz para el Usuario
 export interface User {
   id?: number | string; // Permitir string si el backend usa UUIDs como string
@@ -21,6 +40,7 @@ export interface User {
   biografia?: string;
   totalHabitosCompletados?: number;
   totalDesafiosCompletados?: number;
+  preferences?: BackendUserProfilePreferences; // <<< AÑADIDO/MODIFICADO AQUÍ
 }
 
 // Interfaz para la RESPUESTA DEL LOGIN que coincide con LoginResponseDTO.java
@@ -35,6 +55,7 @@ export interface LoginResponse {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080'; // URL base de tu API
+  private usersApiUrl = `${this.apiUrl}/users`; // URL específica para usuarios
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
   private isBrowser: boolean;
@@ -94,23 +115,33 @@ export class AuthService {
       );
   }
 
-  updateUserProfile(userId: string | number, profileData: Partial<User>): Observable<User> {
-    const url = `${this.apiUrl}/users/${userId}`;
+  updateUserProfile(userId: string | number, profileData: Partial<User>): Observable<User> { // Este es para datos generales del perfil
+    const url = `${this.usersApiUrl}/${userId}`;
     return this.http.put<User>(url, profileData).pipe(
-      tap((updatedUserFromServer: User) => {
-        // Actualizar el usuario actual si el perfil modificado es el del usuario logueado
-        const currentUser = this.currentUserValue;
-        if (currentUser && currentUser.id === updatedUserFromServer.id) {
-          if (this.isBrowser) {
-            localStorage.setItem('currentUser', JSON.stringify(updatedUserFromServer));
-          }
-          this.currentUserSubject.next(updatedUserFromServer);
+      tap(updatedUser => {
+        // Actualizar el usuario actual si el ID coincide
+        if (this.currentUserSubject.value && this.currentUserSubject.value.id === updatedUser.id) {
+          this.updateCurrentUserState(updatedUser);
         }
       }),
       catchError(this.handleError)
     );
   }
-  
+
+  // NUEVO MÉTODO para actualizar las preferencias de visualización del perfil
+  updateUserDisplayPreferences(userId: string | number, preferencesData: BackendUserProfilePreferences): Observable<User> {
+    const url = `${this.usersApiUrl}/${userId}/preferences`;
+    return this.http.put<User>(url, preferencesData).pipe(
+      tap(updatedUser => {
+        // Actualizar el usuario actual si el ID coincide
+        if (this.currentUserSubject.value && this.currentUserSubject.value.id === updatedUser.id) {
+          this.updateCurrentUserState(updatedUser); // Esto actualizará el BehaviorSubject y notificará a los suscriptores
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
   // Método para refrescar los datos del usuario actual desde el backend
   refreshCurrentUserData(): Observable<User | null> {
     const token = this.getAuthToken(); // Verificar si hay token

@@ -59,10 +59,33 @@
   font-size: 1.8em;
 }
 
+.empty-state {
+  text-align: center;
+  padding: 50px 20px; /* Mantenemos un buen padding en el contenedor */
+  color: #6c757d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin: 20px 0;
+}
+
 .empty-state .empty-icon {
-  font-size: 5em;
-  color: #adb5bd;
-  margin-bottom: 10px;
+  font-size: 3rem;  /* Un tamaño notable, equivalente a aprox 48px si 1rem = 16px */
+  color: #adb5bd;   /* Color actual del icono */
+  width: 3rem;      /* Ancho explícito igual al font-size */
+  height: 3rem;     /* Alto explícito igual al font-size */
+  display: flex;    /* Usar flex para centrar el contenido del icono (el glifo) */
+  align-items: center; /* Centrado vertical del glifo */
+  justify-content: center; /* Centrado horizontal del glifo */
+  line-height: 1;   /* Evita problemas de altura de línea con iconos de fuente */
+  margin-bottom: 15px; /* Espacio debajo del icono, antes del texto */
+  overflow: visible; /* Asegurar que el glifo no se corte si excede la caja (aunque no debería con flex center) */
+  /* Para depurar, puedes añadir un borde: */
+  /* border: 1px solid red; */
 }
 
 .empty-state a {
