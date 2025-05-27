@@ -1,0 +1,372 @@
+.page-container {
+  padding: 5px; /* Mantenemos el padding reducido para el contenedor de página general */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: var(--page-background, #f4f7f6);
+}
+
+/* Estilos base para .statistics-container (se aplicarán a la vista de LISTA por defecto) */
+.statistics-container {
+  width: 100%;
+  /* Max-width para la vista de lista, similar a como estaba antes o ajustado para .statistics-card-container */
+  max-width: 950px; /* Ajusta si es necesario, un poco más que .statistics-card-container (900px) */
+  margin: 0 auto; /* Centrado */
+  padding: 20px;   /* Padding original para la vista de lista */
+  background-color: var(--color-surface, #fff);
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.1));
+  /* Transición suave si cambias entre vistas (opcional) */
+  transition: max-width 0.3s ease, padding 0.3s ease;
+}
+
+/* Estilos específicos para .statistics-container CUANDO la vista de GRÁFICOS está activa */
+.statistics-container.view-mode-charts {
+  max-width: 1800px; /* Ancho mayor para la vista de gráficos */
+  padding: 5px;      /* Padding reducido para la vista de gráficos */
+}
+
+/* MODIFICADO: Cambiado de .statistics-card a .statistics-card-container */
+/* Este contenedor se usa dentro de la vista de lista */
+.statistics-card-container {
+  max-width: 900px; 
+  width: 100%;
+  margin-top: 20px; /* Este margin-top es para dentro de la vista de lista */
+}
+
+/* MODIFICADO: Selector ajustado y renombrado para claridad */
+.statistics-card-container mat-card-header .header-avatar-icon {
+  font-size: 40px;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--user-primary);
+}
+
+.loading-indicator, .error-message, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.loading-indicator p, .error-message p, .empty-state p {
+  margin-top: 15px;
+  font-size: 1.1em;
+}
+
+.error-message mat-icon {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.empty-state .empty-icon {
+  font-size: 3em;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-disabled, #aeaeae);
+}
+
+.summary-info {
+  font-size: 0.95em;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+  padding: 0 16px; /* Alineado con el contenido de la tarjeta */
+}
+
+/* NUEVOS ESTILOS PARA LA CUADRÍCULA Y TARJETAS */
+/* Remove or comment out the older .filters-section if it's redundant */
+/*
+.filters-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: var(--color-surface-variant, #f8f9fa);
+  border-radius: var(--border-radius-md, 8px);
+}
+*/
+
+/* Ensure .filter-field styles are active and correctly defined if they were part of the older section */
+/* The .filter-field styles you had seem fine, ensure they are not commented out if they were part of the old block */
+.filter-field { /* This class is used in your current HTML for the mat-form-fields */
+  min-width: 180px; /* Or 200px as in the newer suggestion, adjust as needed */
+  flex: 1 1 180px; /* Allows them to grow and shrink */
+}
+
+/* Styles for the main container and header */
+/* .statistics-container { */
+/*   padding: 20px; */
+/*   max-width: 800px; */
+/*   margin: 20px auto; */
+/*   background-color: #fff; */
+/*   border-radius: 8px; */
+/*   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+/* } */
+
+.header-controls {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee; /* This was already present and is good */
+}
+
+.header-controls h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* Styles for the filters toolbar - this should be the active style for the filter container */
+.filters-toolbar {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 16px; 
+  margin-top: 15px; /* Added some top margin for spacing from subtitle */
+  /* margin-bottom: 10px; /* This was from the newer suggestion, adjust as needed or remove if .header-controls padding is enough */
+}
+
+/* Remove or comment out .filter-select if you are consistently using .filter-field in your HTML */
+/*
+.filter-select {
+  min-width: 200px; 
+  flex-grow: 1; 
+}
+*/
+
+/* Estilos para el spinner, mensajes de error y estado vacío (ya deberías tenerlos similares) */
+.loading-spinner-container,
+.error-message-container,
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #757575;
+}
+
+.loading-spinner-container p {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.error-message-container mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+}
+
+.empty-state-container .empty-icon {
+  font-size: 60px;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 15px;
+  color: #bdbdbd;
+}
+
+.empty-state-container p {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+.empty-state-container .empty-subtext {
+  font-size: 0.9em;
+  color: var(--color-text-secondary);
+  margin-top: 8px;
+}
+
+/* Contenedor para la cuadrícula de estadísticas (donde se muestran los gráficos de progreso) */
+/* Estos estilos para .charts-grid solo tendrán efecto visual cuando .statistics-container.view-mode-charts esté activo y proporcione el ancho */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(635px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Estilos para cada tarjeta de gráfico individual dentro de .charts-grid */
+/* Asegúrate que estas clases coincidan con las de tus mat-card de gráficos */
+.charts-grid .chart-card.card-style {
+  background-color: var(--color-surface, #fff);
+  border-radius: var(--border-radius-md, 8px);
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+    display: flex;
+  flex-direction: column;
+  min-height: 390px; /* Ajusta esta altura. Si chartViewSize[1] es 300px, 
+                        más el header (~50px) y padding de contenido (~32px), 
+                        necesitas al menos ~382px. Damos un poco de margen.
+                        Si un gráfico específico necesita más altura interna (ej. muchas barras),
+                        idealmente su chartViewSize[1] en el TS debería ser mayor. */
+}
+
+.charts-grid .chart-card.card-style mat-card-header {
+  padding-bottom: 8px; 
+}
+
+.charts-grid .chart-card.card-style mat-card-title {
+  font-size: 1.1em; 
+  white-space: normal;
+}
+
+.charts-grid .chart-card.card-style mat-card-content {
+  padding: 16px; 
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  flex-grow: 1; 
+  overflow: hidden; /* Mantenemos hidden. Si el contenido del gráfico (etiquetas) se corta,
+                       es porque el chartViewSize es demasiado pequeño para ese contenido,
+                       no porque la tarjeta lo corte externamente. */
+}
+
+/* Ajustes específicos para ngx-charts para mejorar legibilidad y evitar cortes */
+/* NOTA: ::ng-deep puede ser deprecado en el futuro, pero es común para estilizar componentes encapsulados. */
+
+/* Etiquetas principales de los ejes (ej: "Puntos", "Día de la Semana", "Hábito") */
+:host ::ng-deep .ngx-charts .axis-label {
+  font-size: 0.8em !important; /* Reducido ligeramente más */
+}
+
+/* Etiquetas de las marcas en el eje X (ej: "Dom", "Lun", "Mar" o nombres de hábitos en gráficos de barras verticales) */
+:host ::ng-deep .ngx-charts .x.axis .tick text {
+  font-size: 0.7em !important; /* Reducido aún más. Para etiquetas largas en este eje, considera opciones de ngx-charts en TS como trimXAxisTicks, maxXAxisTickLength o rotación. */
+}
+
+/* Etiquetas de las marcas en el eje Y (ej: nombres de hábitos en gráficos de barras horizontales, números) */
+:host ::ng-deep .ngx-charts .y.axis .tick text {
+  font-size: 0.7em !important; /* Reducido aún más. Este es clave para las etiquetas de hábitos en barras horizontales. */
+                               /* Si aún se cortan, considera opciones de ngx-charts en TS como trimYAxisTicks, maxYAxisTickLength, o aumentar chartViewSize[0] (ancho del gráfico). */
+}
+
+/* Título de la leyenda */
+:host ::ng-deep .ngx-charts .legend-title .legend-title-text {
+  font-weight: bold;
+  font-size: 0.85em !important; /* Reducido ligeramente más */
+}
+
+/* Etiquetas de los ítems de la leyenda */
+:host ::ng-deep .ngx-charts .chart-legend .legend-label-text {
+   font-size: 0.65em !important; /* Reducido aún más para la leyenda */
+   white-space: normal !important; /* Intento para que el texto se ajuste si es posible */
+   line-height: 1.1 !important;
+   /* Nota: ngx-charts a menudo trunca el texto del nodo antes de que CSS pueda aplicar text-overflow. */
+}
+
+/* Ajustes para las etiquetas del gráfico de tarta (pie chart) */
+/* Estas son las etiquetas que salen de las porciones de la tarta */
+:host ::ng-deep .ngx-charts-pie-chart .pie-label { /* Específico para ngx-charts-pie-chart */
+  font-size: 0.6em !important; /* Reducido aún más para las etiquetas de las porciones */
+  /* fill: #333 !important; */ /* Puedes cambiar el color si es necesario */
+}
+
+/* Si estás usando ngx-charts-advanced-pie-chart y las etiquetas son parte de una leyenda externa con líneas: */
+:host ::ng-deep .ngx-charts-advanced-pie-chart .advanced-pie-legend-item text,
+:host ::ng-deep .ngx-charts-advanced-pie-chart .legend-label-text { /* Cubre etiquetas de leyenda en advanced pie */
+  font-size: 0.65em !important; /* Reducido también */
+  white-space: normal !important;
+  line-height: 1.1 !important;
+}
+
+/* Estilos para ngx-charts */
+:host ::ng-deep .ngx-charts {
+  text-overflow: clip !important; /* Intenta evitar el truncamiento general */
+}
+
+/* Leyenda del Gráfico de Tarta */
+/* COMENTAMOS ESTA REGLA ANTERIOR PORQUE PODRÍA ESTAR EN CONFLICTO
+:host ::ng-deep .ngx-charts-pie-chart .chart-legend .legend-label-text,
+:host ::ng-deep .ngx-charts-pie-chart .legend-title-text {
+  font-size: 0.8em !important;
+  white-space: normal !important;
+  line-height: 1.2 !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+  display: inline-block !important;
+  max-width: 120px !important;
+}
+*/
+
+:host ::ng-deep .ngx-charts-pie-chart .chart-legend .legend-item {
+  margin-right: 5px !important; /* Espacio entre ítems de leyenda */
+}
+
+
+/* Etiquetas de los ejes para gráficos de barras */
+:host ::ng-deep .ngx-charts-bar-vertical .x.axis .tick text,
+:host ::ng-deep .ngx-charts-bar-horizontal .y.axis .tick text {
+  font-size: 0.85em !important; /* Ajusta el tamaño si es necesario */
+  fill: #555 !important; /* Color del texto */
+  white-space: normal !important; /* Para que wrapXAxisTicks/wrapYAxisTicks funcione mejor */
+  text-overflow: clip !important;
+  overflow: visible !important;
+}
+
+/* Específico para etiquetas del eje X en gráficos verticales si se superponen mucho */
+:host ::ng-deep .ngx-charts-bar-vertical .x.axis .tick text {
+  /* Si wrapXAxisTicks no es suficiente, podrías considerar rotarlas,
+     pero usualmente wrap es mejor para la legibilidad.
+  transform: rotate(-35deg);
+  text-anchor: end !important;
+  dominant-baseline: middle; */
+}
+
+/* Etiquetas de las porciones del gráfico de tarta (si [trimLabels]="false" no es suficiente) */
+:host ::ng-deep .ngx-charts-pie-chart .pie-label {
+  font-size: 0.8em !important;
+  fill: #333 !important;
+}
+
+/* Estilos para la leyenda de ngx-charts para mostrar el texto completo y legible */
+:host ::ng-deep .ngx-charts-pie-chart .ngx-charts-legend .legend-label-text {
+  text-overflow: initial !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  max-width: none !important;
+  font-size: 14px !important; /* Clave para el tamaño del texto */
+  line-height: 1.5 !important;
+  display: inline-block !important; 
+  vertical-align: middle;
+  word-break: break-word !important;
+  padding-left: 5px !important; /* Espacio entre el color y el texto */
+}
+
+/* Contenedor de cada item de la leyenda para que se apilen verticalmente */
+:host ::ng-deep .ngx-charts-pie-chart .ngx-charts-legend .legend-entry {
+  display: flex !important;         /* Para alinear el cuadrito de color y el texto del item */
+  align-items: center !important;   /* Centra verticalmente el color y el texto */
+  width: 100% !important;           /* Clave para que cada item ocupe una línea si el padre es flex column, o para forzar el salto si el padre es flex row wrap */
+  margin-bottom: 8px !important;    /* Espacio entre items de leyenda apilados */
+  margin-right: 0 !important;       
+  min-height: 24px !important;      
+  float: none !important;           
+}
+
+/* Contenedor principal de la leyenda */
+/* The following rule has been removed
+:host ::ng-deep .ngx-charts-pie-chart .ngx-charts-legend {
+  width: 100% !important;
+  max-width: none !important;
+  margin-top: 15px !important;      
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+*/

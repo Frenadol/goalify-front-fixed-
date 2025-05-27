@@ -1,0 +1,291 @@
+<div class="statistics-container"
+     [ngClass]="{
+       'view-mode-charts': currentViewMode === 'charts',
+       'view-mode-list': currentViewMode === 'list'
+     }">
+  <div class="header-controls">
+    <h1>Mi Progreso y Estadísticas</h1>
+    <p class="subtitle">Un resumen de tu actividad reciente.</p>
+
+    <div *ngIf="habitsErrorMessage && !isLoading" class="warning-message-container">
+      <mat-icon color="accent">warning_amber</mat-icon>
+      <p>{{ habitsErrorMessage }}</p>
+    </div>
+
+    <div class="filters-toolbar">
+      <!-- Category Filter -->
+      <mat-form-field appearance="outline" class="filter-field"
+        *ngIf="categories && categories.length > 1">
+        <mat-label>Categoría</mat-label>
+        <mat-select [(ngModel)]="selectedCategory" (selectionChange)="onFilterChange()">
+          <mat-option *ngFor="let category of categories" [value]="category">
+            {{ category === 'all' ? 'Todas las Categorías' : (category | titlecase) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Habit Name Filter -->
+      <mat-form-field appearance="outline" class="filter-field"
+        *ngIf="habitsForFilter && habitsForFilter.length > 0">
+        <mat-label>Hábito Específico</mat-label>
+        <mat-select [(ngModel)]="selectedHabitId" (selectionChange)="onFilterChange()">
+          <mat-option value="all">Todos los Hábitos</mat-option>
+          <mat-option *ngFor="let habit of habitsForFilter" [value]="habit.id">
+            {{ habit.nombre | titlecase }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Time Period Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Período</mat-label>
+        <mat-select [(ngModel)]="selectedPeriod" (selectionChange)="onFilterChange()">
+          <mat-option *ngFor="let option of timeFilterOptions" [value]="option.value">
+            {{ option.viewValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Controles para cambiar de vista -->
+    <div class="view-mode-controls">
+      <button mat-stroked-button (click)="setViewMode('list')" [class.active-view-button]="currentViewMode === 'list'">
+        <mat-icon>list</mat-icon> Lista
+      </button>
+      <button mat-stroked-button (click)="setViewMode('charts')" [class.active-view-button]="currentViewMode === 'charts'">
+        <mat-icon>bar_chart</mat-icon> Gráficos
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido que cambia según el modo de vista -->
+  <ng-container [ngSwitch]="currentViewMode">
+
+    <!-- VISTA DE GRÁFICOS -->
+    <ng-container *ngSwitchCase="'charts'">
+      <div *ngIf="isLoading && displayedStatistics.length === 0" class="loading-spinner-container">
+        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+        <p>Cargando datos para gráficos...</p>
+      </div>
+      <div *ngIf="!isLoading && errorMessage" class="error-message-container">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ errorMessage }}</p>
+      </div>
+      <div *ngIf="!isLoading && !errorMessage && displayedStatistics.length === 0" class="empty-state-container">
+        <mat-icon class="empty-icon">signal_cellular_no_sim</mat-icon>
+        <p>No hay datos suficientes para mostrar gráficos con los filtros seleccionados.</p>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && displayedStatistics.length > 0" class="charts-grid">
+        <!-- Distribución por Hábito (Gráfico de Tarta) -->
+        <mat-card class="chart-card card-style" *ngIf="categoryDistributionChart && categoryDistributionChart.length > 0">
+          <mat-card-header>
+            <mat-card-title>Distribución por Hábito</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- CAMBIO AQUÍ --> 
+            <!-- Aumenta la altura de 400 a 480 (o más si es necesario) -->
+            <ngx-charts-pie-chart
+              [view]="[700, 480]" 
+              [scheme]="colorScheme"
+              [results]="categoryDistributionChart"
+              [legend]="false"
+              [legendPosition]="LegendPosition.Below" 
+              [legendTitle]="''"
+              [labels]="true"
+              [trimLabels]="false"
+              [doughnut]="false"
+              (select)="onChartSelect($event)">
+            </ngx-charts-pie-chart>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Rendimiento de Hábitos (Gráfico de Barras Verticales) -->
+        <mat-card class="chart-card card-style" *ngIf="habitPerformanceChart && habitPerformanceChart.length > 0">
+          <mat-card-header>
+            <mat-card-title>Rendimiento por Hábito (Completados)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ngx-charts-bar-vertical
+              [view]="[700, 400]"
+              [scheme]="colorScheme"
+              [results]="habitPerformanceChart"
+              [gradient]="false"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false" 
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              xAxisLabel="Hábito" 
+              yAxisLabel="Veces Completado"
+              [trimXAxisTicks]="false"
+              [maxYAxisTickLength]="100"
+              (select)="onChartSelect($event)">
+            </ngx-charts-bar-vertical>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Puntos por Hábito (Gráfico de Barras Horizontales) -->
+        <mat-card class="chart-card card-style" *ngIf="pointsByHabitChart && pointsByHabitChart.length > 0">
+          <mat-card-header>
+            <mat-card-title>Puntos Ganados por Hábito</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ngx-charts-bar-horizontal
+              [view]="[700, 400]"
+              [scheme]="colorScheme"
+              [results]="pointsByHabitChart"
+              [gradient]="false"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              xAxisLabel="Puntos"
+              yAxisLabel="Hábito"
+              [showDataLabel]="true"
+              [trimYAxisTicks]="false"
+              [maxXAxisTickLength]="100"
+              (select)="onChartSelect($event)">
+            </ngx-charts-bar-horizontal>
+          </mat-card-content>
+        </mat-card>
+
+         <!-- Consistencia de Finalización (Gráfico de Barras Verticales) -->
+        <mat-card class="chart-card card-style" 
+                  *ngIf="completionConsistencyChart && completionConsistencyChart.length > 0 && completionConsistencyChart[0] && completionConsistencyChart[0].series && completionConsistencyChart[0].series.length > 0">
+          <mat-card-header>
+            <mat-card-title>Consistencia por Día de la Semana</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ngx-charts-bar-vertical
+              [view]="[700, 400]"
+              [scheme]="colorScheme"
+              [results]="completionConsistencyChart[0].series"
+              [gradient]="false"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              xAxisLabel="Día de la Semana"
+              yAxisLabel="Completados"
+              [trimXAxisTicks]="false" 
+              (select)="onChartSelect($event)">
+            </ngx-charts-bar-vertical>
+          </mat-card-content>
+        </mat-card>
+
+      </div> <!-- Cierre de .charts-grid -->
+    </ng-container> <!-- Cierre de ng-container [ngSwitchCase]="'charts'" -->
+
+    <!-- VISTA DE LISTA -->
+    <ng-container *ngSwitchCase="'list'">
+      <!-- Spinner de carga y mensajes de error/vacío (sin cambios) -->
+      <div *ngIf="isLoading && displayedStatistics.length === 0" class="loading-spinner-container">
+        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+        <p>Cargando estadísticas...</p>
+      </div>
+
+      <div *ngIf="!isLoading && errorMessage" class="error-message-container">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && displayedStatistics.length === 0 && !isAnyFilterActive()" class="empty-state-container">
+        <mat-icon class="empty-icon">history_toggle_off</mat-icon>
+        <p>Aún no tienes actividades registradas.</p>
+        <p class="empty-subtext">Completa tus hábitos para ver tu progreso aquí.</p>
+      </div>
+      
+      <div *ngIf="!isLoading && !errorMessage && displayedStatistics.length === 0 && isAnyFilterActive()" class="empty-state-container">
+        <mat-icon class="empty-icon">filter_alt_off</mat-icon>
+        <p>No hay actividades que coincidan con los filtros seleccionados.</p>
+        <p class="empty-subtext">Intenta ajustar tu búsqueda.</p>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && displayedStatistics.length > 0" class="statistics-grid-container">
+        <p class="results-summary">
+          Mostrando {{ displayedStatistics.length }}
+          {{ displayedStatistics.length === 1 ? 'registro' : 'registros' }}.
+        </p>
+        <div class="statistics-grid">
+          <mat-card *ngFor="let statistic of displayedStatistics" class="statistic-card-item card-style" (click)="openHabitDetailDialog(statistic)">
+            <mat-card-header>
+              <div mat-card-avatar class="item-icon-area">
+                <img *ngIf="statistic.iconoUrlHabito" [src]="statistic.iconoUrlHabito" alt="Icono del hábito" class="habit-icon-stats">
+                <mat-icon *ngIf="!statistic.iconoUrlHabito" class="habit-icon-stats default-list-icon">checklist_rtl</mat-icon>
+              </div>
+              <mat-card-title class="item-habit-name">{{ statistic.nombreHabito | titlecase }}</mat-card-title>
+              <mat-card-subtitle class="item-completion-details">
+                <span class="item-completion-date">{{ statistic.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span *ngIf="statistic.categoriaHabito && statistic.categoriaHabito !== 'Sin Categoría'" class="category-chip">{{ statistic.categoriaHabito }}</span>
+                <span *ngIf="!statistic.categoriaHabito || statistic.categoriaHabito === 'Sin Categoría'" class="category-chip">Sin Categoría Asignada</span>
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="item-points-content">
+              <span class="points-value"
+                    [ngClass]="{
+                      'positive-points': statistic.puntosGanados > 0,
+                      'zero-points': statistic.puntosGanados === 0 || statistic.puntosGanados === null || statistic.puntosGanados === undefined,
+                      'negative-points': statistic.puntosGanados < 0
+                    }">
+                {{ statistic.puntosGanados !== null && statistic.puntosGanados !== undefined ? statistic.puntosGanados : 0 }} Puntos
+              </span>
+            </mat-card-content>
+          </mat-card>
+        </div> <!-- Cierre de .statistics-grid -->
+      </div> <!-- Cierre de .statistics-grid-container -->
+    </ng-container> <!-- Cierre de ng-container [ngSwitchCase]="'list'" -->
+
+  </ng-container> <!-- Cierre de ng-container [ngSwitch]="currentViewMode" -->
+
+  <!-- Sección para Desafíos Completados -->
+  <div class="header-controls" style="margin-top: 40px;">
+    <h2>Mis Desafíos Completados</h2>
+    <p class="subtitle">Un resumen de tus logros en desafíos.</p>
+  </div>
+
+  <div *ngIf="isLoadingCompletedChallenges" class="loading-spinner-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p>Cargando desafíos completados...</p>
+  </div>
+
+  <div *ngIf="!isLoadingCompletedChallenges && completedChallengesErrorMessage" class="error-message-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p>{{ completedChallengesErrorMessage }}</p>
+  </div>
+
+  <div *ngIf="!isLoadingCompletedChallenges && !completedChallengesErrorMessage && completedChallenges.length === 0" class="empty-state-container">
+    <mat-icon class="empty-icon">emoji_events</mat-icon>
+    <p>Aún no has completado ningún desafío.</p>
+    <p class="empty-subtext">
+      ¡Participa y completa desafíos para ver tus logros aquí!
+    </p>
+  </div>
+
+  <div *ngIf="!isLoadingCompletedChallenges && !completedChallengesErrorMessage && completedChallenges.length > 0" class="statistics-grid-container">
+    <p class="results-summary">
+      Has completado {{ completedChallenges.length }} desafío{{ completedChallenges.length === 1 ? '' : 's' }}.
+    </p>
+    <div class="statistics-grid">
+      <mat-card *ngFor="let challenge of completedChallenges" class="statistic-card-item challenge-card card-style" (click)="openChallengeDetailDialog(challenge)">
+        <mat-card-header>
+          <div mat-card-avatar class="item-icon-area">
+            <mat-icon class="habit-icon-stats default-list-icon">emoji_events</mat-icon>
+          </div>
+          <mat-card-title class="item-habit-name">{{ challenge.nombre | titlecase }}</mat-card-title>
+          <mat-card-subtitle class="item-completion-details">
+            <span class="item-completion-date">Completado el: {{ challenge.userChallengeData.fechaCompletado | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="challenge.categoria" class="category-chip">{{ challenge.categoria | titlecase }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="item-points-content">
+          <span class="points-value positive-points" *ngIf="challenge.puntosRecompensa">
+            +{{ challenge.puntosRecompensa }} Puntos
+          </span>
+        </mat-card-content>
+      </mat-card>
+    </div> <!-- Cierre de .statistics-grid (para desafíos) -->
+  </div> <!-- Cierre de .statistics-grid-container (para desafíos) -->
+</div> <!-- Cierre de .statistics-container -->

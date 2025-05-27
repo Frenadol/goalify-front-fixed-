@@ -21,15 +21,15 @@ export interface UserChallengeDetail {
   id: number;
   nombre: string;
   descripcion?: string;
-  fechaInicio: Date | string; // Cambiado: ya no es opcional con ?
-  fechaFin: Date | string;   // Cambiado: ya no es opcional con ?
+  fechaInicio?: Date | string; // Cambiado a opcional
+  fechaFin?: Date | string;   // Cambiado a opcional
   puntosRecompensa?: number;
-  estado?: string; // 'ACTIVO', 'PENDIENTE', 'FINALIZADO', 'CANCELADO'
+  estado?: string; // 'ACTIVO', 'PENDIENTE', 'FINALIZADO', 'CANCELADO' (estado del Challenge original)
   tipo?: string; // 'INDIVIDUAL', 'GRUPAL'
   categoria?: string;
   imageUrl?: string;
   userChallengeData: UserChallenge; // La relación UsuarioDesafio
-  isCompletingAction?: boolean; // <--- AÑADIDO AQUÍ
+  isCompletingAction?: boolean;
 }
 
 export interface UserProfileUpdatePayload {

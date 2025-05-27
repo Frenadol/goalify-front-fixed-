@@ -3,17 +3,17 @@ import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { UserProfileDetailsComponent } from './user-profile-details/user-profile-details.component';
+import { UserStatisticsComponent } from './user-statistics/user-statistics.component';
 import { AuthGuard } from './auth.guard';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { adminGuard } from './admin/admin.guard';
 import { UserManagementComponent } from './admin/user-management/user-management.component';
-import { UserProfileDetailsComponent } from './user-profile-details/user-profile-details.component'; // <-- IMPORTA EL NUEVO COMPONENTE
+import { ChallengeListComponent } from './challenges/challenge-list/challenge-list.component';
+import { MyChallengesListComponent } from './challenges/my-challenges-list/my-challenges-list.component';
 
 // Importar rutas de admin para desafíos
 import { adminChallengeRoutes } from './challenges/challenges-routing.module';
-// Importar componentes de desafío directamente si son standalone y se usan con loadComponent
-import { ChallengeListComponent } from './challenges/challenge-list/challenge-list.component';
-import { MyChallengesListComponent } from './challenges/my-challenges-list/my-challenges-list.component'; // CAMBIO AQUÍ
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -38,9 +38,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { path: 'welcome', component: WelcomeComponent, canActivate: [AuthGuard] },
-  { // NUEVA RUTA PARA EL PERFIL DETALLADO DEL USUARIO
-    path: 'user-profile', // Esta es la ruta que ya usas en welcome.component.html
+  {
+    path: 'user-profile',
     component: UserProfileDetailsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'app/progress', // Esta es la ruta para "Mi Progreso"
+    component: UserStatisticsComponent, // Asegúrate de que aquí dice UserStatisticsComponent (sin el "2")
     canActivate: [AuthGuard]
   },
   {

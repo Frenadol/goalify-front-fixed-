@@ -1,0 +1,49 @@
+<!-- filepath: c:\Users\Fernando\Downloads\Goalify-frontend-main (1)\Goalify-frontend-main\src\app\user-statistics\habit-detail-dialog\habit-detail-dialog.component.html -->
+<div class="compact-habit-detail-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="main-title">Detalle de Actividad</h2>
+    <button mat-icon-button mat-dialog-close class="close-button" aria-label="Cerrar diálogo">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content-compact">
+    <div class="activity-item-view">
+      <div class="activity-icon-area">
+        <img *ngIf="data.habit.iconoUrl" [src]="data.habit.iconoUrl" alt="Icono del hábito" class="habit-display-icon">
+        <mat-icon *ngIf="!data.habit.iconoUrl" class="habit-display-icon default-list-icon">checklist_rtl</mat-icon>
+      </div>
+      <div class="activity-info-area">
+        <span class="habit-name-display">{{ data.habit.nombre }}</span>
+        <span class="habit-category-display" *ngIf="data.habit.categoria">{{ data.habit.categoria }}</span>
+        <span class="completion-date-display" *ngIf="data.completion">
+          Completado: {{ data.completion.fecha | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+      </div>
+      <div class="activity-points-area" *ngIf="data.completion && data.completion.puntosGanados !== undefined && data.completion.puntosGanados !== null">
+        <span class="points-value" [ngClass]="{'positive-points': data.completion.puntosGanados > 0, 'zero-points': data.completion.puntosGanados === 0, 'negative-points': data.completion.puntosGanados < 0}">
+          {{ data.completion.puntosGanados >= 0 ? '+' : '' }}{{ data.completion.puntosGanados }}
+        </span>
+      </div>
+    </div>
+
+    <mat-divider class="details-divider" *ngIf="data.habit.descripcion"></mat-divider>
+
+    <div *ngIf="data.habit.descripcion" class="additional-details">
+      <p class="habit-description-text"><strong>Descripción:</strong> {{ data.habit.descripcion }}</p>
+    </div>
+    
+    <!-- Puedes añadir selectivamente más detalles si son cruciales y caben en el diseño -->
+    <!-- Ejemplo:
+    <mat-divider class="details-divider" *ngIf="data.habit.frecuencia"></mat-divider>
+    <div *ngIf="data.habit.frecuencia" class="additional-details">
+        <p><strong>Frecuencia:</strong> {{ data.habit.frecuencia | titlecase }}</p>
+    </div>
+    -->
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions-compact">
+    <button mat-stroked-button mat-dialog-close>Cerrar</button>
+  </mat-dialog-actions>
+</div>

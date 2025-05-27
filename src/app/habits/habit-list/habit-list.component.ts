@@ -13,17 +13,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
- import { Habit } from '../../models/habit.model';
+import { Habit } from '../../models/habit.model';
 import { HabitService } from '../habit.service';
 import { AuthService, User } from '../../auth.service';
 import { ConfirmDialogComponent, DialogData } from '../../shared/confirm-dialog.component'; 
 
 interface HabitUIMode extends Habit {
-  // Habit ya incluye id, nombre, fechaCreacion, isCompletingAction, isCompletedToday, isExpanded
-  // No es necesario redeclararlos aquí si la interfaz Habit está correctamente definida e importada.
-  // Si alguna propiedad específica de UI no está en Habit, añádela aquí.
-  // Por ejemplo, si isExpanded fuera solo de UI y no del modelo base:
-  // isExpanded?: boolean; 
+  isExpanded: boolean;
+  isCompletedToday: boolean;
+  isCompletingAction: boolean;
 }
 
 @Component({
@@ -46,7 +44,7 @@ interface HabitUIMode extends Habit {
   templateUrl: './habit-list.component.html',
   styleUrls: ['./habit-list.component.css']
 })
-export class HabitListComponent implements OnInit, OnDestroy {
+export class HabitListComponent implements OnInit {
   allHabits: HabitUIMode[] = [];
   displayedHabits: HabitUIMode[] = [];
   isLoading = false;
@@ -87,9 +85,9 @@ export class HabitListComponent implements OnInit, OnDestroy {
     this.habitsSubscription = this.habitService.getMyHabits().pipe(
       map((habits: Habit[]): HabitUIMode[] => habits.map((habit: Habit) => ({
         ...habit,
-        isExpanded: habit.isExpanded || false, // Asegurar que isExpanded tenga un valor
+        isExpanded: false, // Initialize directly
         isCompletedToday: this.checkIfCompletedToday(habit.fechaUltimaCompletacion),
-        isCompletingAction: habit.isCompletingAction || false // Asegurar que isCompletingAction tenga un valor
+        isCompletingAction: false, // Initialize directly
       }))),
       catchError((error: any) => {
         console.error('Error al cargar hábitos:', error);
@@ -214,10 +212,10 @@ export class HabitListComponent implements OnInit, OnDestroy {
         const index = this.allHabits.findIndex(h => h.id === updatedHabit.id);
         if (index > -1) {
           this.allHabits[index] = {
-            ...this.allHabits[index], // Mantener propiedades de UI que no vengan del backend
-            ...updatedHabit,          // Sobrescribir con datos del backend
+            ...updatedHabit, // Spread updated data from server
+            isExpanded: this.allHabits[index].isExpanded, // Preserve existing isExpanded state
             isCompletedToday: this.checkIfCompletedToday(updatedHabit.fechaUltimaCompletacion),
-            isCompletingAction: false
+            isCompletingAction: false // Reset this action flag
           };
           this.updateDisplayedHabits();
         }
