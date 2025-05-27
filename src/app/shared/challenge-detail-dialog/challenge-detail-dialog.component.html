@@ -5,63 +5,67 @@
     {{ data.nombre }}
   </h1>
 
-  <mat-dialog-content class="dialog-content">
-    <div class="challenge-details-grid">
-      <div class="challenge-image-container" *ngIf="data.imageUrl">
-        <img [src]="data.imageUrl" [alt]="data.nombre" class="challenge-image">
+  <div mat-dialog-content class="dialog-content">
+    <p *ngIf="data.descripcion; else noDescription">{{ data.descripcion }}</p>
+    <ng-template #noDescription>
+      <p><em>Este desafío no tiene una descripción detallada.</em></p>
+    </ng-template>
+
+    <mat-divider></mat-divider>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <mat-icon>category</mat-icon>
+        <span><strong>Categoría:</strong> {{ data.categoria || 'No especificada' }}</span>
       </div>
-
-      <div class="challenge-info">
-        <p class="description" *ngIf="data.descripcion">{{ data.descripcion }}</p>
-        <p class="description" *ngIf="!data.descripcion">Este desafío no tiene una descripción detallada.</p>
-
-        <mat-divider></mat-divider>
-
-        <div class="info-section">
-          <div class="info-item">
-            <mat-icon>category</mat-icon>
-            <span><strong>Categoría:</strong> {{ data.categoria || 'No especificada' }}</span>
-          </div>
-          <div class="info-item">
-            <mat-icon>emoji_events</mat-icon>
-            <span><strong>Puntos:</strong> {{ data.puntosRecompensa || 0 }}</span>
-          </div>
-          <div class="info-item">
-            <mat-icon>event</mat-icon>
-            <span><strong>Inicio:</strong> {{ data.fechaInicio | date:'dd/MM/yyyy' }}</span>
-          </div>
-          <div class="info-item">
-            <mat-icon>event_busy</mat-icon>
-            <span><strong>Fin:</strong> {{ data.fechaFin | date:'dd/MM/yyyy' }}</span>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="user-participation-section">
-          <h3>Tu Participación</h3>
-          <div class="info-item">
-            <mat-icon>assignment_ind</mat-icon>
-            <span><strong>Estado:</strong>
-              <span class="status-tag" [ngClass]="getStatusClass(data.userChallengeData.estadoParticipacion)">
-                {{ data.userChallengeData.estadoParticipacion | titlecase }}
-              </span>
-            </span>
-          </div>
-          <div class="info-item" *ngIf="data.userChallengeData.fechaInscripcion">
-            <mat-icon>how_to_reg</mat-icon>
-            <span><strong>Inscrito el:</strong> {{ data.userChallengeData.fechaInscripcion | date:'dd/MM/yyyy HH:mm' }}</span>
-          </div>
-          <div class="info-item" *ngIf="data.userChallengeData.fechaCompletado">
-            <mat-icon>check_circle</mat-icon>
-            <span><strong>Completado el:</strong> {{ data.userChallengeData.fechaCompletado | date:'dd/MM/yyyy HH:mm' }}</span>
-          </div>
-        </div>
+      <div class="info-item">
+        <mat-icon>emoji_events</mat-icon>
+        <span><strong>Puntos:</strong> {{ data.puntosRecompensa || 0 }}</span>
+      </div>
+      <div class="info-item">
+        <mat-icon>date_range</mat-icon>
+        <span><strong>Inicio:</strong> {{ data.fechaInicio | date:'dd/MM/yyyy' : 'UTC' }}</span>
+      </div>
+      <div class="info-item">
+        <mat-icon>event_busy</mat-icon>
+        <span><strong>Fin:</strong> {{ data.fechaFin | date:'dd/MM/yyyy' : 'UTC' }}</span>
       </div>
     </div>
-  </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
+    <mat-divider *ngIf="data.userChallengeData"></mat-divider>
+
+    <div *ngIf="data.userChallengeData" class="user-participation-section">
+      <h3>Tu Participación</h3>
+      <div class="info-item">
+        <mat-icon>assignment_ind</mat-icon>
+        <span><strong>Estado:</strong>
+          <span *ngIf="data.userChallengeData.estadoParticipacion; else noParticipationState"
+                class="status-tag"
+                [ngClass]="getStatusClass(data.userChallengeData.estadoParticipacion)">
+            {{ data.userChallengeData.estadoParticipacion | titlecase }}
+          </span>
+          <ng-template #noParticipationState>
+            <span>No disponible</span>
+          </ng-template>
+        </span>
+      </div>
+
+      <div class="info-item" *ngIf="data.userChallengeData.fechaInscripcion">
+        <mat-icon>how_to_reg</mat-icon>
+        <span><strong>Inscrito el:</strong> {{ data.userChallengeData.fechaInscripcion | date:'dd/MM/yyyy HH:mm' : 'UTC' }}</span>
+      </div>
+      <div class="info-item" *ngIf="data.userChallengeData.fechaCompletado">
+        <mat-icon>check_circle</mat-icon>
+        <span><strong>Completado el:</strong> {{ data.userChallengeData.fechaCompletado | date:'dd/MM/yyyy HH:mm' : 'UTC' }}</span>
+      </div>
+    </div>
+    <div *ngIf="!data.userChallengeData" class="user-participation-section">
+       <p>No hay datos de participación disponibles para este desafío.</p>
+    </div>
+
+  </div>
+
+  <div mat-dialog-actions align="end">
     <button mat-stroked-button (click)="onClose()">Cerrar</button>
-  </mat-dialog-actions>
+  </div>
 </div>

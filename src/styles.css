@@ -466,3 +466,19 @@ body.admin-view h1, body.admin-view h2, body.admin-view h3 {
 .mat-mdc-snack-bar-container .mdc-snackbar__surface {
   border-radius: 8px;
 }
+
+/* styles.css (o tu archivo global de estilos) */
+/* ... otros estilos ... */
+
+.habit-detail-dialog-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  /* El contenedor del diálogo de Angular Material MDC */
+  border-radius: 12px !important; /* Bordes más redondeados para el panel general */
+  /* padding: 0 !important; */ /* Descomenta y ajusta si quieres eliminar todo el padding interno del contenedor */
+}
+
+/* Si no usas MDC (versiones más antiguas de Material):
+.habit-detail-dialog-panel .mat-dialog-container {
+  border-radius: 12px !important;
+  padding: 0 !important; // Cuidado con esto, puede afectar el header y actions si no los ajustas bien
+}
+*/

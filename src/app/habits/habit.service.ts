@@ -13,7 +13,7 @@ export class HabitService {
   constructor(private http: HttpClient) {}
 
   getMyHabits(): Observable<Habit[]> {
-    return this.http.get<Habit[]>(this.apiUrl).pipe(
+    return this.http.get<Habit[]>(this.apiUrl).pipe( // Llama a GET http://localhost:8080/habits
       map(habits => habits.map(habit => ({
         ...habit,
         // Asumimos que el backend podría devolver 'fechaUltimaCompletacion'
@@ -61,6 +61,19 @@ export class HabitService {
   // NUEVO MÉTODO para obtener estadísticas de hábitos (para el perfil)
   getHabitStatsForUser(): Observable<{ totalCompletionsToday: number; totalOverallCompletions: number; activeHabits: number; longestStreakOverall: number }> {
     return this.http.get<{ totalCompletionsToday: number; totalOverallCompletions: number; activeHabits: number; longestStreakOverall: number }>(`${this.apiUrl}/user-stats`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getAllUserHabits(): Observable<Habit[]> {
+    // Este método debe obtener los hábitos del usuario actual.
+    // El endpoint GET /habits en el backend ya hace esto.
+    return this.http.get<Habit[]>(this.apiUrl).pipe( // Llama a GET http://localhost:8080/habits
+      map(habits => habits.map(habit => ({
+        ...habit,
+        // Puedes añadir transformaciones aquí si es necesario,
+        // como asegurar que las fechas sean objetos Date, etc.
+      }))),
       catchError(this.handleError)
     );
   }

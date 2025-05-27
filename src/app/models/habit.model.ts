@@ -1,21 +1,34 @@
 // filepath: src/app/models/habit.model.ts
 export interface Habit {
   id: number;
-  userId?: string; // o number, según tu backend
+  // idUsuario: number; // Uncomment if you have this property
   nombre: string;
   descripcion?: string;
-  frecuencia: string; // 'DIARIO', 'SEMANAL', etc.
-  horaProgramada?: string | null; // Asegúrate que el backend lo maneje como string o null
+  frecuencia: string;
+
+  // Properties needed to fix errors
   puntosRecompensa: number;
-  estado: string; // 'activo', 'inactivo'
-  fechaCreacion?: Date;
-  ultimaActualizacion?: Date;
-  fechaUltimaCompletacion?: string | Date | null; // Añadido: El backend podría enviar esto
-  rachaActual?: number; // Añadido: El backend podría enviar esto
-  // Campos para la UI
-  isCompletingAction?: boolean;
-  isCompletedToday?: boolean; // Lo calcularemos o el backend lo enviará
-  isExpanded?: boolean; // <--- AÑADIR ESTA LÍNEA
+  horaProgramada?: string | null;
+  estado: string;
+  fechaUltimaCompletacion?: string | Date | null;
+  fechaCreacion?: string | Date; // Used for sorting
+  rachaActual?: number;
+
+  // Add these missing properties
+  iconoUrl?: string;
+  categoria?: string;
+  metaDiaria?: string | number; // Or simply meta?: string | number;
+  puntosPorCompleticion?: number; // This might be intended to be puntosRecompensa, verify if distinct field needed
+  puntosBase?: number;
+
+  // Optional: other common habit properties
+  // colorEtiqueta?: string;
+  // icono?: string; // If you use a general 'icon' field for Material Icons vs imageUrl
+  // meta?: string;
+  // unidadMeta?: string;
+  // valorMeta?: number;
+  // rachaMasLarga?: number;
+  // isCompletedToday?: boolean; // If backend sends this directly
 }
 
 export interface PredefinedHabit {

@@ -1,0 +1,207 @@
+/* filepath: c:\Users\Fernando\Downloads\Goalify-frontend-main (1)\Goalify-frontend-main\src\app\user-statistics\habit-detail-dialog\habit-detail-dialog.component.css */
+.dialog-container {
+  padding: 0; /* Angular Material Dialog maneja el padding exterior */
+}
+
+.dialog-card {
+  box-shadow: none !important; /* El diálogo ya provee sombra */
+  border-radius: var(--border-radius-lg, 12px); /* Consistente con otros diálogos */
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px; /* Reducir padding si es necesario */
+  border-bottom: 1px solid #e0e0e0; /* Similar a los divisores de Material */
+}
+
+.header-icon-container {
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.habit-icon-large {
+  width: 56px; /* Tamaño del icono */
+  height: 56px;
+  border-radius: var(--border-radius-md, 8px);
+  object-fit: cover; /* Para imágenes */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface-variant, #f0f0f0); /* Fondo para iconos de material */
+}
+
+.default-icon {
+  font-size: 36px; /* Tamaño del icono de Material */
+  color: var(--user-primary);
+}
+
+.header-text-dialog {
+  flex-grow: 1;
+}
+
+.header-text-dialog mat-card-title {
+  font-size: 1.3em;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.header-text-dialog mat-card-subtitle {
+  font-size: 0.9em;
+  color: var(--color-text-secondary);
+}
+
+.close-button {
+  color: var(--color-text-secondary);
+}
+
+.dialog-content {
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.dialog-content section h4 {
+  font-size: 1.05em;
+  font-weight: 500;
+  color: var(--user-primary);
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.dialog-content p {
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.dialog-content strong {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.points {
+  color: var(--user-accent, #4CAF50);
+  font-weight: bold;
+}
+
+.divider {
+  margin: 24px 0;
+}
+
+mat-card-actions {
+  padding: 8px 20px 16px 20px; /* Ajustar padding */
+}
+
+.compact-habit-detail-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Asegura que use el ancho del panel del diálogo */
+}
+
+.dialog-content-compact {
+  padding: 16px; /* Padding para el contenido principal */
+  flex-grow: 1;
+}
+
+.activity-item-view {
+  display: flex;
+  align-items: center;
+  background-color: var(--app-background-color, #f5f5f5); /* Un color de fondo claro, o transparente si el panel del diálogo ya tiene color */
+  border-radius: 8px; /* Bordes redondeados para el "cuadrado" */
+  padding: 12px 16px;
+  margin-bottom: 16px; /* Espacio si hay más contenido debajo */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Sombra sutil */
+}
+
+.activity-icon-area {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* Evita que el icono se encoja */
+}
+
+.habit-display-icon {
+  width: 36px;
+  height: 36px;
+  font-size: 36px; /* Para mat-icon */
+  object-fit: contain; /* Para img */
+  border-radius: 4px; /* Ligeramente redondeado si es una imagen */
+}
+
+.default-list-icon {
+  color: var(--primary-color, #3f51b5); /* Color del icono por defecto */
+}
+
+.activity-info-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0; /* Para que el texto haga wrap correctamente */
+}
+
+.habit-name-display {
+  font-weight: 500;
+  font-size: 1rem; /* 16px */
+  color: #212121; /* Color de texto principal */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.habit-category-display,
+.completion-date-display {
+  font-size: 0.8rem; /* 12.8px */
+  color: #757575; /* Color de texto secundario */
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-points-area {
+  margin-left: 16px;
+  font-weight: 500;
+  font-size: 0.9rem; /* 14.4px */
+  flex-shrink: 0;
+}
+
+.points-value.positive-points {
+  color: #388e3c; /* Verde para puntos positivos */
+  background-color: #e8f5e9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.points-value.zero-points {
+  color: #757575; /* Gris para cero puntos */
+}
+.points-value.negative-points {
+  color: #d32f2f; /* Rojo para puntos negativos */
+  background-color: #ffebee;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.details-divider {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.additional-details {
+  font-size: 0.875rem; /* 14px */
+  color: #424242;
+  padding: 0 4px; /* Pequeño padding si es necesario */
+}
+
+.habit-description-text {
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.dialog-actions-compact {
+  padding: 8px 16px; /* Padding para las acciones */
+  border-top: 1px solid #e0e0e0;
+}
