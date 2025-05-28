@@ -21,7 +21,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+  import { MatProgressBarModule } from '@angular/material/progress-bar'; // AÑADE ESTA LÍNEA
 import { ChallengeDetailDialogComponent } from '../shared/challenge-detail-dialog/challenge-detail-dialog.component';
+import { ProfileDisplayPreferences } from './user-profile.models'; // MODIFICADO: Solo importar ProfileDisplayPreferences
 
 export interface HabitStats {
   totalCompletionsToday: number;
@@ -32,6 +34,14 @@ export interface HabitStats {
 
 export interface UserChallengeDetail extends Challenge { // CAMBIO AQUÍ: Añadido 'export'
   userChallengeData: UserChallenge;
+}
+
+// Definición de la estructura de un Rango y los rangos disponibles
+interface RangoNivel {
+  nombre: string; // Debe coincidir con los valores de currentUser.rango (ej. 'NOVATO', 'ASPIRANTE')
+  puntosMinimos: number;
+  icono: string; // Ruta al icono del rango
+  mensajeMotivacional?: string; // NUEVA PROPIEDAD PARA EL TOOLTIP
 }
 
 @Component({
@@ -53,7 +63,8 @@ export interface UserChallengeDetail extends Challenge { // CAMBIO AQUÍ: Añadi
     MatDividerModule,
     MatListModule,
     MatTooltipModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatProgressBarModule // AÑADE ESTA LÍNEA AQUÍ TAMBIÉN
   ],
   templateUrl: './user-profile-details.component.html',
   styleUrls: ['./user-profile-details.component.css']
@@ -68,14 +79,18 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
 
   showSettingsPanel: boolean = false;
   // Esta estructura es para las opciones de visualización de ESTA PÁGINA
-  profileDisplayPreferences = {
+  profileDisplayPreferences: ProfileDisplayPreferences = {
     showPoints: true,
     showLevel: true,
+    showRank: true, // NUEVA PREFERENCIA AÑADIDA
     showChallengesCompleted: true,
     showHabitsCompletedToday: true,
     showTotalHabitsCompleted: true,
     showBestStreak: true,
-    profileCardColor: '#FFFFFF' // Color por defecto
+    profileCardColor: '#ffffff', // o el color por defecto que uses
+    themeColor: 'default-theme', // o el tema por defecto
+    showChallengePointsOnCard: false, // Asumiendo que estas existen
+    showChallengeDatesOnCard: false   // Asumiendo que estas existen
   };
 
   userChallengeDetails: UserChallengeDetail[] = [];
@@ -90,8 +105,28 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   isLoadingHabitStats: boolean = true;
   habitStatsError: string | null = null;
 
-  defaultAvatarUrl: string = 'assets/images/default-avatar.png';
+  defaultAvatarUrl = 'assets/images/avatars/default-avatar.png'; // Ya lo tienes
+  defaultRankIcon = 'assets/rangos/rangodefault.png'; // Mantén un icono por defecto
+
+  // Nuevas propiedades para el progreso del rango (ya las tienes)
+  rangoActualDetalles: RangoNivel | null = null;
+  siguienteRangoDetalles: RangoNivel | null = null;
+  progresoRango: number = 0;
+  puntosUsuario: number = 0;
+
   private componentSubscriptions = new Subscription(); // AÑADIR ESTA LÍNEA
+
+  // CORRECCIÓN AQUÍ: Asegúrate de que los iconos coincidan con tus nombres de archivo
+  // Basado en tu feedback, el patrón es: 'assets/rangos/rango' + nombre.toLowerCase() + '.png'
+  public readonly RANGOS_DEFINIDOS: RangoNivel[] = [
+    { nombre: 'NOVATO', puntosMinimos: 0, icono: 'assets/rangos/rangonovato.png', mensajeMotivacional: '¡Todo gran viaje comienza con un primer paso! Sigue así.' },
+    { nombre: 'ASPIRANTE', puntosMinimos: 1000, icono: 'assets/rangos/rangoaspirante.png', mensajeMotivacional: '¡Estás construyendo una base sólida! La disciplina te llevará lejos.' },
+    { nombre: 'DISCIPLINADO', puntosMinimos: 2500, icono: 'assets/rangos/rangodisciplinado.png', mensajeMotivacional: '¡Tu constancia es admirable! Ya eres un ejemplo de dedicación.' },
+    { nombre: 'CONSTANTE', puntosMinimos: 5000, icono: 'assets/rangos/rangoconstante.png', mensajeMotivacional: '¡Has convertido tus metas en hábitos! Sigue brillando.' },
+    { nombre: 'DEDICADO', puntosMinimos: 10000, icono: 'assets/rangos/rangodedicado.png', mensajeMotivacional: '¡Tu dedicación es inquebrantable! Estás marcando la diferencia.' },
+    { nombre: 'INSPIRADOR', puntosMinimos: 20000, icono: 'assets/rangos/rangoinspirador.png', mensajeMotivacional: '¡Eres una fuente de inspiración! Tu progreso motiva a otros.' },
+    { nombre: 'MAESTRO_HABITOS', puntosMinimos: 50000, icono: 'assets/rangos/rangomaestrohabitos.png', mensajeMotivacional: '¡Has alcanzado la maestría! Tu dominio de los hábitos es legendario.' }
+  ];
 
   constructor(
     public authService: AuthService,
@@ -107,8 +142,9 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     const sub = this.authService.currentUser.subscribe(user => {
       if (user && typeof user.id !== 'undefined') {
         this.currentUser = { ...user }; // Crear una copia para evitar mutaciones directas
+        this.puntosUsuario = user.puntosTotales || 0;
         this.editableBio = this.currentUser.biografia || '';
-        
+
         // Cargar preferencias de localStorage primero
         this.loadDisplayPreferencesFromStorage();
 
@@ -117,8 +153,9 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
         if (this.currentUser.preferences && this.currentUser.preferences.cardBackgroundColor) {
           this.profileDisplayPreferences.profileCardColor = this.currentUser.preferences.cardBackgroundColor;
         }
-        
+
         this.fetchProfileData(); // Esto ya estaba
+        this.calcularProgresoRango(); // Asegúrate de llamar a esto después de tener los puntos del usuario
       } else {
         this.currentUser = null;
         // No es necesario resetear profileDisplayPreferences aquí si loadDisplayPreferencesFromStorage
@@ -319,13 +356,18 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
           this.profileDisplayPreferences = {
             showPoints: prefs.showPoints !== undefined ? prefs.showPoints : true,
             showLevel: prefs.showLevel !== undefined ? prefs.showLevel : true,
+            showRank: prefs.showRank !== undefined ? prefs.showRank : true, // MODIFICACIÓN: Añadir esta línea
             showChallengesCompleted: prefs.showChallengesCompleted !== undefined ? prefs.showChallengesCompleted : true,
             showHabitsCompletedToday: prefs.showHabitsCompletedToday !== undefined ? prefs.showHabitsCompletedToday : true,
             showTotalHabitsCompleted: prefs.showTotalHabitsCompleted !== undefined ? prefs.showTotalHabitsCompleted : true,
             showBestStreak: prefs.showBestStreak !== undefined ? prefs.showBestStreak : true,
             // El color de la tarjeta se carga aquí desde localStorage,
             // pero puede ser sobrescrito por el valor del backend en ngOnInit.
-            profileCardColor: prefs.profileCardColor || this.profileDisplayPreferences.profileCardColor // Mantener el actual si no hay en localStorage
+            profileCardColor: prefs.profileCardColor || this.profileDisplayPreferences.profileCardColor, // Mantener el actual si no hay en localStorage
+            // Asegúrate de cargar también themeColor y las otras propiedades si están en localStorage
+            themeColor: prefs.themeColor || this.profileDisplayPreferences.themeColor,
+            showChallengePointsOnCard: prefs.showChallengePointsOnCard !== undefined ? prefs.showChallengePointsOnCard : false,
+            showChallengeDatesOnCard: prefs.showChallengeDatesOnCard !== undefined ? prefs.showChallengeDatesOnCard : false
           };
         } catch (e) {
           console.error('Error al parsear preferencias guardadas de localStorage:', e);
@@ -387,4 +429,88 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     });
   } // Cierre del método saveDisplayPreferences
 
+  // ELIMINAR ESTA PRIMERA IMPLEMENTACIÓN DUPLICADA DE getRankImagePath
+  // getRankImagePath(rankString: string | undefined): string {
+  //   if (!rankString) {
+  //     return this.defaultRankIcon;
+  //   }
+  //   // Convierte "MAESTRO_HABITOS" a "maestrohabitos" para coincidir con nombres de archivo como "rangomaestrohabitos.png"
+  //   const formattedRank = rankString.toLowerCase().replace(/_/g, '');
+  //   return `assets/rangos/rango${formattedRank}.png`;
+  // }
+
+  // ELIMINAR ESTA PRIMERA IMPLEMENTACIÓN DUPLICADA DE onRankImageError
+  // onRankImageError(event: Event) {
+  //   const target = event.target as HTMLImageElement;
+  //   target.src = this.defaultRankIcon; // Carga una imagen por defecto si la específica falla
+  //   target.alt = 'Rango por defecto'; // Actualiza el alt text
+  // }
+
+  // Añade esta función de depuración
+  debugRankValues() {
+    console.log('[DEBUG TEMPLATE] profileDisplayPreferences.showRank:', this.profileDisplayPreferences.showRank);
+    console.log('[DEBUG TEMPLATE] currentUser.rango:', this.currentUser?.rango);
+    console.log('[DEBUG TEMPLATE] Condición *ngIf completa:', this.profileDisplayPreferences.showRank && !!this.currentUser?.rango);
+    return ''; // No renderiza nada en la plantilla
+  }
+
+  private calcularProgresoRango(): void {
+    if (!this.currentUser || typeof this.currentUser.puntosTotales === 'undefined' || !this.currentUser.rango) {
+      this.rangoActualDetalles = null;
+      this.siguienteRangoDetalles = null;
+      this.progresoRango = 0;
+      return;
+    }
+
+    // Normalizar el nombre del rango del usuario para la comparación
+    // Esto es para encontrar el objeto RangoNivel correcto, no para construir la ruta del icono aquí.
+    const nombreRangoUsuario = this.currentUser.rango.toUpperCase().replace(/\s+/g, '_').trim();
+
+    this.rangoActualDetalles = this.RANGOS_DEFINIDOS.find(r => r.nombre.toUpperCase() === nombreRangoUsuario) || null;
+
+    if (!this.rangoActualDetalles) {
+      console.warn(`Rango del usuario "${this.currentUser.rango}" (normalizado: "${nombreRangoUsuario}") no encontrado en RANGOS_DEFINIDOS. No se mostrará progreso. Verifique que el nombre del rango en currentUser.rango coincida con alguno de los 'nombre' en RANGOS_DEFINIDOS.`);
+      this.siguienteRangoDetalles = null;
+      this.progresoRango = 0;
+      return;
+    }
+
+    // Usa this.RANGOS_DEFINIDOS aquí
+    const indiceRangoActual = this.RANGOS_DEFINIDOS.findIndex(r => r.nombre.toUpperCase() === this.rangoActualDetalles!.nombre.toUpperCase());
+
+    if (indiceRangoActual < this.RANGOS_DEFINIDOS.length - 1) {
+      this.siguienteRangoDetalles = this.RANGOS_DEFINIDOS[indiceRangoActual + 1];
+      const puntosRangoActual = this.rangoActualDetalles.puntosMinimos;
+      const puntosSiguienteRango = this.siguienteRangoDetalles.puntosMinimos;
+
+      const puntosNecesariosParaSiguiente = puntosSiguienteRango - puntosRangoActual;
+      const puntosGanadosEnRangoActual = this.puntosUsuario - puntosRangoActual;
+
+      if (puntosNecesariosParaSiguiente > 0) {
+        this.progresoRango = Math.max(0, Math.min(100, (puntosGanadosEnRangoActual / puntosNecesariosParaSiguiente) * 100));
+      } else {
+        this.progresoRango = (this.puntosUsuario >= puntosRangoActual) ? 100 : 0;
+      }
+    } else {
+      this.siguienteRangoDetalles = null;
+      this.progresoRango = 100;
+    }
+    // console.log('[DEBUG RANGO] Usuario:', this.currentUser.rango, 'Puntos:', this.puntosUsuario);
+    // console.log('[DEBUG RANGO] Actual:', this.rangoActualDetalles);
+    // console.log('[DEBUG RANGO] Siguiente:', this.siguienteRangoDetalles);
+    // console.log('[DEBUG RANGO] Progreso:', this.progresoRango);
+  }
+  // ... el resto de tus métodos ...
+  // Asegúrate de que el método getRankImagePath también use this.RANGOS_DEFINIDOS si es necesario
+  getRankImagePath(rankName: string): string | null { // ESTA ES LA IMPLEMENTACIÓN QUE SE CONSERVA
+    if (!rankName) return null;
+    const rankNameToCompare = rankName.toUpperCase().replace(/\s+/g, '_').trim();
+    const rank = this.RANGOS_DEFINIDOS.find(r => r.nombre.toUpperCase().replace(/\s+/g, '_').trim() === rankNameToCompare);
+    return rank ? rank.icono : null;
+  }
+
+  onRankImageError(event: Event) { // ESTA ES LA IMPLEMENTACIÓN QUE SE CONSERVA
+    (event.target as HTMLImageElement).src = this.defaultRankIcon;
+  }
+  // ...
 }

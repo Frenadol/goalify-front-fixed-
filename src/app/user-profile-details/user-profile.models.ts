@@ -35,3 +35,17 @@ export interface UserChallengeDetail {
 export interface UserProfileUpdatePayload {
   // Define aquí la carga útil para actualizar el perfil del usuario
 }
+
+export interface ProfileDisplayPreferences {
+  showPoints?: boolean;
+  showLevel?: boolean;
+  showRank?: boolean; // NUEVA PROPIEDAD AÑADIDA
+  showChallengesCompleted?: boolean;
+  showHabitsCompletedToday?: boolean;
+  showTotalHabitsCompleted?: boolean;
+  showBestStreak?: boolean;
+  profileCardColor?: string;
+  themeColor?: string;
+  showChallengePointsOnCard?: boolean;
+  showChallengeDatesOnCard?: boolean;
+}
