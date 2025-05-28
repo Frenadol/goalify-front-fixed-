@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Habit, HabitClientPayload } from '../models/habit.model';
+import { AuthService } from '../auth.service'; // IMPORTAR AuthService
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { Habit, HabitClientPayload } from '../models/habit.model';
 export class HabitService {
   private apiUrl = 'http://localhost:8080/habits';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {} // INYECTAR AuthService
 
   getMyHabits(): Observable<Habit[]> {
     return this.http.get<Habit[]>(this.apiUrl).pipe( // Llama a GET http://localhost:8080/habits
@@ -19,8 +20,7 @@ export class HabitService {
         // Asumimos que el backend podría devolver 'fechaUltimaCompletacion'
         // y calculamos 'isCompletedToday' en el frontend si es necesario,
         // o el backend ya lo incluye. Por ahora, no lo añadimos aquí.
-      }))),
-      catchError(this.handleError)
+      })))
     );
   }
 
@@ -54,6 +54,14 @@ export class HabitService {
     // actualizar puntos, rachas, etc.
     // Devuelve el hábito actualizado.
     return this.http.post<Habit>(`${this.apiUrl}/${habitId}/complete`, {}).pipe(
+      tap(() => {
+        // Después de completar el hábito exitosamente,
+        // le pedimos al AuthService que refresque los datos del usuario actual.
+        this.authService.refreshCurrentUserData().subscribe({
+          next: () => console.log('User data refreshed after habit completion.'),
+          error: err => console.error('Error refreshing user data after habit completion:', err)
+        });
+      }),
       catchError(this.handleError)
     );
   }
@@ -73,8 +81,7 @@ export class HabitService {
         ...habit,
         // Puedes añadir transformaciones aquí si es necesario,
         // como asegurar que las fechas sean objetos Date, etc.
-      }))),
-      catchError(this.handleError)
+      })))
     );
   }
 

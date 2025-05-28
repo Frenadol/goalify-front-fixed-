@@ -1,78 +1,131 @@
 <div class="page-container">
   <div class="profile-details-wrapper">
-    <div *ngIf="isLoading && !currentUser" class="loading-indicator">
-      <mat-spinner diameter="60"></mat-spinner>
-      <p>Cargando perfil...</p>
-    </div>
-
-    <div *ngIf="!isLoading && !currentUser" class="error-message">
-      <mat-icon>error_outline</mat-icon>
-      <p>No se pudo cargar el perfil del usuario.</p>
-      <!-- Podrías añadir un botón para reintentar o volver -->
-    </div>
-
-    <div class="profile-container" *ngIf="currentUser; else loadingOrError">
+    <!-- ESTE ES EL DIV PRINCIPAL QUE ENVUELVE EL CONTENIDO DEL PERFIL O EL ESTADO DE CARGA/ERROR -->
+    <div *ngIf="currentUser; else loadingOrError" class="profile-container">
       <mat-card class="profile-card" [style.backgroundColor]="profileDisplayPreferences.profileCardColor">
         <mat-card-header class="profile-card-header">
           <img mat-card-avatar
                [src]="currentUser.fotoPerfil || defaultAvatarUrl"
                (error)="onImageError($event)"
                alt="Avatar de {{ currentUser.nombre }}"
-
                class="profile-avatar-img">
           <mat-card-title class="profile-name">{{ currentUser.nombre }}</mat-card-title>
           <mat-card-subtitle class="profile-email" *ngIf="currentUser.email">{{ currentUser.email }}</mat-card-subtitle>
-          <!-- Icono de Ajustes -->
           <button mat-icon-button class="profile-settings-button" (click)="toggleSettingsPanel()" matTooltip="Personalizar vista del perfil">
             <mat-icon>settings</mat-icon>
           </button>
         </mat-card-header>
 
         <mat-card-content class="profile-card-content">
-          <div class="profile-stats-section">
+          <!-- ... tu sección de Biografía ... -->
+          <mat-divider *ngIf="currentUser"></mat-divider>
+
+          <!-- Sección Mis Estadísticas -->
+          <div class="profile-stats-section" *ngIf="currentUser">
             <h3 class="section-title">Mis Estadísticas</h3>
             <div class="profile-info-grid">
+              {{ debugRankValues() }}
+
               <!-- Puntos Totales -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showPoints">
                 <mat-icon class="info-icon">star_outline</mat-icon>
                 <span class="info-label">Puntos Totales:</span>
-                <span class="info-value">{{ currentUser.puntosTotales || 0 }}</span>
+                <span class="info-value">{{ currentUser.puntosTotales != null ? currentUser.puntosTotales : 0 }}</span>
               </div>
+
               <!-- Nivel -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showLevel">
                 <mat-icon class="info-icon">bar_chart</mat-icon>
                 <span class="info-label">Nivel:</span>
-                <span class="info-value">{{ currentUser.nivel || 1 }}</span>
+                <span class="info-value">{{ currentUser.nivel != null ? currentUser.nivel : 1 }}</span>
               </div>
+
+              <!-- El bloque de Rango y Progreso YA NO ESTÁ AQUÍ -->
+
               <!-- Desafíos Completados -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showChallengesCompleted">
                 <mat-icon class="info-icon">emoji_events</mat-icon>
                 <span class="info-label">Desafíos Completados (Total):</span>
-                <span class="info-value">{{ currentUser.totalDesafiosCompletados || 0 }}</span>
+                <span class="info-value">{{ currentUser.totalDesafiosCompletados != null ? currentUser.totalDesafiosCompletados : 0 }}</span>
               </div>
+
               <!-- Hábitos Completados Hoy -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showHabitsCompletedToday && habitStats">
-                <mat-icon class="info-icon">rule</mat-icon> <!-- Icono para hábitos completados hoy -->
+                <mat-icon class="info-icon">rule</mat-icon>
                 <span class="info-label">Hábitos Completados Hoy:</span>
-                <span class="info-value">{{ habitStats.totalCompletionsToday }}</span>
+                <span class="info-value">{{ habitStats.totalCompletionsToday != null ? habitStats.totalCompletionsToday : 0 }}</span>
               </div>
+
               <!-- Hábitos Completados (Total) -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showTotalHabitsCompleted && habitStats">
-                <mat-icon class="info-icon">done_all</mat-icon> <!-- Icono para hábitos totales -->
+                <mat-icon class="info-icon">done_all</mat-icon>
                 <span class="info-label">Hábitos Completados (Total):</span>
-                <span class="info-value">{{ habitStats.totalOverallCompletions }}</span>
+                <span class="info-value">{{ habitStats.totalOverallCompletions != null ? habitStats.totalOverallCompletions : 0 }}</span>
               </div>
+
               <!-- Mejor Racha -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showBestStreak && habitStats">
-                <mat-icon class="info-icon">local_fire_department</mat-icon> <!-- Icono para racha -->
+                <mat-icon class="info-icon">local_fire_department</mat-icon>
                 <span class="info-label">Mejor Racha (Hábitos):</span>
-                <span class="info-value">{{ habitStats.longestStreakOverall }} días</span>
+                <span class="info-value">{{ habitStats.longestStreakOverall != null ? habitStats.longestStreakOverall : 0 }} días</span>
               </div>
-            </div>
+
+              <!-- Rango y Progreso (NUEVA UBICACIÓN) -->
+              <div class="info-item-container stat-full-width" *ngIf="profileDisplayPreferences.showRank">
+                <!-- Mostrar Rango Actual -->
+                <div class="info-item"
+                     *ngIf="rangoActualDetalles"
+                     [matTooltip]="rangoActualDetalles.mensajeMotivacional || ''"
+                     matTooltipPosition="above"> <!-- AQUÍ FALTABA EL > -->
+                  <img [src]="rangoActualDetalles.icono"
+                       alt="Icono del rango {{ rangoActualDetalles.nombre }}"
+                       class="rank-icon info-icon">
+                  <span class="info-label">Rango:</span>
+                  <span class="info-value">{{ rangoActualDetalles.nombre | titlecase }}</span>
+
+                  <!-- Sección de Barra de Progreso del Rango -->
+                  <div *ngIf="currentUser" class="rank-progress-section">
+                    <div class="rank-progress-bar-container">
+                      <mat-progress-bar
+                        mode="determinate"
+                        [value]="progresoRango"
+                        aria-label="Progreso para el siguiente rango">
+                      </mat-progress-bar>
+                    </div>
+                    <div class="rank-progress-text">
+                      <span *ngIf="siguienteRangoDetalles">
+                        {{ puntosUsuario | number }} / {{ siguienteRangoDetalles.puntosMinimos | number }} Puntos para {{ siguienteRangoDetalles.nombre | titlecase }}
+                      </span>
+                      <span *ngIf="!siguienteRangoDetalles && rangoActualDetalles && rangoActualDetalles.nombre.toUpperCase() === RANGOS_DEFINIDOS[RANGOS_DEFINIDOS.length - 1].nombre.toUpperCase()">
+                        ¡Has alcanzado el rango máximo: {{ rangoActualDetalles.nombre | titlecase }}! ({{ puntosUsuario | number }} Puntos)
+                      </span>
+                      <span *ngIf="!siguienteRangoDetalles && rangoActualDetalles && rangoActualDetalles.nombre.toUpperCase() !== RANGOS_DEFINIDOS[RANGOS_DEFINIDOS.length - 1].nombre.toUpperCase() && progresoRango >= 100">
+                        {{ puntosUsuario | number }} Puntos (Progreso al siguiente rango no definido)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Fallback si rangoActualDetalles no está pero currentUser.rango sí -->
+                <div class="info-item"
+                     *ngIf="!rangoActualDetalles && currentUser?.rango"
+                     [matTooltip]="''"
+                     matTooltipPosition="above"> <!-- AQUÍ FALTABA EL > -->
+                  <img
+                    [src]="getRankImagePath(currentUser!.rango!)"
+                    alt="Icono del rango"
+                    (error)="onRankImageError($event)">
+                  <span class="info-label">Rango:</span>
+                  <span class="info-value">{{ currentUser.rango | titlecase }}</span>
+                </div>
+              </div>
+              <!-- Fin Rango y Progreso -->
+
+            </div> <!-- Cierre de profile-info-grid -->
           </div>
+          <!-- Fin Sección Mis Estadísticas -->
+          <mat-divider *ngIf="currentUser"></mat-divider>
 
-          <mat-divider></mat-divider>
-
+          <!-- ...resto de tu contenido como Biografía, Desafíos, etc. ... -->
           <div class="biography-section">
             <div class="section-header">
               <h3 class="section-title">Biografía</h3>
@@ -190,6 +243,7 @@
         <div class="settings-options">
           <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showPoints">Mostrar Puntos Totales</mat-slide-toggle>
           <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showLevel">Mostrar Nivel</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showRank">Mostrar Rango</mat-slide-toggle>
           <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showChallengesCompleted">Mostrar Desafíos Completados</mat-slide-toggle>
           <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showHabitsCompletedToday">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
           <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showTotalHabitsCompleted">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
@@ -211,16 +265,13 @@
           </button>
         </div>
       </div>
-
-    </div>
+    </div> <!-- CIERRE DEL DIV *ngIf="currentUser; else loadingOrError" -->
 
     <ng-template #loadingOrError>
-      <!-- Mostrar si el componente está cargando O si authService está cargando y no hay usuario aún -->
       <div *ngIf="isLoading || (authService.getIsUserLoading() && !currentUser)" class="loading-container">
         <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
         <p>Cargando perfil...</p>
       </div>
-      <!-- Mostrar si NO está cargando el componente Y NO está cargando authService Y NO hay usuario -->
       <div *ngIf="!isLoading && !authService.getIsUserLoading() && !currentUser" class="loading-container">
         <p>No se pudo cargar la información del usuario. <a routerLink="/login">Intenta iniciar sesión</a>.</p>
       </div>

@@ -78,6 +78,19 @@
   padding: 25px 30px;
 }
 
+/* Estilos para la cuadrícula de información del perfil */
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Crea dos columnas de igual ancho */
+  gap: 16px; /* Espacio entre los elementos de la cuadrícula (ajusta según necesites) */
+  /* Si ya tienes estilos para .profile-info-grid, asegúrate que estos estén presentes o ajústalos */
+}
+
+/* Estilo para los elementos de estadísticas que deben ocupar todo el ancho */
+.profile-info-grid .stat-full-width {
+  grid-column: 1 / -1; /* Hace que el elemento ocupe desde la primera hasta la última columna (todo el ancho) */
+}
+
 .profile-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -92,12 +105,14 @@
   padding: 15px;
   border-radius: var(--border-radius-md);
   border: 1px solid var(--border-color-light, #eef2f5);
+  /* Asegúrate de que .info-item pueda acomodar el icono más grande si es necesario */
+  min-height: 50px; /* Ajusta si es necesario para acomodar el icono más grande */
 }
 
 .info-icon {
   color: var(--user-primary);
-  margin-right: 12px;
-  font-size: 1.6em;
+  margin-right: 8px; /* Espacio entre el icono y la etiqueta */
+  font-size: 1.6em; /* Este font-size se aplica a los mat-icon, no a las img. rank-icon usa width/height */
 }
 
 .info-label {
@@ -395,3 +410,37 @@
   border: none;
   border-radius: var(--border-radius-sm, 4px);
 }
+
+.rank-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0; /* Evita que el icono se encoja si no hay suficiente espacio */
+  /* margin-right ya no es necesario aquí si usamos column-gap en el contenedor */
+  /* vertical-align: middle; /* Menos relevante con display:flex y align-items:center en el padre */
+}
+
+/* Estilos para el .info-item que contiene la información del rango */
+.info-item:has(.rank-icon) {
+  display: flex;
+  flex-wrap: wrap;     /* Permite que los elementos pasen a la siguiente línea si no caben */
+  align-items: center; /* Centra verticalmente el icono y el texto cuando están en la misma línea */
+  column-gap: 16px;  /* Espacio horizontal entre el icono y el texto. */
+  row-gap: 12px;      /* Espacio vertical si los elementos internos se envuelven. */
+  margin-bottom: 20px; /* AÑADIDO: Espacio considerable debajo de todo el bloque del rango */
+}
+
+/* Estilos para el texto del nombre del rango para hacerlo más prominente */
+/* Esto asume que el nombre del rango está dentro de un elemento con clase .info-value. */
+/* Si la clase es diferente en tu HTML, necesitarás ajustar este selector. */
+.info-item:has(.rank-icon) .info-value {
+  font-size: 1.1rem; /* Ligeramente más grande para destacar */
+  font-weight: 600;  /* Más grueso (semi-bold) */
+  line-height: 1.4;  /* Ajusta el interlineado si es necesario con el nuevo tamaño/peso */
+  /* Considera añadir un pequeño margen inferior si el texto envuelve y queda muy pegado a lo de abajo */
+  /* margin-bottom: 4px; */
+}
+
+/* La regla vacía que tenías antes: */
+/* .info-item:has(.rank-icon) > .rank-icon { } */
+/* ha sido eliminada ya que los estilos del icono están en .rank-icon y la separación se maneja con column-gap. */
