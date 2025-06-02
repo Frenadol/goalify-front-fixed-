@@ -12,16 +12,17 @@ export interface BackendUserProfilePreferences {
   showHabitStats?: boolean;
   showCurrentChallenges?: boolean;
   showCompletedChallenges?: boolean;
-  cardBackgroundColor?: string; // Este es el campo clave para el color de la tarjeta de perfil
+  cardBackgroundColor?: string;
   cardTextColor?: string;
   showEmailOnCard?: boolean;
   showJoinDateOnCard?: boolean;
-  showPointsOnCard?: boolean;
+  showPointsOnCard?: boolean; // Para Puntos Actuales
   showLevelOnCard?: boolean;
-  cardColor?: string; // Este es para las tarjetas de desafío, según tu DTO
+  cardColor?: string;
   showChallengeCategoryOnCard?: boolean;
   showChallengePointsOnCard?: boolean;
   showChallengeDatesOnCard?: boolean;
+  showRecordPoints?: boolean; // <<< NUEVA PREFERENCIA AÑADIDA AQUÍ
 }
 
 // Interfaz para el Usuario
@@ -36,13 +37,13 @@ export interface User {
   ultimaActualizacion?: string | Date;
   fechaUltimoIngreso?: string | Date;
   puntosTotales?: number;
-  nivel?: number; // Asumo que este campo existe o existirá
-  biografia?: string;
+  puntosTotalesHistoricos?: number;
+  puntosRecord?: number; // <<< NUEVO CAMPO AÑADIDO AQUÍ
+  nivel?: number;  biografia?: string;
   totalHabitosCompletados?: number;
   totalDesafiosCompletados?: number;
   preferences?: BackendUserProfilePreferences;
-  fechasRangosConseguidos?: { [key: string]: string }; // <--- AÑADIDO: Para las fechas de los rangos
-}
+  fechasRangosConseguidos?: { [key: string]: string };}
 
 // Interfaz para la RESPUESTA DEL LOGIN que coincide con LoginResponseDTO.java
 export interface LoginResponse {

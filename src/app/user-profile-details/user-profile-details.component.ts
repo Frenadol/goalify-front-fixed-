@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // AÑADIR ReactiveFormsModule, FormBuilder, FormGroup, Validators
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription, forkJoin, of, Observable } from 'rxjs';
 import { switchMap, tap, catchError, filter, map, finalize } from 'rxjs/operators';
-import { AuthService, User, BackendUserProfilePreferences } from '../auth.service'; // Importar la interfaz
+import { AuthService, User, BackendUserProfilePreferences } from '../auth.service';
 import { ChallengeService } from '../challenges/challenge.service';
 import { HabitService } from '../habits/habit.service';
 import { Challenge } from '../challenges/challenge.model';
@@ -21,9 +21,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-  import { MatProgressBarModule } from '@angular/material/progress-bar'; // AÑADE ESTA LÍNEA
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ChallengeDetailDialogComponent } from '../shared/challenge-detail-dialog/challenge-detail-dialog.component';
-import { ProfileDisplayPreferences } from './user-profile.models'; // MODIFICADO: Solo importar ProfileDisplayPreferences
+import { ProfileDisplayPreferences } from './user-profile.models';
 
 export interface HabitStats {
   totalCompletionsToday: number;
@@ -32,16 +32,15 @@ export interface HabitStats {
   longestStreakOverall: number;
 }
 
-export interface UserChallengeDetail extends Challenge { // CAMBIO AQUÍ: Añadido 'export'
+export interface UserChallengeDetail extends Challenge {
   userChallengeData: UserChallenge;
 }
 
-// Definición de la estructura de un Rango y los rangos disponibles
 interface RangoNivel {
-  nombre: string; // Debe coincidir con los valores de currentUser.rango (ej. 'NOVATO', 'ASPIRANTE')
+  nombre: string;
   puntosMinimos: number;
-  icono: string; // Ruta al icono del rango
-  mensajeMotivacional?: string; // NUEVA PROPIEDAD PARA EL TOOLTIP
+  icono: string;
+  mensajeMotivacional?: string;
 }
 
 @Component({
@@ -52,7 +51,7 @@ interface RangoNivel {
     DatePipe,
     TitleCasePipe,
     FormsModule,
-    ReactiveFormsModule, // <--- AÑADIR ReactiveFormsModule A LOS IMPORTS DEL COMPONENTE
+    ReactiveFormsModule,
     RouterModule,
     MatFormFieldModule,
     MatInputModule,
@@ -65,7 +64,7 @@ interface RangoNivel {
     MatListModule,
     MatTooltipModule,
     MatSlideToggleModule,
-    MatProgressBarModule // AÑADE ESTA LÍNEA AQUÍ TAMBIÉN
+    MatProgressBarModule
   ],
   templateUrl: './user-profile-details.component.html',
   styleUrls: ['./user-profile-details.component.css']
@@ -77,23 +76,27 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   isEditingBio: boolean = false;
   editableBio: string = '';
   isSavingBio: boolean = false;
-  bioEditForm: FormGroup; // <--- AÑADIR ESTA LÍNEA
-  bioEditError: string | null = null; // <--- AÑADIR ESTA LÍNEA
+  bioEditForm: FormGroup;
+  bioEditError: string | null = null;
 
   showSettingsPanel: boolean = false;
-  // Esta estructura es para las opciones de visualización de ESTA PÁGINA
+  profileDisplayPreferencesForm!: FormGroup;
+  isSavingPreferences: boolean = false;
+
+  // ÚNICA DECLARACIÓN E INICIALIZACIÓN DE profileDisplayPreferences
   profileDisplayPreferences: ProfileDisplayPreferences = {
     showPoints: true,
     showLevel: true,
-    showRank: true, // NUEVA PREFERENCIA AÑADIDA
+    showRank: true,
+    showRecordPoints: true, // Asegúrate que esta nueva preferencia esté aquí
     showChallengesCompleted: true,
     showHabitsCompletedToday: true,
     showTotalHabitsCompleted: true,
     showBestStreak: true,
-    profileCardColor: '#ffffff', // o el color por defecto que uses
-    themeColor: 'default-theme', // o el tema por defecto
-    showChallengePointsOnCard: false, // Asumiendo que estas existen
-    showChallengeDatesOnCard: false   // Asumiendo que estas existen
+    profileCardColor: '#ffffff',
+    themeColor: 'default-theme',
+    showChallengePointsOnCard: true, // Ajustado a true como en la otra declaración
+    showChallengeDatesOnCard: true   // Ajustado a true como en la otra declaración
   };
 
   userChallengeDetails: UserChallengeDetail[] = [];
@@ -108,19 +111,16 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   isLoadingHabitStats: boolean = true;
   habitStatsError: string | null = null;
 
-  defaultAvatarUrl = 'assets/images/avatars/default-avatar.png'; // Ya lo tienes
-  defaultRankIcon = 'assets/rangos/rangodefault.png'; // Mantén un icono por defecto
+  defaultAvatarUrl = 'assets/images/avatars/default-avatar.png';
+  defaultRankIcon = 'assets/rangos/rangodefault.png';
 
-  // Nuevas propiedades para el progreso del rango (ya las tienes)
   rangoActualDetalles: RangoNivel | null = null;
   siguienteRangoDetalles: RangoNivel | null = null;
   progresoRango: number = 0;
   puntosUsuario: number = 0;
 
-  private componentSubscriptions = new Subscription(); // AÑADIR ESTA LÍNEA
+  private componentSubscriptions = new Subscription();
 
-  // CORRECCIÓN AQUÍ: Asegúrate de que los iconos coincidan con tus nombres de archivo
-  // Basado en tu feedback, el patrón es: 'assets/rangos/rango' + nombre.toLowerCase() + '.png'
   public readonly RANGOS_DEFINIDOS: RangoNivel[] = [
     { nombre: 'NOVATO', puntosMinimos: 0, icono: 'assets/rangos/rangonovato.png', mensajeMotivacional: '¡Todo gran viaje comienza con un primer paso! Sigue así.' },
     { nombre: 'ASPIRANTE', puntosMinimos: 1000, icono: 'assets/rangos/rangoaspirante.png', mensajeMotivacional: '¡Estás construyendo una base sólida! La disciplina te llevará lejos.' },
@@ -131,50 +131,164 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     { nombre: 'MAESTRO_HABITOS', puntosMinimos: 50000, icono: 'assets/rangos/rangomaestrohabitos.png', mensajeMotivacional: '¡Has alcanzado la maestría! Tu dominio de los hábitos es legendario.' }
   ];
 
+  // defaultProfileDisplayPreferences se usa para resetear, la propiedad principal es profileDisplayPreferences
+  private readonly defaultProfileDisplayPreferences: ProfileDisplayPreferences = {
+    showPoints: true,
+    showLevel: true,
+    showRank: true,
+    showChallengesCompleted: true,
+    showHabitsCompletedToday: true,
+    showTotalHabitsCompleted: true,
+    showBestStreak: true,
+    showRecordPoints: true,
+    profileCardColor: '#ffffff',
+    themeColor: 'default-theme',
+    showChallengeDatesOnCard: true,
+    showChallengePointsOnCard: true,
+  };
+
   constructor(
     public authService: AuthService,
     private snackBar: MatSnackBar,
     private challengeService: ChallengeService,
     private habitService: HabitService,
     private dialog: MatDialog,
-    private router: Router, // Asegúrate de que router esté aquí si lo usas
-    private fb: FormBuilder // <--- AÑADIR FormBuilder AL CONSTRUCTOR
+    private router: Router,
+    private fb: FormBuilder
   ) {
-    this.bioEditForm = this.fb.group({ // <--- INICIALIZAR EL FORMULARIO
-      biografia: ['', [Validators.maxLength(500)]] // Puedes ajustar validadores según necesites
+    this.bioEditForm = this.fb.group({
+      biografia: ['', [Validators.maxLength(500)]]
     });
+    // profileDisplayPreferences ya está inicializado arriba con sus valores por defecto.
+    // profileDisplayPreferencesForm se inicializará en ngOnInit después de cargar las preferencias.
   }
 
   ngOnInit(): void {
     this.isLoading = true;
-    const sub = this.authService.currentUser.subscribe(user => {
+    const sub = this.authService.currentUser.pipe(
+        filter(user => user !== undefined)
+    ).subscribe(user => {
       if (user && typeof user.id !== 'undefined') {
         this.currentUser = { ...user };
         this.puntosUsuario = user.puntosTotales || 0;
         this.editableBio = this.currentUser.biografia || '';
-        this.bioEditForm.patchValue({ biografia: this.editableBio }); // <--- ACTUALIZAR VALOR DEL FORMULARIO
+        this.bioEditForm.patchValue({ biografia: this.editableBio });
 
-        // Cargar preferencias de localStorage primero
-        this.loadDisplayPreferencesFromStorage();
-
-        // Si el usuario del backend tiene preferencias y un color de tarjeta, usarlo.
-        // Esto permite que el color del backend sobreescriba el de localStorage.
-        if (this.currentUser.preferences && this.currentUser.preferences.cardBackgroundColor) {
-          this.profileDisplayPreferences.profileCardColor = this.currentUser.preferences.cardBackgroundColor;
+        if (this.currentUser.preferences) {
+            this.loadUserPreferences(this.currentUser.preferences);
+        } else {
+            this.loadDisplayPreferencesFromStorage();
         }
+        this.initializeDisplayPreferencesForm();
 
-        this.fetchProfileData(); // Esto ya estaba
-        this.calcularProgresoRango(); // Asegúrate de llamar a esto después de tener los puntos del usuario
+        this.fetchProfileData();
+        this.calcularProgresoRango();
       } else {
         this.currentUser = null;
-        // No es necesario resetear profileDisplayPreferences aquí si loadDisplayPreferencesFromStorage
-        // ya maneja el caso de usuario no logueado (usa defaults o borra si es por ID).
-        // Opcionalmente, podrías resetear a valores por defecto explícitamente si el usuario se desloguea.
-        this.profileDisplayPreferences.profileCardColor = '#FFFFFF'; // Reset a default si no hay usuario
-        this.isLoading = false; // Detener carga si no hay usuario
+        this.loadDisplayPreferencesFromStorage();
+        this.initializeDisplayPreferencesForm();
+        this.isLoading = false;
       }
     });
     this.componentSubscriptions.add(sub);
+  }
+
+  private initializeDisplayPreferencesForm(): void {
+    const prefsToUse = this.profileDisplayPreferences; // Usar la propiedad de clase ya actualizada
+    this.profileDisplayPreferencesForm = this.fb.group({
+      showPoints: [prefsToUse.showPoints],
+      showLevel: [prefsToUse.showLevel],
+      showRank: [prefsToUse.showRank],
+      showChallengesCompleted: [prefsToUse.showChallengesCompleted],
+      showHabitsCompletedToday: [prefsToUse.showHabitsCompletedToday],
+      showTotalHabitsCompleted: [prefsToUse.showTotalHabitsCompleted],
+      showBestStreak: [prefsToUse.showBestStreak],
+      showRecordPoints: [prefsToUse.showRecordPoints],
+      profileCardColor: [prefsToUse.profileCardColor],
+      themeColor: [prefsToUse.themeColor],
+      showChallengePointsOnCard: [prefsToUse.showChallengePointsOnCard],
+      showChallengeDatesOnCard: [prefsToUse.showChallengeDatesOnCard],
+    });
+  }
+  
+  protected loadUserPreferences(backendPrefs: BackendUserProfilePreferences): void {
+      // Actualiza la propiedad de clase this.profileDisplayPreferences
+      this.profileDisplayPreferences = {
+        showPoints: backendPrefs.showPointsOnCard ?? this.defaultProfileDisplayPreferences.showPoints,
+        showLevel: backendPrefs.showLevelOnCard ?? this.defaultProfileDisplayPreferences.showLevel,
+        showRank: this.defaultProfileDisplayPreferences.showRank, // Asumir que no viene del backend o se maneja diferente
+        showChallengesCompleted: backendPrefs.showCompletedChallenges ?? this.defaultProfileDisplayPreferences.showChallengesCompleted,
+        showHabitsCompletedToday: this.defaultProfileDisplayPreferences.showHabitsCompletedToday,
+        showTotalHabitsCompleted: this.defaultProfileDisplayPreferences.showTotalHabitsCompleted,
+        showBestStreak: this.defaultProfileDisplayPreferences.showBestStreak,
+        showRecordPoints: backendPrefs.showRecordPoints ?? this.defaultProfileDisplayPreferences.showRecordPoints,
+        profileCardColor: backendPrefs.cardBackgroundColor ?? this.defaultProfileDisplayPreferences.profileCardColor,
+        themeColor: backendPrefs.themeColor ?? this.defaultProfileDisplayPreferences.themeColor,
+        showChallengeDatesOnCard: backendPrefs.showChallengeDatesOnCard ?? this.defaultProfileDisplayPreferences.showChallengeDatesOnCard,
+        showChallengePointsOnCard: backendPrefs.showChallengePointsOnCard ?? this.defaultProfileDisplayPreferences.showChallengePointsOnCard,
+      };
+  }
+
+  // ÚNICA IMPLEMENTACIÓN DE saveDisplayPreferences
+  saveDisplayPreferences(): void {
+    if (!this.profileDisplayPreferencesForm || this.profileDisplayPreferencesForm.invalid) {
+      this.snackBar.open('Formulario de preferencias inválido.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    if (!this.currentUser || typeof this.currentUser.id === 'undefined') {
+      this.snackBar.open('No se pueden guardar las preferencias (usuario no identificado).', 'Cerrar', { duration: 3000 });
+      this.toggleSettingsPanel();
+      return;
+    }
+
+    this.isSavingPreferences = true;
+    const formValues = this.profileDisplayPreferencesForm.value;
+
+    this.profileDisplayPreferences = {
+        ...this.profileDisplayPreferences,
+        ...formValues
+    };
+    
+    const storageKey = this.getPreferencesStorageKey();
+    if (storageKey) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(formValues));
+      } catch (e) {
+        console.error('Error al guardar preferencias en localStorage:', e);
+      }
+    }
+
+    const backendPrefsPayload: BackendUserProfilePreferences = this.mapToBackendPreferences(formValues);
+
+    this.authService.updateUserDisplayPreferences(this.currentUser.id, backendPrefsPayload)
+      .pipe(finalize(() => {
+        this.isSavingPreferences = false;
+        this.profileDisplayPreferencesForm.markAsPristine();
+      }))
+      .subscribe({
+        next: (updatedUser) => {
+          this.snackBar.open('Preferencias de visualización guardadas.', 'Cerrar', { duration: 2500 });
+          this.toggleSettingsPanel();
+        },
+        error: (err) => {
+          console.error('Error al guardar preferencias en el backend:', err);
+          this.snackBar.open(`Error al guardar: ${err.message || 'Error desconocido'}`, 'Cerrar', { duration: 3500 });
+        }
+      });
+  }
+
+  // ÚNICA IMPLEMENTACIÓN DE mapToBackendPreferences
+  private mapToBackendPreferences(formValues: ProfileDisplayPreferences): BackendUserProfilePreferences {
+    return {
+      showPointsOnCard: formValues.showPoints,
+      showLevelOnCard: formValues.showLevel,
+      showCompletedChallenges: formValues.showChallengesCompleted,
+      showRecordPoints: formValues.showRecordPoints,
+      cardBackgroundColor: formValues.profileCardColor,
+      themeColor: formValues.themeColor,
+      showChallengeDatesOnCard: formValues.showChallengeDatesOnCard,
+      showChallengePointsOnCard: formValues.showChallengePointsOnCard,
+    };
   }
 
   private fetchProfileData(): void {
@@ -182,7 +296,7 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
       this.isLoading = false;
       return;
     }
-    this.isLoading = true; // Indicar carga general del perfil
+    this.isLoading = true;
 
     const challenges$ = this.loadUserChallenges();
     const completedChallenges$ = this.loadCompletedUserChallenges();
@@ -206,13 +320,12 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
         this.userChallengeDetails = results.challenges;
         this.completedUserChallengeDetails = results.completedChallenges;
         this.habitStats = results.habitStats;
-
         this.isLoadingChallenges = false;
         this.isLoadingCompletedChallenges = false;
         this.isLoadingHabitStats = false;
-        this.isLoading = false; // Carga general completada
+        this.isLoading = false;
       },
-      error: (err) => { // Este error es para el forkJoin en sí, aunque los catchError internos deberían manejar la mayoría
+      error: (err) => {
         console.error('Error general al cargar datos del perfil:', err);
         this.snackBar.open('Error al cargar todos los datos del perfil.', 'Cerrar', { duration: 3000 });
         this.isLoadingChallenges = false;
@@ -224,11 +337,12 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   }
 
   loadUserChallenges(): Observable<UserChallengeDetail[]> {
+    this.isLoadingChallenges = true; // Indicar carga
+    this.challengesError = null; // Limpiar error previo
     return this.challengeService.getMyJoinedChallenges().pipe(
       switchMap((userChallenges: UserChallenge[]) => {
         const activeChallenges = userChallenges.filter(uc => uc.estadoParticipacion !== 'COMPLETADO');
         if (activeChallenges.length === 0) {
-          this.isLoadingChallenges = false; // No hay nada que cargar
           return of([]);
         }
         const challengeObservables = activeChallenges.map(uc =>
@@ -243,15 +357,16 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
         return forkJoin(challengeObservables);
       }),
       map(details => details.filter((d): d is UserChallengeDetail => d !== null)),
-      tap(() => { if (!this.challengesError) this.isLoadingChallenges = false; }) // Desactivar si no hubo error previo
+      finalize(() => this.isLoadingChallenges = false) // Asegurar que se desactive el loading
     );
   }
 
   loadCompletedUserChallenges(): Observable<UserChallengeDetail[]> {
+    this.isLoadingCompletedChallenges = true;
+    this.completedChallengesError = null;
     return this.challengeService.getCompletedUserChallenges().pipe(
       switchMap((completedUserChallenges: UserChallenge[]) => {
         if (completedUserChallenges.length === 0) {
-          this.isLoadingCompletedChallenges = false; // No hay nada que cargar
           return of([]);
         }
         const challengeObservables = completedUserChallenges.map(uc =>
@@ -266,22 +381,16 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
         return forkJoin(challengeObservables);
       }),
       map(details => details.filter((d): d is UserChallengeDetail => d !== null)),
-      tap(() => { if(!this.completedChallengesError) this.isLoadingCompletedChallenges = false; })
+      finalize(() => this.isLoadingCompletedChallenges = false)
     );
   }
 
   loadHabitStats(): Observable<HabitStats | null> {
+    this.isLoadingHabitStats = true;
+    this.habitStatsError = null;
     return this.habitService.getHabitStatsForUser().pipe(
-      tap(() => { if(!this.habitStatsError) this.isLoadingHabitStats = false; })
+      finalize(() => this.isLoadingHabitStats = false)
     );
-  }
-
-  private formatError(error: any, context: string): string {
-    console.error(`Error cargando ${context}:`, error);
-    if (error && error.message) {
-      return `Error al cargar ${context}: ${error.message}`;
-    }
-    return `Ocurrió un error desconocido al cargar ${context}.`;
   }
 
   ngOnDestroy(): void {
@@ -293,75 +402,42 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
       this.cancelEditBio();
     } else {
       this.editableBio = this.currentUser?.biografia || '';
-      this.bioEditForm.patchValue({ biografia: this.editableBio }); // <--- ACTUALIZAR VALOR DEL FORMULARIO
+      this.bioEditForm.patchValue({ biografia: this.editableBio });
       this.isEditingBio = true;
     }
   }
 
   cancelEditBio(): void {
     this.isEditingBio = false;
-    // this.editableBio = this.currentUser?.biografia || ''; // Ya no es necesario si usas el form
-    this.bioEditForm.patchValue({ biografia: this.currentUser?.biografia || '' }); // <--- RESETEAR VALOR DEL FORMULARIO
+    this.bioEditForm.patchValue({ biografia: this.currentUser?.biografia || '' });
   }
 
   guardarBiografia(): void {
     if (this.bioEditForm.invalid || !this.currentUser || !this.currentUser.id) {
-      console.warn('Guardar biografía: Formulario inválido o currentUser no disponible.');
-      if (this.bioEditForm.invalid) {
-        console.log('Errores del formulario:', this.bioEditForm.errors);
-        // Marcar campos como tocados para mostrar errores si es necesario
-        Object.keys(this.bioEditForm.controls).forEach(field => {
-          const control = this.bioEditForm.get(field);
-          control?.markAsTouched({ onlySelf: true });
-        });
-      }
       return;
     }
     this.isSavingBio = true;
     this.bioEditError = null;
-
     const nuevaBiografia = this.bioEditForm.value.biografia;
-
-    // LOG 1: Verifica el estado de currentUser.fotoPerfil ANTES de enviar
-    console.log('[DEBUG] UserProfileDetailsComponent - currentUser ANTES de payload para bio:', JSON.stringify(this.currentUser, null, 2));
-
     const updatePayload: Partial<User> = {
       biografia: nuevaBiografia,
-      fotoPerfil: this.currentUser.fotoPerfil // Esta es la línea crucial
+      fotoPerfil: this.currentUser.fotoPerfil // Mantener la foto de perfil actual
     };
 
-    // LOG 2: Verifica el payload que se va a enviar
-    console.log('[DEBUG] UserProfileDetailsComponent - updatePayload para bio:', JSON.stringify(updatePayload, null, 2));
-
     this.authService.updateUserProfile(this.currentUser.id, updatePayload)
-      .pipe(
-        finalize(() => {
-          this.isSavingBio = false;
-        })
-      )
+      .pipe(finalize(() => { this.isSavingBio = false; }))
       .subscribe({
         next: (updatedUser) => {
-          // LOG 3: Verifica el usuario que devuelve el servicio (y el backend)
-          console.log('[DEBUG] UserProfileDetailsComponent - updatedUser DESPUÉS de guardar bio (desde authService):', JSON.stringify(updatedUser, null, 2));
-          
-          this.isEditingBio = false; // <--- CORREGIR AQUÍ (era editBioMode)
+          this.isEditingBio = false;
           this.snackBar.open('Biografía actualizada con éxito.', 'Cerrar', {
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-            panelClass: ['snackbar-success']
+            duration: 3000, panelClass: ['snackbar-success']
           });
-          // this.currentUser se actualizará a través de la suscripción en ngOnInit
         },
         error: (error) => {
-          console.error('[DEBUG] UserProfileDetailsComponent - Error al guardar biografía:', error);
-          this.bioEditError = error.message || 'Error al actualizar la biografía.';
-          // Proporcionar un valor de cadena predeterminado para satisfacer al compilador
-          this.snackBar.open(this.bioEditError || 'Ocurrió un error al guardar la biografía.', 'Cerrar', {
-            duration: 5000,
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-            panelClass: ['snackbar-error']
+          // Asignar un mensaje de error específico o genérico
+          this.bioEditError = error?.error?.message || error?.message || 'Error desconocido al actualizar la biografía.';
+          this.snackBar.open(this.bioEditError ?? 'Error al actualizar la biografía.', 'Cerrar', { // <<< CORRECCIÓN AQUÍ
+            duration: 5000, panelClass: ['snackbar-error']
           });
         }
       });
@@ -373,19 +449,14 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
 
   openChallengeDetails(challengeDetail: UserChallengeDetail): void {
     this.dialog.open(ChallengeDetailDialogComponent, {
-      width: '600px', // Puedes ajustar el ancho
-      maxWidth: '90vw', // Para responsividad
-      data: challengeDetail,
-      panelClass: 'challenge-detail-dialog-panel' // Clase opcional para estilos globales del panel
+      width: '600px', maxWidth: '90vw', data: challengeDetail, panelClass: 'challenge-detail-dialog-panel'
     });
   }
 
-  // Helper para obtener la clase de estado (si no la tienes ya)
   getStatusClass(status: string): string {
     return 'status-' + status.toLowerCase().replace(/\s+/g, '_');
   }
 
-  // --- NUEVOS MÉTODOS PARA PERSONALIZACIÓN ---
   toggleSettingsPanel(): void {
     this.showSettingsPanel = !this.showSettingsPanel;
   }
@@ -399,110 +470,42 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
 
   loadDisplayPreferencesFromStorage(): void {
     const key = this.getPreferencesStorageKey();
+    let prefsToApply = { ...this.defaultProfileDisplayPreferences }; // Empezar con los defaults
+
     if (key) {
       const storedPrefs = localStorage.getItem(key);
       if (storedPrefs) {
         try {
-          const prefs = JSON.parse(storedPrefs);
-          this.profileDisplayPreferences = {
-            showPoints: prefs.showPoints !== undefined ? prefs.showPoints : true,
-            showLevel: prefs.showLevel !== undefined ? prefs.showLevel : true,
-            showRank: prefs.showRank !== undefined ? prefs.showRank : true, // MODIFICACIÓN: Añadir esta línea
-            showChallengesCompleted: prefs.showChallengesCompleted !== undefined ? prefs.showChallengesCompleted : true,
-            showHabitsCompletedToday: prefs.showHabitsCompletedToday !== undefined ? prefs.showHabitsCompletedToday : true,
-            showTotalHabitsCompleted: prefs.showTotalHabitsCompleted !== undefined ? prefs.showTotalHabitsCompleted : true,
-            showBestStreak: prefs.showBestStreak !== undefined ? prefs.showBestStreak : true,
-            // El color de la tarjeta se carga aquí desde localStorage,
-            // pero puede ser sobrescrito por el valor del backend en ngOnInit.
-            profileCardColor: prefs.profileCardColor || this.profileDisplayPreferences.profileCardColor, // Mantener el actual si no hay en localStorage
-            // Asegúrate de cargar también themeColor y las otras propiedades si están en localStorage
-            themeColor: prefs.themeColor || this.profileDisplayPreferences.themeColor,
-            showChallengePointsOnCard: prefs.showChallengePointsOnCard !== undefined ? prefs.showChallengePointsOnCard : false,
-            showChallengeDatesOnCard: prefs.showChallengeDatesOnCard !== undefined ? prefs.showChallengeDatesOnCard : false
+          const parsedPrefs = JSON.parse(storedPrefs);
+          // Sobrescribir los defaults solo con las propiedades que existen en parsedPrefs
+          prefsToApply = {
+            ...prefsToApply, // Mantener defaults para lo que no esté en localStorage
+            showPoints: parsedPrefs.showPoints !== undefined ? parsedPrefs.showPoints : prefsToApply.showPoints,
+            showLevel: parsedPrefs.showLevel !== undefined ? parsedPrefs.showLevel : prefsToApply.showLevel,
+            showRank: parsedPrefs.showRank !== undefined ? parsedPrefs.showRank : prefsToApply.showRank,
+            showChallengesCompleted: parsedPrefs.showChallengesCompleted !== undefined ? parsedPrefs.showChallengesCompleted : prefsToApply.showChallengesCompleted,
+            showHabitsCompletedToday: parsedPrefs.showHabitsCompletedToday !== undefined ? parsedPrefs.showHabitsCompletedToday : prefsToApply.showHabitsCompletedToday,
+            showTotalHabitsCompleted: parsedPrefs.showTotalHabitsCompleted !== undefined ? parsedPrefs.showTotalHabitsCompleted : prefsToApply.showTotalHabitsCompleted,
+            showBestStreak: parsedPrefs.showBestStreak !== undefined ? parsedPrefs.showBestStreak : prefsToApply.showBestStreak,
+            showRecordPoints: parsedPrefs.showRecordPoints !== undefined ? parsedPrefs.showRecordPoints : prefsToApply.showRecordPoints,
+            profileCardColor: parsedPrefs.profileCardColor || prefsToApply.profileCardColor,
+            themeColor: parsedPrefs.themeColor || prefsToApply.themeColor,
+            showChallengePointsOnCard: parsedPrefs.showChallengePointsOnCard !== undefined ? parsedPrefs.showChallengePointsOnCard : prefsToApply.showChallengePointsOnCard,
+            showChallengeDatesOnCard: parsedPrefs.showChallengeDatesOnCard !== undefined ? parsedPrefs.showChallengeDatesOnCard : prefsToApply.showChallengeDatesOnCard,
           };
         } catch (e) {
           console.error('Error al parsear preferencias guardadas de localStorage:', e);
-          // Mantener los defaults si hay error, el color del backend (si existe) se aplicará después.
         }
       }
     }
-    // Si no hay clave o no hay prefs guardadas, se mantienen los valores por defecto iniciales.
-    // El color del backend (si existe) se aplicará después en ngOnInit.
+    this.profileDisplayPreferences = prefsToApply; // Aplicar las preferencias finales
   }
-
-  saveDisplayPreferences(): void {
-    if (!this.currentUser || typeof this.currentUser.id === 'undefined') {
-      this.snackBar.open('No se pueden guardar las preferencias (usuario no identificado).', 'Cerrar', { duration: 3000 });
-      this.toggleSettingsPanel();
-      return;
-    }
-
-    const userId = this.currentUser.id;
-
-    // 1. Guardar en localStorage (para las preferencias de esta página)
-    const key = this.getPreferencesStorageKey();
-    if (key) {
-      try {
-        localStorage.setItem(key, JSON.stringify(this.profileDisplayPreferences));
-      } catch (e) {
-        console.error('Error al guardar preferencias en localStorage:', e);
-        // No mostrar snackbar aquí todavía, el guardado en backend es más importante.
-      }
-    }
-
-    // 2. Preparar datos para el backend
-    // Tomamos las preferencias actuales del usuario (del backend) y solo actualizamos el color.
-    const backendPrefsPayload: BackendUserProfilePreferences = {
-      ...(this.currentUser.preferences || {}), // Copia las preferencias existentes del backend o un objeto vacío
-      cardBackgroundColor: this.profileDisplayPreferences.profileCardColor // Actualiza/añade el color de la tarjeta
-    };
-
-    // 3. Llamar al servicio para guardar en el backend
-    this.isSavingBio = true; // Reutilizar un spinner o crear uno nuevo para "guardando preferencias"
-    this.authService.updateUserDisplayPreferences(userId, backendPrefsPayload).subscribe({
-      next: (updatedUser) => {
-        this.isSavingBio = false;
-        // AuthService ya actualiza su currentUserSubject con updatedUser gracias al tap.
-        // this.currentUser se actualizará a través de la suscripción en ngOnInit.
-        // Opcionalmente, para una respuesta más inmediata en la UI antes de que la suscripción se dispare:
-        // if (this.currentUser) {
-        //   this.currentUser.preferences = updatedUser.preferences;
-        // }
-        this.snackBar.open('Preferencias de visualización guardadas.', 'Cerrar', { duration: 2500 });
-        this.toggleSettingsPanel();
-      },
-      error: (err) => {
-        this.isSavingBio = false;
-        console.error('Error al guardar preferencias en el backend:', err);
-        this.snackBar.open(`Error al guardar: ${err.message || 'Error desconocido'}`, 'Cerrar', { duration: 3500 });
-        // No cerramos el panel en caso de error para que el usuario pueda reintentar.
-      }
-    });
-  } // Cierre del método saveDisplayPreferences
-
-  // ELIMINAR ESTA PRIMERA IMPLEMENTACIÓN DUPLICADA DE getRankImagePath
-  // getRankImagePath(rankString: string | undefined): string {
-  //   if (!rankString) {
-  //     return this.defaultRankIcon;
-  //   }
-  //   // Convierte "MAESTRO_HABITOS" a "maestrohabitos" para coincidir con nombres de archivo como "rangomaestrohabitos.png"
-  //   const formattedRank = rankString.toLowerCase().replace(/_/g, '');
-  //   return `assets/rangos/rango${formattedRank}.png`;
-  // }
-
-  // ELIMINAR ESTA PRIMERA IMPLEMENTACIÓN DUPLICADA DE onRankImageError
-  // onRankImageError(event: Event) {
-  //   const target = event.target as HTMLImageElement;
-  //   target.src = this.defaultRankIcon; // Carga una imagen por defecto si la específica falla
-  //   target.alt = 'Rango por defecto'; // Actualiza el alt text
-  // }
-
-  // Añade esta función de depuración
+  
   debugRankValues() {
     console.log('[DEBUG TEMPLATE] profileDisplayPreferences.showRank:', this.profileDisplayPreferences.showRank);
     console.log('[DEBUG TEMPLATE] currentUser.rango:', this.currentUser?.rango);
     console.log('[DEBUG TEMPLATE] Condición *ngIf completa:', this.profileDisplayPreferences.showRank && !!this.currentUser?.rango);
-    return ''; // No renderiza nada en la plantilla
+    return '';
   }
 
   private calcularProgresoRango(): void {
@@ -512,31 +515,22 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
       this.progresoRango = 0;
       return;
     }
-
-    // Normalizar el nombre del rango del usuario para la comparación
-    // Esto es para encontrar el objeto RangoNivel correcto, no para construir la ruta del icono aquí.
     const nombreRangoUsuario = this.currentUser.rango.toUpperCase().replace(/\s+/g, '_').trim();
-
     this.rangoActualDetalles = this.RANGOS_DEFINIDOS.find(r => r.nombre.toUpperCase() === nombreRangoUsuario) || null;
 
     if (!this.rangoActualDetalles) {
-      console.warn(`Rango del usuario "${this.currentUser.rango}" (normalizado: "${nombreRangoUsuario}") no encontrado en RANGOS_DEFINIDOS. No se mostrará progreso. Verifique que el nombre del rango en currentUser.rango coincida con alguno de los 'nombre' en RANGOS_DEFINIDOS.`);
       this.siguienteRangoDetalles = null;
       this.progresoRango = 0;
       return;
     }
-
-    // Usa this.RANGOS_DEFINIDOS aquí
     const indiceRangoActual = this.RANGOS_DEFINIDOS.findIndex(r => r.nombre.toUpperCase() === this.rangoActualDetalles!.nombre.toUpperCase());
 
     if (indiceRangoActual < this.RANGOS_DEFINIDOS.length - 1) {
       this.siguienteRangoDetalles = this.RANGOS_DEFINIDOS[indiceRangoActual + 1];
       const puntosRangoActual = this.rangoActualDetalles.puntosMinimos;
       const puntosSiguienteRango = this.siguienteRangoDetalles.puntosMinimos;
-
       const puntosNecesariosParaSiguiente = puntosSiguienteRango - puntosRangoActual;
       const puntosGanadosEnRangoActual = this.puntosUsuario - puntosRangoActual;
-
       if (puntosNecesariosParaSiguiente > 0) {
         this.progresoRango = Math.max(0, Math.min(100, (puntosGanadosEnRangoActual / puntosNecesariosParaSiguiente) * 100));
       } else {
@@ -546,22 +540,16 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
       this.siguienteRangoDetalles = null;
       this.progresoRango = 100;
     }
-    // console.log('[DEBUG RANGO] Usuario:', this.currentUser.rango, 'Puntos:', this.puntosUsuario);
-    // console.log('[DEBUG RANGO] Actual:', this.rangoActualDetalles);
-    // console.log('[DEBUG RANGO] Siguiente:', this.siguienteRangoDetalles);
-    // console.log('[DEBUG RANGO] Progreso:', this.progresoRango);
   }
-  // ... el resto de tus métodos ...
-  // Asegúrate de que el método getRankImagePath también use this.RANGOS_DEFINIDOS si es necesario
-  getRankImagePath(rankName: string): string | null { // ESTA ES LA IMPLEMENTACIÓN QUE SE CONSERVA
+
+  getRankImagePath(rankName: string): string | null {
     if (!rankName) return null;
     const rankNameToCompare = rankName.toUpperCase().replace(/\s+/g, '_').trim();
     const rank = this.RANGOS_DEFINIDOS.find(r => r.nombre.toUpperCase().replace(/\s+/g, '_').trim() === rankNameToCompare);
     return rank ? rank.icono : null;
   }
 
-  onRankImageError(event: Event) { // ESTA ES LA IMPLEMENTACIÓN QUE SE CONSERVA
+  onRankImageError(event: Event) {
     (event.target as HTMLImageElement).src = this.defaultRankIcon;
   }
-  // ...
 }

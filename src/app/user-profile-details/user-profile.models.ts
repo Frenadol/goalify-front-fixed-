@@ -37,15 +37,17 @@ export interface UserProfileUpdatePayload {
 }
 
 export interface ProfileDisplayPreferences {
-  showPoints?: boolean;
+  showPoints?: boolean; // Para Puntos Actuales
   showLevel?: boolean;
-  showRank?: boolean; // NUEVA PROPIEDAD AÑADIDA
+  showRank?: boolean;
   showChallengesCompleted?: boolean;
   showHabitsCompletedToday?: boolean;
   showTotalHabitsCompleted?: boolean;
   showBestStreak?: boolean;
+  showRecordPoints?: boolean; // <<< NUEVA PREFERENCIA AÑADIDA AQUÍ
   profileCardColor?: string;
   themeColor?: string;
   showChallengePointsOnCard?: boolean;
   showChallengeDatesOnCard?: boolean;
+  // showHistoricalPoints?: boolean; // Si también quieres controlar esto
 }
