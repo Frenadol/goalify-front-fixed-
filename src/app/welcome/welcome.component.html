@@ -21,7 +21,7 @@
 
           <div class="action-card" (click)="navigateTo('/habits')">
             <div class="action-card-icon">
-              <span class="material-icons-outlined">checklist</span>
+              <span class="material-icons-outlined">checklist_rtl</span>
             </div>
             <h3 class="action-card-title">Mis Hábitos</h3>
             <p class="action-card-description">Visualiza y gestiona tus hábitos actuales.</p>
@@ -30,7 +30,7 @@
           <!-- NUEVA TARJETA PARA MIS DESAFÍOS -->
           <div class="action-card" (click)="navigateTo('/my-challenges')">
             <div class="action-card-icon">
-              <span class="material-icons-outlined">emoji_events</span> <!-- Icono de desafíos -->
+              <span class="material-icons-outlined">military_tech</span>
             </div>
             <h3 class="action-card-title">Mis Desafíos</h3>
             <p class="action-card-description">Consulta los desafíos en los que participas.</p>
@@ -39,7 +39,7 @@
 
           <div class="action-card" (click)="navigateTo('/challenges')"> <!-- Esta es la lista general de desafíos -->
             <div class="action-card-icon">
-              <span class="material-icons-outlined">workspace_premium</span> <!-- Icono diferente para explorar -->
+              <span class="material-icons-outlined">emoji_events</span>
             </div>
             <h3 class="action-card-title">Explorar Desafíos</h3>
             <p class="action-card-description">Descubre y únete a nuevos desafíos.</p>
@@ -55,7 +55,7 @@
 
           <div class="action-card" (click)="navigateTo('/user-profile')">
             <div class="action-card-icon">
-              <span class="material-icons-outlined">settings</span>
+              <span class="material-icons-outlined">account_circle</span>
             </div>
             <h3 class="action-card-title">Mi Perfil</h3>
             <p class="action-card-description">Ajusta tus preferencias y perfil.</p>
@@ -64,17 +64,22 @@
           <!-- TARJETA "MIS MEDALLAS" CON TU ESTRUCTURA HTML -->
           <div class="action-card" (click)="abrirDialogoMedallas()">
             <div class="action-card-icon">
-              <!-- Asegúrate de que 'emoji_events' o el icono que prefieras esté disponible
-                   y sea el correcto para "Mis Medallas".
-                   Si usas MatIcon, sería <mat-icon>emoji_events</mat-icon>
-                   Si usas span con material-icons-outlined, mantenlo así.
-                   Voy a asumir que sigues el patrón de span. -->
-              <span class="material-icons-outlined">military_tech</span> <!-- Cambiado a 'military_tech' como ejemplo, puedes usar 'emoji_events' u otro -->
+              <span class="material-icons-outlined">shield</span>
             </div>
             <h3 class="action-card-title">Mis Medallas</h3>
             <p class="action-card-description">Consulta los rangos que has desbloqueado.</p>
           </div>
           <!-- FIN TARJETA "MIS MEDALLAS" -->
+
+          <!-- NUEVA TARJETA PARA EL MERCADO -->
+          <div class="action-card" (click)="navigateTo('/market')"> <!-- Asume una ruta '/market' -->
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">storefront</span> <!-- Icono de tienda -->
+            </div>
+            <h3 class="action-card-title">Mercado de Recompensas</h3>
+            <p class="action-card-description">Canjea tus puntos por recompensas exclusivas.</p>
+          </div>
+          <!-- FIN NUEVA TARJETA PARA EL MERCADO -->
 
         </div> <!-- Fin de actions-grid -->
 

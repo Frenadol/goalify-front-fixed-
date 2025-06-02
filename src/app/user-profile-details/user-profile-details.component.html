@@ -22,22 +22,27 @@
 
           <!-- Sección Mis Estadísticas -->
           <div class="profile-stats-section" *ngIf="currentUser">
-            <h3 class="section-title">Mis Estadísticas</h3>
+            <h4>Mis Estadísticas</h4>
             <div class="profile-info-grid">
-              {{ debugRankValues() }}
-
-              <!-- Puntos Totales -->
+              <!-- Puntos Actuales -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showPoints">
-                <mat-icon class="info-icon">star_outline</mat-icon>
-                <span class="info-label">Puntos Totales:</span>
-                <span class="info-value">{{ currentUser.puntosTotales != null ? currentUser.puntosTotales : 0 }}</span>
+                <mat-icon class="info-icon">military_tech</mat-icon>
+                <span class="info-label">Puntos Actuales:</span>
+                <span class="info-value">{{ currentUser.puntosTotales ?? 0 | number }}</span>
               </div>
 
               <!-- Nivel -->
               <div class="info-item" *ngIf="profileDisplayPreferences.showLevel">
                 <mat-icon class="info-icon">bar_chart</mat-icon>
                 <span class="info-label">Nivel:</span>
-                <span class="info-value">{{ currentUser.nivel != null ? currentUser.nivel : 1 }}</span>
+                <span class="info-value">{{ currentUser.nivel ?? 0 | number }}</span>
+              </div>
+              
+              <!-- Puntos Récord (NUEVO) -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showRecordPoints && currentUser.puntosRecord !== undefined">
+                <mat-icon class="info-icon">leaderboard</mat-icon>
+                <span class="info-label">Puntos Récord:</span>
+                <span class="info-value">{{ currentUser.puntosRecord ?? 0 | number }}</span>
               </div>
 
               <!-- El bloque de Rango y Progreso YA NO ESTÁ AQUÍ -->
@@ -247,30 +252,28 @@
       <div class="settings-panel card-style" *ngIf="showSettingsPanel" @fadeInScale>
         <h3>Personalizar Estadísticas y Apariencia</h3>
         <mat-divider></mat-divider>
-        <div class="settings-options">
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showPoints">Mostrar Puntos Totales</mat-slide-toggle>
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showLevel">Mostrar Nivel</mat-slide-toggle>
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showRank">Mostrar Rango</mat-slide-toggle>
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showChallengesCompleted">Mostrar Desafíos Completados</mat-slide-toggle>
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showHabitsCompletedToday">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showTotalHabitsCompleted">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
-          <mat-slide-toggle [(ngModel)]="profileDisplayPreferences.showBestStreak">Mostrar Mejor Racha</mat-slide-toggle>
-
-          <div class="color-picker-setting">
-            <label for="profileCardColorPicker" class="color-picker-label">Color de fondo de la tarjeta:</label>
-            <input type="color" id="profileCardColorPicker" class="profile-color-input"
-                   [(ngModel)]="profileDisplayPreferences.profileCardColor">
-            <span class="color-preview" [style.backgroundColor]="profileDisplayPreferences.profileCardColor"></span>
+        <form [formGroup]="profileDisplayPreferencesForm" (ngSubmit)="saveDisplayPreferences()">
+          <div class="settings-options">
+            <mat-slide-toggle formControlName="showPoints">Mostrar Puntos Actuales</mat-slide-toggle>
+            <mat-slide-toggle formControlName="showLevel">Mostrar Nivel</mat-slide-toggle>
+            <mat-slide-toggle formControlName="showRank">Mostrar Rango y Progreso</mat-slide-toggle>
+            <mat-slide-toggle formControlName="showRecordPoints">Mostrar Puntos Récord</mat-slide-toggle> <!-- <<< NUEVO INTERRUPTOR AÑADIDO AQUÍ -->
+            <mat-slide-toggle formControlName="showChallengesCompleted">Mostrar Desafíos Completados (Total)</mat-slide-toggle>
+            <mat-slide-toggle formControlName="showHabitsCompletedToday">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
+            <mat-slide-toggle formControlName="showTotalHabitsCompleted">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
+            <mat-slide-toggle formControlName="showBestStreak">Mostrar Mejor Racha de Hábitos</mat-slide-toggle>
+            
+            <!-- ...otros toggles de preferencias... -->
           </div>
-        </div>
-        <mat-divider></mat-divider>
-        <div class="settings-actions">
-          <button mat-stroked-button (click)="toggleSettingsPanel()">Cancelar</button>
-          <button mat-flat-button color="primary" (click)="saveDisplayPreferences()" [disabled]="isSavingBio">
-            <mat-spinner *ngIf="isSavingBio" diameter="20" class="button-spinner"></mat-spinner>
-            <span *ngIf="!isSavingBio">Guardar</span>
-          </button>
-        </div>
+          <mat-divider></mat-divider>
+          <div class="settings-actions">
+            <button mat-stroked-button (click)="toggleSettingsPanel()">Cancelar</button>
+            <button mat-flat-button color="primary" (click)="saveDisplayPreferences()" [disabled]="isSavingBio">
+              <mat-spinner *ngIf="isSavingBio" diameter="20" class="button-spinner"></mat-spinner>
+              <span *ngIf="!isSavingBio">Guardar</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div> <!-- CIERRE DEL DIV *ngIf="currentUser; else loadingOrError" -->
 
