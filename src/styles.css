@@ -376,7 +376,7 @@ body.admin-view h1, body.admin-view h2, body.admin-view h3 {
   animation-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045) !important; /* Curva de aceleración para salida */
   /* animation-fill-mode: forwards; /* No es estrictamente necesario para la salida ya que el elemento se elimina */
 }
-/* >>> FIN NUEVA ANIMACIÓN DE SALIDA <<< */
+/* >>> FIN NUEVA ANIMACION DE SALIDA <<< */
 
 /* Estilos para Snackbar Personalizados */
 .custom-snackbar {
@@ -482,3 +482,12 @@ body.admin-view h1, body.admin-view h2, body.admin-view h3 {
   padding: 0 !important; // Cuidado con esto, puede afectar el header y actions si no los ajustas bien
 }
 */
+
+/* ... tus estilos globales existentes ... */
+
+.medallas-dialog-container .mat-mdc-dialog-container .mdc-dialog__surface {
+  /* Ejemplo: bordes redondeados para el panel del diálogo */
+  border-radius: 12px !important;
+  /* Ejemplo: una sombra personalizada si la necesitas */
+  /* box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important; */
+}

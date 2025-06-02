@@ -1,11 +1,23 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core'; // Añadir ViewEncapsulation
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService, User } from '../auth.service';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AuthService, User } from '../auth.service';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
 import { NotificationService, PendingNotification, UserChallengeId } from '../shared/notification.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MedallasDialogComponent, RangoNivelDialog } from '../medallas-dialog/medallas-dialog.component';
+
+// Interfaz local para la lógica de rangos en este componente
+interface RangoNivelWelcome {
+  nombre: string;
+  puntosMinimos: number;
+  icono: string;
+  mensajeMotivacional?: string;
+  // No es necesario fechaConseguida aquí, se añade al transformar a RangoNivelDialog
+}
 
 @Component({
   selector: 'app-welcome',
@@ -14,80 +26,149 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     CommonModule,
     UserProfileComponent,
     RouterLink,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatIconModule,
+    MatDialogModule
   ],
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.css'],
-  // Podríamos necesitar ViewEncapsulation.None si los estilos de animación no se aplican globalmente,
-  // pero es mejor mantener los estilos de panelClass en styles.css global.
-  // encapsulation: ViewEncapsulation.None
 })
 export class WelcomeComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
-  private userSubscription: Subscription | undefined;
   userDisplayName: string = 'Usuario';
+  private userSubscription: Subscription | undefined;
+  private notificationSubscription: Subscription | undefined;
+  private readonly MAX_NOTIFICATIONS_TO_SHOW = 3;
 
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-    private notificationService: NotificationService,
-    private snackBar: MatSnackBar
-  ) {}
+  // TU DEFINICIÓN DE RANGOS
+  public readonly RANGOS_DEFINIDOS_WELCOME: RangoNivelWelcome[] = [
+    { nombre: 'NOVATO', puntosMinimos: 0, icono: 'assets/rangos/rangonovato.png', mensajeMotivacional: '¡Todo gran viaje comienza con un primer paso! Sigue así.' },
+    { nombre: 'ASPIRANTE', puntosMinimos: 1000, icono: 'assets/rangos/rangoaspirante.png', mensajeMotivacional: '¡Estás construyendo una base sólida! La disciplina te llevará lejos.' },
+    { nombre: 'DISCIPLINADO', puntosMinimos: 2500, icono: 'assets/rangos/rangodisciplinado.png', mensajeMotivacional: '¡Tu constancia es admirable! Ya eres un ejemplo de dedicación.' },
+    { nombre: 'CONSTANTE', puntosMinimos: 5000, icono: 'assets/rangos/rangoconstante.png', mensajeMotivacional: '¡Has convertido tus metas en hábitos! Sigue brillando.' },
+    { nombre: 'DEDICADO', puntosMinimos: 10000, icono: 'assets/rangos/rangodedicado.png', mensajeMotivacional: '¡Tu dedicación es inquebrantable! Estás marcando la diferencia.' },
+    { nombre: 'INSPIRADOR', puntosMinimos: 20000, icono: 'assets/rangos/rangoinspirador.png', mensajeMotivacional: '¡Eres una fuente de inspiración! Tu progreso motiva a otros.' },
+    { nombre: 'MAESTRO_HABITOS', puntosMinimos: 50000, icono: 'assets/rangos/rangomaestrohabitos.png', mensajeMotivacional: '¡Has alcanzado la maestría! Tu dominio de los hábitos es legendario.' }
+  ];
+
+  public medallasParaDialogo: RangoNivelDialog[] = [];
+
+  // Inyección de dependencias
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private notificationService = inject(NotificationService);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+
+
+  constructor() {}
 
   ngOnInit(): void {
-    this.userSubscription = this.authService.currentUser.subscribe((user: User | null) => {
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
       this.currentUser = user;
-      this.userDisplayName = user?.nombre || 'Usuario'; // <--- CAMBIO AQUÍ
+      if (user) {
+        this.userDisplayName = user.nombre;
+        // Podrías llamar a prepararMedallasParaDialogo aquí si quieres tenerlas listas
+        // o esperar a que se haga clic en el botón.
+        // this.prepararMedallasParaDialogo(); // Opcional: preparar al cargar el usuario
+      } else {
+        this.userDisplayName = 'Usuario';
+        this.medallasParaDialogo = [];
+      }
+    });
+    this.checkPendingNotifications();
+  }
 
-      if (user && !user.esAdministrador) {
-        this.checkForPendingNotifications();
+  checkPendingNotifications(): void {
+    this.notificationSubscription = this.notificationService.getPendingNotifications().subscribe({
+      next: (notifications) => {
+        if (notifications && notifications.length > 0) {
+          const notificationsToShow = notifications.slice(0, this.MAX_NOTIFICATIONS_TO_SHOW);
+          notificationsToShow.forEach((notification, index) => {
+            setTimeout(() => {
+              this.showNotificationSnackbar(notification);
+            }, index * 4000); // Muestra cada notificación con un pequeño retraso
+          });
+
+          // Marcar como leídas después de mostrarlas (o al interactuar)
+          const idsToMark = notifications.map(n => n.userChallengeId);
+          this.notificationService.markNotificationsAsRead(idsToMark).subscribe({
+            // Opcional: manejar éxito/error de marcar como leído
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener notificaciones pendientes:', error);
       }
     });
   }
 
-  checkForPendingNotifications(): void {
-    this.notificationService.getPendingNotifications().subscribe({
-      next: (notifications) => {
-        if (notifications && notifications.length > 0) {
-          const idsToMarkAsRead: UserChallengeId[] = [];
-          notifications.forEach((notification, index) => {
-            // Añadimos un pequeño retraso para que las notificaciones no aparezcan todas a la vez si hay varias
-            setTimeout(() => {
-              this.snackBar.open(
-                `🔔 ¡Nuevo desafío asignado: ${notification.challengeName}!`, // Icono añadido al mensaje
-                '✖', // Botón de cierre
-                {
-                  duration: 7000,
-                  horizontalPosition: 'right', // Posición a la derecha
-                  verticalPosition: 'bottom',    // Posición arriba
-                  panelClass: ['custom-snackbar', 'snackbar-info', 'slide-in-right'] // Clases para estilo y animación
-                }
-              );
-            }, index * 300); // Retraso incremental
-
-            if (notification.userChallengeId &&
-                typeof notification.userChallengeId.idUsuario === 'number' &&
-                typeof notification.userChallengeId.idDesafio === 'number') {
-              idsToMarkAsRead.push(notification.userChallengeId);
-            } else {
-              console.warn('Formato de userChallengeId incorrecto en la notificación:', notification);
-            }
-          });
-
-          if (idsToMarkAsRead.length > 0) {
-            this.notificationService.markNotificationsAsRead(idsToMarkAsRead).subscribe({
-              next: () => console.log('Notificaciones marcadas como leídas en el backend.'),
-              error: (err) => console.error('Error al marcar notificaciones como leídas en el backend:', err)
-            });
-          }
-        } else {
-          console.log('No hay notificaciones pendientes para el usuario.');
-        }
-      },
-      error: (err) => {
-        console.error('Error al obtener notificaciones pendientes:', err);
+  private showNotificationSnackbar(notification: PendingNotification): void {
+    const snackBarRef = this.snackBar.open(
+      `¡Nuevo desafío asignado: ${notification.challengeName}!`,
+      'Ver Mis Desafíos',
+      {
+        duration: 7000, // Duración más larga para dar tiempo a hacer clic
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar-challenge']
       }
+    );
+
+    snackBarRef.onAction().subscribe(() => {
+      this.router.navigate(['/my-challenges']);
     });
+  }
+
+  prepararMedallasParaDialogo(): void {
+    if (!this.currentUser || typeof this.currentUser.puntosTotales === 'undefined') {
+      this.medallasParaDialogo = [];
+      return;
+    }
+
+    const puntosUsuario = this.currentUser.puntosTotales;
+    const fechasConseguidasDelUsuario = this.currentUser.fechasRangosConseguidos || {};
+    const iconoMedallaBloqueada = 'assets/rangos/medalladesconocida.png';
+    const nombreMedallaBloqueada = "??????";
+    const descripcionMedallaBloqueada = "Sigue esforzándote para desbloquear este rango."; // O un string vacío si prefieres
+
+    this.medallasParaDialogo = this.RANGOS_DEFINIDOS_WELCOME.map(rangoBase => {
+      const conseguida = puntosUsuario >= rangoBase.puntosMinimos;
+      const fechaConseguidaString = conseguida ? (fechasConseguidasDelUsuario[rangoBase.nombre] || undefined) : undefined;
+      const iconoAMostrar = conseguida ? rangoBase.icono : iconoMedallaBloqueada;
+      const nombreAMostrar = conseguida ? rangoBase.nombre : nombreMedallaBloqueada;
+      const descripcionAMostrar = conseguida ? rangoBase.mensajeMotivacional : descripcionMedallaBloqueada;
+      // El mensaje motivacional también podría ser diferente o vacío para las no conseguidas
+      const mensajeMotivacionalAMostrar = conseguida ? rangoBase.mensajeMotivacional : descripcionMedallaBloqueada;
+
+
+      return {
+        nombre: nombreAMostrar,
+        icono: iconoAMostrar,
+        conseguida: conseguida,
+        descripcion: descripcionAMostrar,
+        mensajeMotivacional: mensajeMotivacionalAMostrar,
+        puntosMinimos: rangoBase.puntosMinimos,
+        fechaConseguida: fechaConseguidaString
+      };
+    });
+  }
+
+
+  abrirDialogoMedallas(): void {
+    this.prepararMedallasParaDialogo(); // Asegurarse de que las medallas estén preparadas con las fechas
+    if (this.medallasParaDialogo.length > 0) {
+      this.dialog.open(MedallasDialogComponent, {
+        width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '85vh',
+        data: { medallas: this.medallasParaDialogo },
+        panelClass: 'medallas-info-dialog-panel' // Asegúrate que esta clase CSS exista y esté bien definida
+      });
+    } else {
+      // Esto podría ocurrir si currentUser es null o no tiene puntosTotales.
+      this.snackBar.open('No hay información de medallas para mostrar o el usuario no está cargado.', 'Cerrar', { duration: 3000 });
+    }
   }
 
   navigateTo(route: string): void {
@@ -95,6 +176,11 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.userSubscription?.unsubscribe();
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
   }
 }

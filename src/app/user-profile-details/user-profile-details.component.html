@@ -137,17 +137,24 @@
               <p>{{ currentUser.biografia || 'Aún no has añadido una biografía.' }}</p>
             </div>
             <div *ngIf="isEditingBio" class="bio-edit-area">
-              <mat-form-field appearance="outline" class="full-width-field">
-                <mat-label>Edita tu biografía</mat-label>
-                <textarea matInput [(ngModel)]="editableBio" rows="4" maxlength="500"></textarea>
-              </mat-form-field>
+              <form [formGroup]="bioEditForm" (ngSubmit)="guardarBiografia()">
+                <mat-form-field appearance="outline" class="full-width-field">
+                  <mat-label>Edita tu biografía</mat-label>
+                  <textarea matInput formControlName="biografia" rows="4" maxlength="500"></textarea>
+                  <!-- Mostrar errores de validación si es necesario -->
+                  <mat-error *ngIf="bioEditForm.get('biografia')?.hasError('maxlength')">
+                    La biografía no puede exceder los 500 caracteres.
+                  </mat-error>
+                </mat-form-field>
+              <!-- </form> No cierres el form aquí si los botones están fuera, o muévelos dentro -->
               <div class="bio-edit-actions">
-                <button mat-stroked-button (click)="cancelEditBio()" [disabled]="isSavingBio">Cancelar</button>
-                <button mat-flat-button color="primary" (click)="saveBiography()" [disabled]="isSavingBio || editableBio === (currentUser.biografia || '')">
+                <button mat-stroked-button type="button" (click)="cancelEditBio()" [disabled]="isSavingBio">Cancelar</button>
+                <button mat-flat-button color="primary" type="submit" [disabled]="isSavingBio || bioEditForm.invalid || bioEditForm.pristine">
                   <mat-spinner *ngIf="isSavingBio" diameter="20" class="button-spinner"></mat-spinner>
                   {{ isSavingBio ? 'Guardando...' : 'Guardar Biografía' }}
                 </button>
               </div>
+              </form> <!-- Cierra el form aquí si los botones están dentro -->
             </div>
           </div>
 

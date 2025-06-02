@@ -26,7 +26,7 @@ export interface BackendUserProfilePreferences {
 
 // Interfaz para el Usuario
 export interface User {
-  id?: number | string; // Permitir string si el backend usa UUIDs como string
+  id?: number | string;
   nombre: string;
   email?: string;
   fotoPerfil?: string | null;
@@ -36,11 +36,12 @@ export interface User {
   ultimaActualizacion?: string | Date;
   fechaUltimoIngreso?: string | Date;
   puntosTotales?: number;
-  nivel?: number;
+  nivel?: number; // Asumo que este campo existe o existirá
   biografia?: string;
   totalHabitosCompletados?: number;
   totalDesafiosCompletados?: number;
-  preferences?: BackendUserProfilePreferences; // <<< AÑADIDO/MODIFICADO AQUÍ
+  preferences?: BackendUserProfilePreferences;
+  fechasRangosConseguidos?: { [key: string]: string }; // <--- AÑADIDO: Para las fechas de los rangos
 }
 
 // Interfaz para la RESPUESTA DEL LOGIN que coincide con LoginResponseDTO.java
