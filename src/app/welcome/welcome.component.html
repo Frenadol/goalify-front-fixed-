@@ -60,6 +60,22 @@
             <h3 class="action-card-title">Mi Perfil</h3>
             <p class="action-card-description">Ajusta tus preferencias y perfil.</p>
           </div>
+
+          <!-- TARJETA "MIS MEDALLAS" CON TU ESTRUCTURA HTML -->
+          <div class="action-card" (click)="abrirDialogoMedallas()">
+            <div class="action-card-icon">
+              <!-- Asegúrate de que 'emoji_events' o el icono que prefieras esté disponible
+                   y sea el correcto para "Mis Medallas".
+                   Si usas MatIcon, sería <mat-icon>emoji_events</mat-icon>
+                   Si usas span con material-icons-outlined, mantenlo así.
+                   Voy a asumir que sigues el patrón de span. -->
+              <span class="material-icons-outlined">military_tech</span> <!-- Cambiado a 'military_tech' como ejemplo, puedes usar 'emoji_events' u otro -->
+            </div>
+            <h3 class="action-card-title">Mis Medallas</h3>
+            <p class="action-card-description">Consulta los rangos que has desbloqueado.</p>
+          </div>
+          <!-- FIN TARJETA "MIS MEDALLAS" -->
+
         </div> <!-- Fin de actions-grid -->
 
       </section>

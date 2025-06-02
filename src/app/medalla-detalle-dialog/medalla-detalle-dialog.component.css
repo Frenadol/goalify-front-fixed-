@@ -1,0 +1,122 @@
+.medalla-detalle-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px; /* Ajusta el padding general del diálogo */
+  max-width: 450px; /* Un poco más ancho */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dialog-title {
+  font-size: 1.75em; /* Tamaño del título */
+  color: var(--user-primary, #3f51b5); /* Usa tu variable de color primario */
+  margin: 0 0 16px 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color-light, #eee);
+}
+
+.title-icon {
+  font-size: 1.5em; /* Ajusta el tamaño del icono en el título */
+  height: 1.5em;
+  width: 1.5em;
+}
+
+.title-icon.achieved-icon {
+  color: var(--color-success, #28a745); /* Color para medallas conseguidas */
+}
+
+.title-icon.locked-icon {
+  color: var(--color-text-secondary, #6c757d); /* Color para medallas bloqueadas */
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 10px;
+  overflow-y: auto; /* Para scroll si el contenido es largo */
+  max-height: 60vh;
+}
+
+.medalla-imagen-container {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 50%; /* Contenedor circular para la imagen */
+  background-color: var(--background-color-light, #f5f5f5); /* Fondo suave */
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+  width: 150px; /* Ancho del contenedor circular */
+  height: 150px; /* Alto del contenedor circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medalla-imagen-grande {
+  width: 120px; /* Imagen un poco más pequeña que el contenedor para efecto de padding */
+  height: 120px;
+  object-fit: contain;
+  border-radius: 50%; /* Imagen también circular */
+}
+
+.medalla-info {
+  width: 100%;
+}
+
+.medalla-info p {
+  font-size: 1.05em;
+  color: var(--color-text-primary, #333);
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+.medalla-info .descripcion {
+  font-weight: 500;
+}
+
+.medalla-info .mensaje-motivacional {
+  font-style: italic;
+  color: var(--color-text-secondary, #555);
+  margin-top: 8px;
+}
+
+.puntos-info, .estado-info, .fecha-conseguida-info { /* AÑADIDO .fecha-conseguida-info aquí */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95em;
+  color: var(--color-text-secondary, #666);
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: var(--background-color-lighter, #f9f9f9);
+  border-radius: var(--border-radius-md, 6px);
+}
+
+.puntos-info mat-icon, .estado-info mat-icon, .fecha-conseguida-info mat-icon { /* AÑADIDO .fecha-conseguida-info mat-icon aquí */
+  color: var(--user-accent, #ff4081); /* Usa tu color de acento */
+}
+
+.puntos-info strong, .estado-info strong, .fecha-conseguida-info strong { /* AÑADIDO .fecha-conseguida-info strong aquí */
+  color: var(--color-text-primary, #333);
+  font-weight: 600;
+}
+
+/* Ajuste específico si el icono de estado ya tiene un color diferente */
+.estado-info mat-icon {
+  color: var(--user-primary, #3f51b5); /* Mantenemos su color específico si lo tenía */
+}
+.estado-info strong {
+  text-transform: capitalize;
+}
+
+
+mat-dialog-actions {
+  padding: 16px 0 0 0; /* Ajusta padding de las acciones */
+  margin-top: 10px;
+  border-top: 1px solid var(--border-color-light, #eee);
+}

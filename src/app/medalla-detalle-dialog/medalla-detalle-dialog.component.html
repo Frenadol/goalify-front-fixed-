@@ -1,0 +1,51 @@
+<div class="medalla-detalle-container" cdkTrapFocus>
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon *ngIf="data.conseguida" class="title-icon achieved-icon" matTooltip="¡Conseguida!">military_tech</mat-icon>
+    <mat-icon *ngIf="!data.conseguida" class="title-icon locked-icon" matTooltip="Bloqueada">lock</mat-icon>
+    {{ data.nombre | titlecase }}
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="medalla-imagen-container">
+      <!-- Usando ngSrc para optimización de imagen si NgOptimizedImage está importado -->
+      <img [ngSrc]="data.icono" 
+           [alt]="'Icono de ' + data.nombre" 
+           class="medalla-imagen-grande" 
+           width="120" 
+           height="120" 
+           priority>
+    </div>
+
+    <mat-divider *ngIf="data.descripcion || data.mensajeMotivacional || data.puntosMinimos"></mat-divider>
+
+    <div class="medalla-info">
+      <p *ngIf="data.descripcion" class="descripcion">
+        {{ data.descripcion }}
+      </p>
+
+      <p *ngIf="data.mensajeMotivacional && data.mensajeMotivacional !== data.descripcion" class="mensaje-motivacional">
+        <em>{{ data.mensajeMotivacional }}</em>
+      </p>
+
+      <div *ngIf="data.puntosMinimos !== undefined && data.puntosMinimos !== null" class="puntos-info">
+        <mat-icon>stars</mat-icon>
+        <span>Se desbloquea con <strong>{{ data.puntosMinimos | number }}</strong> puntos.</span>
+      </div>
+
+      <div class="estado-info">
+        <mat-icon>{{ data.conseguida ? 'check_circle_outline' : 'highlight_off' }}</mat-icon>
+        <span>Estado: <strong>{{ data.conseguida ? 'Conseguida' : 'No conseguida' }}</strong></span>
+      </div>
+
+      <div *ngIf="data.conseguida && data.fechaConseguida" class="fecha-conseguida-info">
+        <mat-icon>calendar_today</mat-icon>
+        <span>Fecha de obtención: <strong>{{ data.fechaConseguida | date:'dd/MM/yyyy' }}</strong></span>
+      </div>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" (click)="cerrarDialogo()" cdkFocusInitial>Cerrar</button>
+  </mat-dialog-actions>
+</div>

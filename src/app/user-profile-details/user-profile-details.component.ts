@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // AÑADIR ReactiveFormsModule, FormBuilder, FormGroup, Validators
 import { Router, RouterModule } from '@angular/router';
 import { Subscription, forkJoin, of, Observable } from 'rxjs';
-import { switchMap, tap, catchError, filter, map } from 'rxjs/operators';
+import { switchMap, tap, catchError, filter, map, finalize } from 'rxjs/operators';
 import { AuthService, User, BackendUserProfilePreferences } from '../auth.service'; // Importar la interfaz
 import { ChallengeService } from '../challenges/challenge.service';
 import { HabitService } from '../habits/habit.service';
@@ -52,6 +52,7 @@ interface RangoNivel {
     DatePipe,
     TitleCasePipe,
     FormsModule,
+    ReactiveFormsModule, // <--- AÑADIR ReactiveFormsModule A LOS IMPORTS DEL COMPONENTE
     RouterModule,
     MatFormFieldModule,
     MatInputModule,
@@ -76,6 +77,8 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   isEditingBio: boolean = false;
   editableBio: string = '';
   isSavingBio: boolean = false;
+  bioEditForm: FormGroup; // <--- AÑADIR ESTA LÍNEA
+  bioEditError: string | null = null; // <--- AÑADIR ESTA LÍNEA
 
   showSettingsPanel: boolean = false;
   // Esta estructura es para las opciones de visualización de ESTA PÁGINA
@@ -134,16 +137,22 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     private challengeService: ChallengeService,
     private habitService: HabitService,
     private dialog: MatDialog,
-    private router: Router // Asegúrate de que router esté aquí si lo usas
-  ) {}
+    private router: Router, // Asegúrate de que router esté aquí si lo usas
+    private fb: FormBuilder // <--- AÑADIR FormBuilder AL CONSTRUCTOR
+  ) {
+    this.bioEditForm = this.fb.group({ // <--- INICIALIZAR EL FORMULARIO
+      biografia: ['', [Validators.maxLength(500)]] // Puedes ajustar validadores según necesites
+    });
+  }
 
   ngOnInit(): void {
     this.isLoading = true;
     const sub = this.authService.currentUser.subscribe(user => {
       if (user && typeof user.id !== 'undefined') {
-        this.currentUser = { ...user }; // Crear una copia para evitar mutaciones directas
+        this.currentUser = { ...user };
         this.puntosUsuario = user.puntosTotales || 0;
         this.editableBio = this.currentUser.biografia || '';
+        this.bioEditForm.patchValue({ biografia: this.editableBio }); // <--- ACTUALIZAR VALOR DEL FORMULARIO
 
         // Cargar preferencias de localStorage primero
         this.loadDisplayPreferencesFromStorage();
@@ -284,36 +293,78 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
       this.cancelEditBio();
     } else {
       this.editableBio = this.currentUser?.biografia || '';
+      this.bioEditForm.patchValue({ biografia: this.editableBio }); // <--- ACTUALIZAR VALOR DEL FORMULARIO
       this.isEditingBio = true;
     }
   }
 
   cancelEditBio(): void {
     this.isEditingBio = false;
-    this.editableBio = this.currentUser?.biografia || ''; // Restaura al valor original
+    // this.editableBio = this.currentUser?.biografia || ''; // Ya no es necesario si usas el form
+    this.bioEditForm.patchValue({ biografia: this.currentUser?.biografia || '' }); // <--- RESETEAR VALOR DEL FORMULARIO
   }
 
-  saveBiography(): void {
-    if (!this.currentUser || typeof this.currentUser.id === 'undefined') {
-      this.snackBar.open('Error: Usuario no identificado.', 'Cerrar', { duration: 3000 });
+  guardarBiografia(): void {
+    if (this.bioEditForm.invalid || !this.currentUser || !this.currentUser.id) {
+      console.warn('Guardar biografía: Formulario inválido o currentUser no disponible.');
+      if (this.bioEditForm.invalid) {
+        console.log('Errores del formulario:', this.bioEditForm.errors);
+        // Marcar campos como tocados para mostrar errores si es necesario
+        Object.keys(this.bioEditForm.controls).forEach(field => {
+          const control = this.bioEditForm.get(field);
+          control?.markAsTouched({ onlySelf: true });
+        });
+      }
       return;
     }
     this.isSavingBio = true;
-    const userId = this.currentUser.id;
-    this.authService.updateUserProfile(userId, { biografia: this.editableBio }).subscribe({
-      next: (updatedUser) => {
-        this.snackBar.open('Biografía actualizada con éxito.', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-        if (this.currentUser) { // Actualizar el currentUser localmente
-            this.currentUser.biografia = updatedUser.biografia;
+    this.bioEditError = null;
+
+    const nuevaBiografia = this.bioEditForm.value.biografia;
+
+    // LOG 1: Verifica el estado de currentUser.fotoPerfil ANTES de enviar
+    console.log('[DEBUG] UserProfileDetailsComponent - currentUser ANTES de payload para bio:', JSON.stringify(this.currentUser, null, 2));
+
+    const updatePayload: Partial<User> = {
+      biografia: nuevaBiografia,
+      fotoPerfil: this.currentUser.fotoPerfil // Esta es la línea crucial
+    };
+
+    // LOG 2: Verifica el payload que se va a enviar
+    console.log('[DEBUG] UserProfileDetailsComponent - updatePayload para bio:', JSON.stringify(updatePayload, null, 2));
+
+    this.authService.updateUserProfile(this.currentUser.id, updatePayload)
+      .pipe(
+        finalize(() => {
+          this.isSavingBio = false;
+        })
+      )
+      .subscribe({
+        next: (updatedUser) => {
+          // LOG 3: Verifica el usuario que devuelve el servicio (y el backend)
+          console.log('[DEBUG] UserProfileDetailsComponent - updatedUser DESPUÉS de guardar bio (desde authService):', JSON.stringify(updatedUser, null, 2));
+          
+          this.isEditingBio = false; // <--- CORREGIR AQUÍ (era editBioMode)
+          this.snackBar.open('Biografía actualizada con éxito.', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snackbar-success']
+          });
+          // this.currentUser se actualizará a través de la suscripción en ngOnInit
+        },
+        error: (error) => {
+          console.error('[DEBUG] UserProfileDetailsComponent - Error al guardar biografía:', error);
+          this.bioEditError = error.message || 'Error al actualizar la biografía.';
+          // Proporcionar un valor de cadena predeterminado para satisfacer al compilador
+          this.snackBar.open(this.bioEditError || 'Ocurrió un error al guardar la biografía.', 'Cerrar', {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snackbar-error']
+          });
         }
-        this.isEditingBio = false;
-        this.isSavingBio = false;
-      },
-      error: (err) => {
-        this.snackBar.open(`Error al actualizar la biografía: ${err.message || 'Inténtalo de nuevo.'}`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-error'] });
-        this.isSavingBio = false;
-      }
-    });
+      });
   }
 
   onImageError(event: Event): void {
