@@ -71,6 +71,8 @@ interface RangoNivel {
 })
 export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
+  // Añade esta línea aquí para resolver el error:
+  private userSubscription: Subscription = new Subscription();
 
   public isLoading: boolean = true;
   isEditingBio: boolean = false;
@@ -165,34 +167,34 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isLoading = true;
-    const sub = this.authService.currentUser.pipe(
-        filter(user => user !== undefined)
-    ).subscribe(user => {
-      if (user && typeof user.id !== 'undefined') {
-        this.currentUser = { ...user };
+    
+    // Observa al usuario actual
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      this.currentUser = user;
+      if (user) {
+        // Inicializar el formulario de biografía
+        this.editableBio = user.biografia || '';
+        this.bioEditForm = this.fb.group({
+          biografia: [this.editableBio]
+        });
+        
+        // Cargar las preferencias específicas del usuario
+        this.loadUserPreferences(user.preferences || {});
+        
+        // Inicializar el formulario de preferencias con los valores cargados
+        this.initializeDisplayPreferencesForm();
+        
+        // Calcular progreso del rango
         this.puntosUsuario = user.puntosTotales || 0;
-        this.editableBio = this.currentUser.biografia || '';
-        this.bioEditForm.patchValue({ biografia: this.editableBio });
-
-        if (this.currentUser.preferences) {
-            this.loadUserPreferences(this.currentUser.preferences);
-        } else {
-            this.loadDisplayPreferencesFromStorage();
-        }
-        this.initializeDisplayPreferencesForm();
-
-        this.fetchProfileData();
         this.calcularProgresoRango();
-      } else {
-        this.currentUser = null;
-        this.loadDisplayPreferencesFromStorage();
-        this.initializeDisplayPreferencesForm();
-        this.isLoading = false;
+        
+        // Cargar datos del perfil (desafíos, estadísticas, etc.)
+        this.fetchProfileData();
       }
+      this.isLoading = false;
     });
-    this.componentSubscriptions.add(sub);
   }
-
+  
   private initializeDisplayPreferencesForm(): void {
     const prefsToUse = this.profileDisplayPreferences; // Usar la propiedad de clase ya actualizada
     this.profileDisplayPreferencesForm = this.fb.group({
@@ -211,71 +213,94 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     });
   }
   
-  protected loadUserPreferences(backendPrefs: BackendUserProfilePreferences): void {
-      // Actualiza la propiedad de clase this.profileDisplayPreferences
-      this.profileDisplayPreferences = {
-        showPoints: backendPrefs.showPointsOnCard ?? this.defaultProfileDisplayPreferences.showPoints,
-        showLevel: backendPrefs.showLevelOnCard ?? this.defaultProfileDisplayPreferences.showLevel,
-        showRank: this.defaultProfileDisplayPreferences.showRank, // Asumir que no viene del backend o se maneja diferente
-        showChallengesCompleted: backendPrefs.showCompletedChallenges ?? this.defaultProfileDisplayPreferences.showChallengesCompleted,
-        showHabitsCompletedToday: this.defaultProfileDisplayPreferences.showHabitsCompletedToday,
-        showTotalHabitsCompleted: this.defaultProfileDisplayPreferences.showTotalHabitsCompleted,
-        showBestStreak: this.defaultProfileDisplayPreferences.showBestStreak,
-        showRecordPoints: backendPrefs.showRecordPoints ?? this.defaultProfileDisplayPreferences.showRecordPoints,
-        profileCardColor: backendPrefs.cardBackgroundColor ?? this.defaultProfileDisplayPreferences.profileCardColor,
-        themeColor: backendPrefs.themeColor ?? this.defaultProfileDisplayPreferences.themeColor,
-        showChallengeDatesOnCard: backendPrefs.showChallengeDatesOnCard ?? this.defaultProfileDisplayPreferences.showChallengeDatesOnCard,
-        showChallengePointsOnCard: backendPrefs.showChallengePointsOnCard ?? this.defaultProfileDisplayPreferences.showChallengePointsOnCard,
-      };
-  }
-
-  // ÚNICA IMPLEMENTACIÓN DE saveDisplayPreferences
-  saveDisplayPreferences(): void {
-    if (!this.profileDisplayPreferencesForm || this.profileDisplayPreferencesForm.invalid) {
-      this.snackBar.open('Formulario de preferencias inválido.', 'Cerrar', { duration: 3000 });
-      return;
-    }
-    if (!this.currentUser || typeof this.currentUser.id === 'undefined') {
-      this.snackBar.open('No se pueden guardar las preferencias (usuario no identificado).', 'Cerrar', { duration: 3000 });
-      this.toggleSettingsPanel();
-      return;
-    }
-
-    this.isSavingPreferences = true;
-    const formValues = this.profileDisplayPreferencesForm.value;
-
-    this.profileDisplayPreferences = {
-        ...this.profileDisplayPreferences,
-        ...formValues
-    };
+  protected loadUserPreferences(backendPrefs: any): void {
+  // Primero intenta cargar desde localStorage si hay un usuario actual
+  let preferences = null;
+  
+  if (this.currentUser && this.currentUser.id) {
+    const userPrefsKey = `user_prefs_${this.currentUser.id}`;
+    const storedPrefsString = localStorage.getItem(userPrefsKey);
     
-    const storageKey = this.getPreferencesStorageKey();
-    if (storageKey) {
+    if (storedPrefsString) {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(formValues));
+        preferences = JSON.parse(storedPrefsString);
       } catch (e) {
-        console.error('Error al guardar preferencias en localStorage:', e);
+        console.error('Error al parsear preferencias del localStorage', e);
       }
     }
-
-    const backendPrefsPayload: BackendUserProfilePreferences = this.mapToBackendPreferences(formValues);
-
-    this.authService.updateUserDisplayPreferences(this.currentUser.id, backendPrefsPayload)
-      .pipe(finalize(() => {
-        this.isSavingPreferences = false;
-        this.profileDisplayPreferencesForm.markAsPristine();
-      }))
-      .subscribe({
-        next: (updatedUser) => {
-          this.snackBar.open('Preferencias de visualización guardadas.', 'Cerrar', { duration: 2500 });
-          this.toggleSettingsPanel();
-        },
-        error: (err) => {
-          console.error('Error al guardar preferencias en el backend:', err);
-          this.snackBar.open(`Error al guardar: ${err.message || 'Error desconocido'}`, 'Cerrar', { duration: 3500 });
-        }
-      });
   }
+
+  // Si se encontraron preferencias en localStorage, úsalas
+  if (preferences) {
+    this.profileDisplayPreferences = preferences;
+    return;
+  }
+  
+  // Si no, usa las preferencias del backend o las por defecto
+  this.profileDisplayPreferences = {
+    showPoints: backendPrefs.showPointsOnCard ?? this.defaultProfileDisplayPreferences.showPoints,
+    showLevel: backendPrefs.showLevelOnCard ?? this.defaultProfileDisplayPreferences.showLevel,
+    showRank: this.defaultProfileDisplayPreferences.showRank,
+    showChallengesCompleted: backendPrefs.showCompletedChallenges ?? this.defaultProfileDisplayPreferences.showChallengesCompleted,
+    showHabitsCompletedToday: this.defaultProfileDisplayPreferences.showHabitsCompletedToday,
+    showTotalHabitsCompleted: this.defaultProfileDisplayPreferences.showTotalHabitsCompleted,
+    showBestStreak: this.defaultProfileDisplayPreferences.showBestStreak,
+    showRecordPoints: backendPrefs.showRecordPoints ?? this.defaultProfileDisplayPreferences.showRecordPoints,
+    profileCardColor: backendPrefs.cardBackgroundColor ?? this.defaultProfileDisplayPreferences.profileCardColor,
+    themeColor: backendPrefs.themeColor ?? this.defaultProfileDisplayPreferences.themeColor,
+    showChallengeDatesOnCard: backendPrefs.showChallengeDatesOnCard ?? this.defaultProfileDisplayPreferences.showChallengeDatesOnCard,
+    showChallengePointsOnCard: backendPrefs.showChallengePointsOnCard ?? this.defaultProfileDisplayPreferences.showChallengePointsOnCard,
+  };
+}
+
+  // ÚNICA IMPLEMENTACIÓN DE saveDisplayPreferences
+  public saveDisplayPreferences(): void {
+  if (!this.currentUser || !this.currentUser.id) {
+    console.error('No se puede guardar las preferencias sin un usuario válido');
+    return;
+  }
+
+  const preferences: ProfileDisplayPreferences = {
+    showPoints: this.profileDisplayPreferencesForm.get('showPoints')?.value,
+    showLevel: this.profileDisplayPreferencesForm.get('showLevel')?.value,
+    showRank: this.profileDisplayPreferencesForm.get('showRank')?.value,
+    showChallengesCompleted: this.profileDisplayPreferencesForm.get('showChallengesCompleted')?.value,
+    showHabitsCompletedToday: this.profileDisplayPreferencesForm.get('showHabitsCompletedToday')?.value,
+    showTotalHabitsCompleted: this.profileDisplayPreferencesForm.get('showTotalHabitsCompleted')?.value,
+    showBestStreak: this.profileDisplayPreferencesForm.get('showBestStreak')?.value,
+    showRecordPoints: this.profileDisplayPreferencesForm.get('showRecordPoints')?.value,
+    profileCardColor: this.profileDisplayPreferencesForm.get('profileCardColor')?.value
+  };
+
+  // Guarda las preferencias en localStorage usando el ID del usuario como clave
+  const userPrefsKey = `user_prefs_${this.currentUser.id}`;
+  localStorage.setItem(userPrefsKey, JSON.stringify(preferences));
+
+  // Guarda en el backend
+  const backendPrefs = {
+    showPointsOnCard: preferences.showPoints,
+    showLevelOnCard: preferences.showLevel,
+    showCompletedChallenges: preferences.showChallengesCompleted,
+    showRecordPoints: preferences.showRecordPoints,
+    cardBackgroundColor: preferences.profileCardColor
+  };
+
+  // Aquí usarías un servicio para guardar en el backend, pero mientras tanto
+  // vamos a actualizar el estado local
+  this.profileDisplayPreferences = preferences;
+  
+  // Actualiza el usuario actual para que mantenga las preferencias
+  if (this.currentUser) {
+    this.currentUser.preferences = backendPrefs;
+    this.authService.updateCurrentUserState(this.currentUser);
+  }
+
+  this.snackBar.open('Preferencias guardadas correctamente', 'Cerrar', {
+    duration: 3000
+  });
+  
+  this.toggleSettingsPanel(); // Cierra el panel de configuración
+}
 
   // ÚNICA IMPLEMENTACIÓN DE mapToBackendPreferences
   private mapToBackendPreferences(formValues: ProfileDisplayPreferences): BackendUserProfilePreferences {
@@ -292,109 +317,119 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   }
 
   private fetchProfileData(): void {
-    if (!this.currentUser || typeof this.currentUser.id === 'undefined') {
-      this.isLoading = false;
-      return;
-    }
-    this.isLoading = true;
-
-    const challenges$ = this.loadUserChallenges();
-    const completedChallenges$ = this.loadCompletedUserChallenges();
-    const habitStats$ = this.loadHabitStats();
-
-    forkJoin({
-      challenges: challenges$.pipe(catchError(err => {
-        this.challengesError = `Error al cargar desafíos: ${err.message}`;
-        return of([]);
-      })),
-      completedChallenges: completedChallenges$.pipe(catchError(err => {
-        this.completedChallengesError = `Error al cargar desafíos completados: ${err.message}`;
-        return of([]);
-      })),
-      habitStats: habitStats$.pipe(catchError(err => {
-        this.habitStatsError = `Error al cargar estadísticas de hábitos: ${err.message}`;
-        return of(null);
-      }))
-    }).subscribe({
-      next: (results) => {
-        this.userChallengeDetails = results.challenges;
-        this.completedUserChallengeDetails = results.completedChallenges;
-        this.habitStats = results.habitStats;
+  if (!this.currentUser || typeof this.currentUser.id === 'undefined') {
+    this.isLoading = false;
+    return;
+  }
+  
+  // Cargar desafíos del usuario
+  this.challengeService.getMyJoinedChallenges().subscribe({
+    next: (userChallenges: UserChallenge[]) => {
+      if (userChallenges.length === 0) {
+        this.userChallengeDetails = [];
         this.isLoadingChallenges = false;
-        this.isLoadingCompletedChallenges = false;
-        this.isLoadingHabitStats = false;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error general al cargar datos del perfil:', err);
-        this.snackBar.open('Error al cargar todos los datos del perfil.', 'Cerrar', { duration: 3000 });
-        this.isLoadingChallenges = false;
-        this.isLoadingCompletedChallenges = false;
-        this.isLoadingHabitStats = false;
-        this.isLoading = false;
+        return;
       }
-    });
-  }
-
-  loadUserChallenges(): Observable<UserChallengeDetail[]> {
-    this.isLoadingChallenges = true; // Indicar carga
-    this.challengesError = null; // Limpiar error previo
-    return this.challengeService.getMyJoinedChallenges().pipe(
-      switchMap((userChallenges: UserChallenge[]) => {
-        const activeChallenges = userChallenges.filter(uc => uc.estadoParticipacion !== 'COMPLETADO');
-        if (activeChallenges.length === 0) {
-          return of([]);
+      
+      // Filtrar solo los desafíos activos (no completados)
+      const activeChallenges = userChallenges.filter(uc => 
+        uc.estadoParticipacion !== 'COMPLETADO'
+      );
+      
+      // Obtener detalles completos para cada desafío
+      const challengeObservables = activeChallenges.map(userChallenge => 
+        this.challengeService.getChallengeById(userChallenge.desafioId).pipe(
+          map(challengeDetails => ({
+            ...challengeDetails,
+            userChallengeData: userChallenge
+          }))
+        )
+      );
+      
+      if (challengeObservables.length === 0) {
+        this.userChallengeDetails = [];
+        this.isLoadingChallenges = false;
+        return;
+      }
+      
+      forkJoin(challengeObservables).subscribe({
+        next: (challengeDetails) => {
+          this.userChallengeDetails = challengeDetails.filter(Boolean) as UserChallengeDetail[];
+          this.isLoadingChallenges = false;
+        },
+        error: (error) => {
+          console.error('Error al cargar detalles de desafíos:', error);
+          this.challengesError = 'Error al cargar detalles de los desafíos';
+          this.isLoadingChallenges = false;
         }
-        const challengeObservables = activeChallenges.map(uc =>
-          this.challengeService.getChallengeById(uc.desafioId).pipe(
-            map(challengeDetails => ({ ...challengeDetails, userChallengeData: uc })),
-            catchError(err => {
-              console.error(`Error cargando detalles del desafío ${uc.desafioId}:`, err);
-              return of(null);
-            })
-          )
-        );
-        return forkJoin(challengeObservables);
-      }),
-      map(details => details.filter((d): d is UserChallengeDetail => d !== null)),
-      finalize(() => this.isLoadingChallenges = false) // Asegurar que se desactive el loading
-    );
-  }
-
-  loadCompletedUserChallenges(): Observable<UserChallengeDetail[]> {
-    this.isLoadingCompletedChallenges = true;
-    this.completedChallengesError = null;
-    return this.challengeService.getCompletedUserChallenges().pipe(
-      switchMap((completedUserChallenges: UserChallenge[]) => {
-        if (completedUserChallenges.length === 0) {
-          return of([]);
+      });
+    },
+    error: (error) => {
+      console.error('Error al cargar desafíos del usuario:', error);
+      this.challengesError = 'Error al cargar los desafíos';
+      this.isLoadingChallenges = false;
+    }
+  });
+  
+  // Cargar desafíos completados
+  this.challengeService.getCompletedUserChallenges().subscribe({
+    next: (completedChallenges: UserChallenge[]) => {
+      if (completedChallenges.length === 0) {
+        this.completedUserChallengeDetails = [];
+        this.isLoadingCompletedChallenges = false;
+        return;
+      }
+      
+      const challengeObservables = completedChallenges.map(userChallenge => 
+        this.challengeService.getChallengeById(userChallenge.desafioId).pipe(
+          map(challengeDetails => ({
+            ...challengeDetails,
+            userChallengeData: userChallenge
+          }))
+        )
+      );
+      
+      forkJoin(challengeObservables).subscribe({
+        next: (challengeDetails) => {
+          this.completedUserChallengeDetails = challengeDetails.filter(Boolean) as UserChallengeDetail[];
+          this.isLoadingCompletedChallenges = false;
+        },
+        error: (error) => {
+          console.error('Error al cargar detalles de desafíos completados:', error);
+          this.completedChallengesError = 'Error al cargar detalles de los desafíos completados';
+          this.isLoadingCompletedChallenges = false;
         }
-        const challengeObservables = completedUserChallenges.map(uc =>
-          this.challengeService.getChallengeById(uc.desafioId).pipe(
-            map(challengeDetails => ({ ...challengeDetails, userChallengeData: uc })),
-            catchError(err => {
-              console.error(`Error cargando detalles del desafío completado ${uc.desafioId}:`, err);
-              return of(null);
-            })
-          )
-        );
-        return forkJoin(challengeObservables);
-      }),
-      map(details => details.filter((d): d is UserChallengeDetail => d !== null)),
-      finalize(() => this.isLoadingCompletedChallenges = false)
-    );
-  }
-
-  loadHabitStats(): Observable<HabitStats | null> {
-    this.isLoadingHabitStats = true;
-    this.habitStatsError = null;
-    return this.habitService.getHabitStatsForUser().pipe(
-      finalize(() => this.isLoadingHabitStats = false)
-    );
-  }
+      });
+    },
+    error: (error) => {
+      console.error('Error al cargar desafíos completados del usuario:', error);
+      this.completedChallengesError = 'Error al cargar los desafíos completados';
+      this.isLoadingCompletedChallenges = false;
+    }
+  });
+  
+  // Cargar estadísticas de hábitos
+  this.habitService.getHabitStatsForUser().subscribe({
+    next: (stats) => {
+      this.habitStats = stats;
+      this.isLoadingHabitStats = false;
+    },
+    error: (error) => {
+      console.error('Error al cargar estadísticas de hábitos:', error);
+      this.habitStatsError = 'Error al cargar estadísticas de hábitos';
+      this.isLoadingHabitStats = false;
+    }
+  });
+}
 
   ngOnDestroy(): void {
+    // Si quieres mantener la desuscripción de componentSubscriptions
     this.componentSubscriptions.unsubscribe();
+    
+    // Añade esta línea para desuscribirte también de userSubscription
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
   }
 
   toggleEditBio(): void {
@@ -459,6 +494,11 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
 
   toggleSettingsPanel(): void {
     this.showSettingsPanel = !this.showSettingsPanel;
+    
+    // Actualizar el formulario con las preferencias actuales cuando se abre el panel
+    if (this.showSettingsPanel) {
+      this.profileDisplayPreferencesForm.patchValue(this.profileDisplayPreferences);
+    }
   }
 
   getPreferencesStorageKey(): string | null {

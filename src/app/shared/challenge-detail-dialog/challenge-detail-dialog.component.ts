@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card'; // Para un mejor layout
 import { MatDividerModule } from '@angular/material/divider';
-import { UserChallengeDetail } from '../../user-profile-details/user-profile-details.component'; // Ajusta la ruta si es necesario
+import { UserChallengeDetail } from '../../user-profile-details/user-profile.models'; // Ajusta la ruta si es necesario
 
 @Component({
   selector: 'app-challenge-detail-dialog',

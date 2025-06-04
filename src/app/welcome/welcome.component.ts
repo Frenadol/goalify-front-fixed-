@@ -8,7 +8,7 @@ import { NotificationService, PendingNotification, UserChallengeId } from '../sh
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MedallasDialogComponent, RangoNivelDialog } from '../medallas-dialog/medallas-dialog.component';
+import { MedallasDialogComponent } from '../medallas-dialog/medallas-dialog.component';
 
 // Interfaz local para la lógica de rangos en este componente
 interface RangoNivelWelcome {
@@ -17,6 +17,17 @@ interface RangoNivelWelcome {
   icono: string;
   mensajeMotivacional?: string;
   // No es necesario fechaConseguida aquí, se añade al transformar a RangoNivelDialog
+}
+
+// Add the missing RangoNivelDialog interface
+interface RangoNivelDialog {
+  nombre: string;
+  icono: string;
+  conseguida: boolean;
+  descripcion?: string;
+  mensajeMotivacional?: string;
+  puntosMinimos: number;
+  fechaConseguida?: string;
 }
 
 @Component({
@@ -130,43 +141,44 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     const fechasConseguidasDelUsuario = this.currentUser.fechasRangosConseguidos || {};
     const iconoMedallaBloqueada = 'assets/rangos/medalladesconocida.png';
     const nombreMedallaBloqueada = "??????";
-    const descripcionMedallaBloqueada = "Sigue esforzándote para desbloquear este rango."; // O un string vacío si prefieres
+    const descripcionMedallaBloqueada = "Sigue esforzándote para desbloquear este rango.";
 
     this.medallasParaDialogo = this.RANGOS_DEFINIDOS_WELCOME.map(rangoBase => {
       const conseguida = puntosUsuario >= rangoBase.puntosMinimos;
       const fechaConseguidaString = conseguida ? (fechasConseguidasDelUsuario[rangoBase.nombre] || undefined) : undefined;
-      const iconoAMostrar = conseguida ? rangoBase.icono : iconoMedallaBloqueada;
-      const nombreAMostrar = conseguida ? rangoBase.nombre : nombreMedallaBloqueada;
-      const descripcionAMostrar = conseguida ? rangoBase.mensajeMotivacional : descripcionMedallaBloqueada;
-      // El mensaje motivacional también podría ser diferente o vacío para las no conseguidas
-      const mensajeMotivacionalAMostrar = conseguida ? rangoBase.mensajeMotivacional : descripcionMedallaBloqueada;
-
-
+      
       return {
-        nombre: nombreAMostrar,
-        icono: iconoAMostrar,
+        nombre: conseguida ? rangoBase.nombre : nombreMedallaBloqueada,
+        icono: conseguida ? rangoBase.icono : iconoMedallaBloqueada,
         conseguida: conseguida,
-        descripcion: descripcionAMostrar,
-        mensajeMotivacional: mensajeMotivacionalAMostrar,
+        descripcion: conseguida ? rangoBase.mensajeMotivacional : descripcionMedallaBloqueada,
+        mensajeMotivacional: conseguida ? rangoBase.mensajeMotivacional : descripcionMedallaBloqueada,
         puntosMinimos: rangoBase.puntosMinimos,
         fechaConseguida: fechaConseguidaString
       };
     });
+    
+    // Asegurarse de que rangosConseguidos esté presente en el currentUser
+    console.log('Medallas preparadas para diálogo:', this.medallasParaDialogo);
+    console.log('Rangos conseguidos usuario:', this.currentUser.rangosConseguidos);
   }
 
 
   abrirDialogoMedallas(): void {
     this.prepararMedallasParaDialogo(); // Asegurarse de que las medallas estén preparadas con las fechas
+    
+    console.log('Abriendo diálogo con medallas:', this.medallasParaDialogo);
+    console.log('Iconos de las medallas:', this.medallasParaDialogo.map(m => m.icono));
+    
     if (this.medallasParaDialogo.length > 0) {
       this.dialog.open(MedallasDialogComponent, {
         width: '800px',
         maxWidth: '95vw',
         maxHeight: '85vh',
         data: { medallas: this.medallasParaDialogo },
-        panelClass: 'medallas-info-dialog-panel' // Asegúrate que esta clase CSS exista y esté bien definida
+        panelClass: 'medallas-info-dialog-panel'
       });
     } else {
-      // Esto podría ocurrir si currentUser es null o no tiene puntosTotales.
       this.snackBar.open('No hay información de medallas para mostrar o el usuario no está cargado.', 'Cerrar', { duration: 3000 });
     }
   }

@@ -1,0 +1,171 @@
+.page-container {
+  padding: 20px;
+  background-color: var(--background-color-light, #f4f7f6); /* Similar a otras páginas */
+  min-height: calc(100vh - var(--navbar-height, 60px));
+}
+
+.manage-market-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 25px;
+  background-color: var(--color-surface, #fff);
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.1));
+}
+
+.component-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.component-header h1 {
+  font-size: 1.8em; /* Ajustado para consistencia */
+  color: var(--admin-primary, #3f51b5); /* Usar color primario de admin */
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.component-header h1 mat-icon {
+  font-size: 1.5em; /* Icono un poco más grande en el título */
+}
+
+.component-header button mat-icon {
+  margin-right: 8px;
+}
+
+.loading-indicator, .error-message, .empty-state-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  margin-top: 20px;
+  border-radius: var(--border-radius-md, 8px);
+}
+
+.loading-indicator p, .error-message p, .empty-state-placeholder {
+  font-size: 1.1em;
+  color: var(--color-text-secondary, #555);
+  margin-top: 15px;
+}
+
+.error-message {
+  background-color: var(--color-error-light, #f8d7da);
+  color: var(--color-error-dark, #721c24);
+  border: 1px solid var(--color-error, #f5c6cb);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.error-message mat-icon {
+  font-size: 1.8em;
+}
+
+.empty-state-placeholder {
+  background-color: var(--background-color-subtle, #e9ecef);
+  color: var(--color-text-secondary, #495057);
+}
+
+.market-content {
+  /* Estilos para la tabla o lista de artículos aquí */
+}
+
+/* Si usas MatTable, puedes añadir estilos aquí */
+/*
+.mat-elevation-z8 {
+  width: 100%;
+  margin-top: 20px;
+}
+.mat-column-actions { // Ejemplo para una columna de acciones
+  width: 120px;
+  text-align: right;
+}
+.mat-column-actions button {
+  margin-left: 8px;
+}
+*/
+
+.item-cards-container {
+  display: flex;
+  flex-wrap: wrap; /* Para que las tarjetas pasen a la siguiente línea si no caben */
+  gap: 20px; /* Espacio entre tarjetas */
+  justify-content: center; /* Centra las tarjetas si hay espacio sobrante */
+  padding-top: 20px;
+}
+
+.item-card {
+  width: 300px; /* Ancho fijo para las tarjetas, ajústalo a tu gusto */
+  display: flex;
+  flex-direction: column; /* Para que el contenido y las acciones se apilen verticalmente */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Para la animación suave */
+  cursor: default; /* Cambia el cursor por defecto sobre la tarjeta */
+}
+
+.item-card:hover {
+  transform: translateY(-5px) scale(1.03); /* Mueve la tarjeta un poco hacia arriba y la agranda */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Sombra más pronunciada */
+}
+
+.item-card-image {
+  width: 100%; /* La imagen ocupa todo el ancho de la tarjeta */
+  height: 200px; /* Altura fija para la imagen, ajústala */
+  object-fit: cover; /* Para que la imagen cubra el espacio sin deformarse */
+  border-bottom: 1px solid #eee; /* Una línea sutil debajo de la imagen */
+}
+
+mat-card-content {
+  flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible antes de las acciones */
+}
+
+.item-status {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre "Activo:" y el toggle */
+  margin-top: 10px;
+}
+
+mat-card-actions {
+  padding: 8px 16px !important; /* Ajusta el padding de las acciones si es necesario */
+}
+
+.empty-state-placeholder {
+  text-align: center;
+  padding: 40px;
+  color: #757575;
+  font-size: 1.1em;
+}
+
+/* Estilos para el loading y error (ya los tenías, pero por si acaso) */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border: 1px solid var(--warn-color, #f44336);
+  border-radius: 4px;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--warn-color, #f44336);
+  gap: 10px;
+}
+
+.error-message mat-icon {
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+}

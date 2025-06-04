@@ -1,0 +1,59 @@
+<!-- filepath: c:\Users\Fernando\Desktop\proyecto defi\Goalify-frontend-main\src\app\market\market.component.html -->
+<div class="page-container">
+  <div class="market-container">
+    <header class="market-header">
+      <h1><mat-icon>storefront</mat-icon> Mercado de Recompensas</h1>
+      <p>¡Canjea tus puntos por ítems exclusivos para personalizar tu experiencia!</p>
+      <!-- CAMBIO: Mostrar puntosRecord y texto "Puntos de Canje" -->
+      <div *ngIf="currentUser" class="user-points-display">
+        Tus Puntos de Canje: <span class="points-value">{{ currentUser.puntosRecord | number }}</span> <mat-icon class="points-icon" matTooltip="Puntos disponibles para gastar en la tienda">stars</mat-icon>
+      </div>
+    </header>
+
+    <div *ngIf="isLoadingItems" class="spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando artículos...</p>
+    </div>
+
+    <div *ngIf="!isLoadingItems && errorMessage" class="error-message-container">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button mat-stroked-button color="primary" (click)="loadMarketItems()">Reintentar</button>
+    </div>
+
+    <div *ngIf="!isLoadingItems && !marketItems.length && !errorMessage" class="empty-market-container">
+      <mat-icon class="empty-icon">sentiment_dissatisfied</mat-icon>
+      <p *ngIf="currentUser">¡Vaya! Parece que no hay artículos disponibles para ti en este momento o ya los tienes todos.</p>
+      <p *ngIf="!currentUser">Inicia sesión para ver los artículos de la tienda.</p>
+    </div>
+
+    <div class="market-grid" *ngIf="!isLoadingItems && marketItems.length">
+      <mat-card *ngFor="let item of marketItems" class="market-item-card" [class.purchased]="isItemUnlocked(item.id)">
+        <mat-card-header>
+          <mat-card-title>{{ item.nombre }}</mat-card-title>
+          <mat-card-subtitle>{{ item.tipoArticulo }}</mat-card-subtitle>
+        </mat-card-header>
+        <div class="image-container">
+          <img mat-card-image [src]="item.imagenUrl || item.imagenPreviewUrl || 'assets/images/default-item.png'" [alt]="item.nombre" class="market-item-image">
+        </div>
+        <mat-card-content>
+          <p class="item-description">{{ item.description }}</p>
+          <p class="item-cost">
+            <mat-icon class="cost-icon">monetization_on</mat-icon>
+            {{ item.costoPuntos }} puntos
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="primary" (click)="openItemDetailsDialog(item)"
+                  [disabled]="!currentUser || (currentUser && !canAfford(item.costoPuntos)) || isItemUnlocked(item.id)">
+            <mat-icon *ngIf="!isItemUnlocked(item.id)">visibility</mat-icon>
+            <span *ngIf="!isItemUnlocked(item.id)">Ver Detalles</span>
+            <span *ngIf="isItemUnlocked(item.id)" class="item-unlocked-badge">
+              <mat-icon>check_circle</mat-icon> Adquirido
+            </span>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

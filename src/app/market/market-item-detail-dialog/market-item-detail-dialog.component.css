@@ -1,0 +1,77 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh; /* Evita que el diálogo sea demasiado alto */
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre el icono y el título */
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.title-icon {
+  font-size: 28px; /* Ajusta el tamaño del icono del título */
+}
+
+.dialog-content {
+  flex-grow: 1;
+  overflow-y: auto; /* Permite scroll si el contenido es muy largo */
+}
+
+.item-image-container {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.item-image-large {
+  max-width: 100%;
+  max-height: 250px; /* Ajusta la altura máxima de la imagen */
+  border-radius: 8px;
+  object-fit: contain; /* Para que la imagen se ajuste bien sin deformarse */
+}
+
+.item-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.item-category, .item-cost, .user-points-info {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cost-icon, .points-icon {
+  font-size: 18px;
+  color: #ffc107; /* Color dorado para los iconos de puntos/costo */
+}
+
+.user-points-info {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+  font-weight: bold;
+}
+
+.dialog-actions {
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.purchase-button, .close-button {
+  min-width: 100px; /* Ancho mínimo para los botones */
+}
+
+.button-spinner {
+  margin-right: 8px; /* Espacio para el spinner dentro del botón */
+  display: inline-block;
+  vertical-align: middle;
+}

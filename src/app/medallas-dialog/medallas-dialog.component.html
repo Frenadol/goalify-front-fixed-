@@ -1,30 +1,49 @@
-<h2 mat-dialog-title class="dialog-title">Mis Medallas Conseguidas</h2>
-<mat-dialog-content class="dialog-content">
-  <div *ngIf="data.medallas && data.medallas.length > 0; else noMedallas" class="medallas-grid">
-    <div
-      *ngFor="let medalla of data.medallas"
-      class="medalla-item"
-      [class.conseguida]="medalla.conseguida"
-      [class.no-conseguida]="!medalla.conseguida"
-      (click)="abrirDetalleMedalla(medalla)"
-      [matTooltip]="medalla.conseguida ? (medalla.descripcion || 'Sin descripción') : ''"
-      matTooltipPosition="above"
-      matTooltipClass="medalla-tooltip"
-      [matTooltipDisabled]="!medalla.conseguida"
-    >
-      <div class="medalla-icon-container">
-        <img [src]="medalla.icono" [alt]="medalla.nombre" class="medalla-icon">
-        <mat-icon *ngIf="medalla.conseguida" class="check-icon">check_circle</mat-icon>
+<div class="medallas-page-container">
+  <h2 class="page-title">Mis Rangos</h2>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando rangos...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="rangos-grid">
+    <div class="rango-card" *ngFor="let medalla of medallas; let i = index" 
+         [class.conseguida]="medalla.conseguida" 
+         [class.bloqueada]="!medalla.conseguida">
+      <div class="rango-img-container">
+        <img [src]="getRangoIcono(medalla)" [alt]="medalla.nombre" class="rango-img">
+        <div *ngIf="medalla.conseguida" class="medalla-conseguida-indicator">
+          <mat-icon>check_circle</mat-icon>
+        </div>
       </div>
-      <div class="medalla-nombre">{{ medalla.nombre | titlecase }}</div>
-      <div *ngIf="!medalla.conseguida" class="medalla-placeholder-text">
+      
+      <h3 class="rango-title" [ngClass]="{'text-muted': !medalla.conseguida}">
+        {{ medalla.nombre }}
+      </h3>
+      
+      <!-- Información cuando la medalla está conseguida -->
+      <div *ngIf="medalla.conseguida" class="rango-info-container">
+        <p *ngIf="medalla.fechaConseguida" class="fecha-conseguida">
+          Conseguido el: {{ medalla.fechaConseguida | date:'dd/MM/yyyy' }}
+        </p>
+        <p class="rango-descripcion">
+          {{ medalla.descripcion }}
+        </p>
+      </div>
+      
+      <!-- Información cuando la medalla está bloqueada -->
+      <div *ngIf="!medalla.conseguida" class="rango-info-bloqueado">
+        <p class="rango-bloqueado">
+          {{ medalla.descripcion }}
+        </p>
+        <p class="puntos-necesarios">
+          Necesitas {{ medalla.puntosMinimos }} puntos
+        </p>
       </div>
     </div>
   </div>
-  <ng-template #noMedallas>
-    <p class="no-medallas-text">Aún no has conseguido ninguna medalla. ¡Sigue esforzándote!</p>
-  </ng-template>
-</mat-dialog-content>
-<mat-dialog-actions class="dialog-actions">
-  <button mat-button (click)="cerrarDialogo()" class="close-button">Cerrar</button>
-</mat-dialog-actions>
+
+  <div class="dialog-actions">
+    <button mat-button color="primary" (click)="onClose()">Volver</button>
+  </div>
+</div>

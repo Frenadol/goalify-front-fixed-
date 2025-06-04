@@ -1,20 +1,15 @@
-export interface Achievement {
-  id: string; // Identificador único del tipo de logro
+export interface Achievement { // Interfaz base para un logro/rango
+  id: string; // NOVATO, ASPIRANTE, etc.
   name: string;
   description: string;
-  iconUrl: string; // Ruta al icono del logro
-  category?: string; // Ej: 'General', 'Rango', 'Hábito Específico'
-  // Otros campos que definan un logro base
+  iconUrl: string;
+  category?: string;
+  criteria?: string; // Cómo se consigue
 }
 
-export interface UserAchievement {
-  id: string | number; // Identificador único del logro obtenido por el usuario
-  achievementId: string; // Referencia al ID del Achievement base
-  userId: string | number; // ID del usuario que obtuvo el logro
-  name: string; // Nombre del logro (puede ser denormalizado)
-  description: string; // Descripción (puede ser denormalizado)
-  iconUrl: string; // Ruta al icono (puede ser denormalizado)
-  dateEarned: Date | string; // Fecha en que se obtuvo el logro
-  category?: string; // Categoría, útil para filtrar (ej. 'Rank')
-  // Otros campos específicos del logro del usuario
+export interface UserAchievement extends Achievement { // Lo que el usuario ha conseguido o su estado
+  userId: string | number;
+  achievementId: string; // Coincide con Achievement.id
+  dateEarned?: Date | string; // undefined si no se ha ganado
+  conseguido?: boolean; // Para saber si está desbloqueado o es placeholder
 }

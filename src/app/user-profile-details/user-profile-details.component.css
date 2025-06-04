@@ -444,3 +444,65 @@
 /* La regla vacía que tenías antes: */
 /* .info-item:has(.rank-icon) > .rank-icon { } */
 /* ha sido eliminada ya que los estilos del icono están en .rank-icon y la separación se maneja con column-gap. */
+
+.color-option {
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+}
+
+.color-label {
+  font-size: 16px;
+  margin-right: 16px;
+  min-width: 120px;
+}
+
+.color-preview-container {
+  display: flex;
+  align-items: center;
+}
+
+.color-picker {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  width: 40px;
+  height: 40px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.color-picker::-webkit-color-swatch {
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+.color-picker::-moz-color-swatch {
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+.color-preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  margin: 0 10px;
+  border: 1px solid #ddd;
+}
+
+.color-value {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Mejorar la apariencia general del panel */
+.settings-panel {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.toggle-option {
+  margin: 12px 0;
+}
