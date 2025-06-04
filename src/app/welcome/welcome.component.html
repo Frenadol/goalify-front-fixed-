@@ -39,13 +39,13 @@
 
           <div class="action-card" (click)="navigateTo('/challenges')"> <!-- Esta es la lista general de desafíos -->
             <div class="action-card-icon">
-              <span class="material-icons-outlined">emoji_events</span>
+              <span class="material-icons-outlined">emoji_events</span> <!-- Icono como en la imagen -->
             </div>
             <h3 class="action-card-title">Explorar Desafíos</h3>
             <p class="action-card-description">Descubre y únete a nuevos desafíos.</p>
           </div>
 
-          <div class="action-card" (click)="navigateTo('/app/progress')">
+          <div class="action-card" (click)="navigateTo('/user-statistics')"> <!-- Asumiendo ruta para estadísticas -->
             <div class="action-card-icon">
               <span class="material-icons-outlined">trending_up</span>
             </div>
@@ -53,7 +53,7 @@
             <p class="action-card-description">Revisa tus estadísticas y avances.</p>
           </div>
 
-          <div class="action-card" (click)="navigateTo('/user-profile')">
+          <div class="action-card" (click)="navigateTo('/profile')"> <!-- Asumiendo ruta para perfil -->
             <div class="action-card-icon">
               <span class="material-icons-outlined">account_circle</span>
             </div>
@@ -61,25 +61,30 @@
             <p class="action-card-description">Ajusta tus preferencias y perfil.</p>
           </div>
 
-          <!-- TARJETA "MIS MEDALLAS" CON TU ESTRUCTURA HTML -->
-          <div class="action-card" (click)="abrirDialogoMedallas()">
+          <div class="action-card" (click)="navigateTo('/medallas')"> <!-- Asumiendo ruta para medallas -->
             <div class="action-card-icon">
               <span class="material-icons-outlined">shield</span>
             </div>
             <h3 class="action-card-title">Mis Medallas</h3>
             <p class="action-card-description">Consulta los rangos que has desbloqueado.</p>
           </div>
-          <!-- FIN TARJETA "MIS MEDALLAS" -->
 
-          <!-- NUEVA TARJETA PARA EL MERCADO -->
-          <div class="action-card" (click)="navigateTo('/market')"> <!-- Asume una ruta '/market' -->
+          <div class="action-card" (click)="navigateTo('/market')">
             <div class="action-card-icon">
-              <span class="material-icons-outlined">storefront</span> <!-- Icono de tienda -->
+              <span class="material-icons-outlined">storefront</span>
             </div>
             <h3 class="action-card-title">Mercado de Recompensas</h3>
             <p class="action-card-description">Canjea tus puntos por recompensas exclusivas.</p>
           </div>
-          <!-- FIN NUEVA TARJETA PARA EL MERCADO -->
+          
+          <!-- NUEVA TARJETA PARA MIS COMPRAS -->
+          <div class="action-card" (click)="navigateTo('/mis-compras')"> <!-- Ruta a la página de compras del usuario -->
+            <div class="action-card-icon">
+              <span class="material-icons-outlined">shopping_bag</span>
+            </div>
+            <h3 class="action-card-title">Mis Compras</h3>
+            <p class="action-card-description">Visualiza los artículos que has adquirido.</p>
+          </div>
 
         </div> <!-- Fin de actions-grid -->
 

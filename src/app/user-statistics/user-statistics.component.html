@@ -276,7 +276,7 @@
           </div>
           <mat-card-title class="item-habit-name">{{ challenge.nombre | titlecase }}</mat-card-title>
           <mat-card-subtitle class="item-completion-details">
-            <span class="item-completion-date">Completado el: {{ challenge.userChallengeData.fechaCompletado | date:'dd/MM/yyyy' }}</span>
+            <span class="item-completion-date">Completado el: {{ challenge.userChallengeData?.fechaCompletado | date:'dd/MM/yyyy' }}</span>
             <span *ngIf="challenge.categoria" class="category-chip">{{ challenge.categoria | titlecase }}</span>
           </mat-card-subtitle>
         </mat-card-header>

@@ -249,28 +249,63 @@
 
       <!-- Panel de Ajustes (Overlay y Contenido) -->
       <div class="settings-panel-overlay" *ngIf="showSettingsPanel" (click)="toggleSettingsPanel()"></div>
-      <div class="settings-panel card-style" *ngIf="showSettingsPanel" @fadeInScale>
+      <!-- Diálogo de Personalizar Estadísticas y Apariencia -->
+      <div class="settings-panel card-style" *ngIf="showSettingsPanel">
         <h3>Personalizar Estadísticas y Apariencia</h3>
         <mat-divider></mat-divider>
+        
         <form [formGroup]="profileDisplayPreferencesForm" (ngSubmit)="saveDisplayPreferences()">
           <div class="settings-options">
-            <mat-slide-toggle formControlName="showPoints">Mostrar Puntos Actuales</mat-slide-toggle>
-            <mat-slide-toggle formControlName="showLevel">Mostrar Nivel</mat-slide-toggle>
-            <mat-slide-toggle formControlName="showRank">Mostrar Rango y Progreso</mat-slide-toggle>
-            <mat-slide-toggle formControlName="showRecordPoints">Mostrar Puntos Récord</mat-slide-toggle> <!-- <<< NUEVO INTERRUPTOR AÑADIDO AQUÍ -->
-            <mat-slide-toggle formControlName="showChallengesCompleted">Mostrar Desafíos Completados (Total)</mat-slide-toggle>
-            <mat-slide-toggle formControlName="showHabitsCompletedToday">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
-            <mat-slide-toggle formControlName="showTotalHabitsCompleted">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
-            <mat-slide-toggle formControlName="showBestStreak">Mostrar Mejor Racha de Hábitos</mat-slide-toggle>
+            <!-- Conectar cada toggle al FormGroup -->
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showPoints" color="primary">Mostrar Puntos Actuales</mat-slide-toggle>
+            </div>
             
-            <!-- ...otros toggles de preferencias... -->
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showLevel" color="primary">Mostrar Nivel</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showRank" color="primary">Mostrar Rango y Progreso</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showRecordPoints" color="primary">Mostrar Puntos Récord</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showChallengesCompleted" color="primary">Mostrar Desafíos Completados (Total)</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showHabitsCompletedToday" color="primary">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showTotalHabitsCompleted" color="primary">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showBestStreak" color="primary">Mostrar Mejor Racha de Hábitos</mat-slide-toggle>
+            </div>
+
+            <!-- Nueva opción de color -->
+            <div class="color-option">
+              <span class="color-label">Color de la Tarjeta:</span>
+              <div class="color-preview-container">
+                <input type="color" formControlName="profileCardColor" class="color-picker">
+                <div class="color-preview" [style.backgroundColor]="profileDisplayPreferencesForm.get('profileCardColor')?.value"></div>
+                <span class="color-value">{{ profileDisplayPreferencesForm.get('profileCardColor')?.value }}</span>
+              </div>
+            </div>
           </div>
-          <mat-divider></mat-divider>
+          
           <div class="settings-actions">
-            <button mat-stroked-button (click)="toggleSettingsPanel()">Cancelar</button>
-            <button mat-flat-button color="primary" (click)="saveDisplayPreferences()" [disabled]="isSavingBio">
-              <mat-spinner *ngIf="isSavingBio" diameter="20" class="button-spinner"></mat-spinner>
-              <span *ngIf="!isSavingBio">Guardar</span>
+            <button mat-button type="button" (click)="toggleSettingsPanel()">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="isSavingPreferences">
+              <mat-spinner *ngIf="isSavingPreferences" diameter="20" class="button-spinner"></mat-spinner>
+              <span *ngIf="!isSavingPreferences">Guardar</span>
+              <span *ngIf="isSavingPreferences">Guardando...</span>
             </button>
           </div>
         </form>

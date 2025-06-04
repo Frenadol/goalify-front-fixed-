@@ -264,7 +264,7 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (details) => {
           this.completedChallenges = details.sort((a,b) =>
-            new Date(b.userChallengeData.fechaCompletado || 0).getTime() - new Date(a.userChallengeData.fechaCompletado || 0).getTime()
+            new Date(b.userChallengeData?.fechaCompletado || Date.now()).getTime() - new Date(a.userChallengeData?.fechaCompletado || Date.now()).getTime()
           );
         },
         error: (err: HttpErrorResponse) => {

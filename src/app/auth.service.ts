@@ -1,9 +1,10 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, finalize, map, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError, of, Subject, timer, Subscription, firstValueFrom } from 'rxjs'; // AÑADE firstValueFrom
+import { catchError, map, switchMap, tap, delay, finalize, filter, take } from 'rxjs/operators'; // AÑADE filter, take
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { MarketItem } from './market/market-item.model';
 
 // Interfaz para las preferencias de perfil tal como vienen/van al backend
 export interface BackendUserProfilePreferences {
@@ -16,13 +17,15 @@ export interface BackendUserProfilePreferences {
   cardTextColor?: string;
   showEmailOnCard?: boolean;
   showJoinDateOnCard?: boolean;
-  showPointsOnCard?: boolean; // Para Puntos Actuales
+  showPointsOnCard?: boolean;
   showLevelOnCard?: boolean;
   cardColor?: string;
   showChallengeCategoryOnCard?: boolean;
   showChallengePointsOnCard?: boolean;
   showChallengeDatesOnCard?: boolean;
-  showRecordPoints?: boolean; // <<< NUEVA PREFERENCIA AÑADIDA AQUÍ
+  showRecordPoints?: boolean;
+  unlockedItems?: string[];
+  selectedAvatarUrl?: string;
 }
 
 // Interfaz para el Usuario
@@ -38,17 +41,27 @@ export interface User {
   fechaUltimoIngreso?: string | Date;
   puntosTotales?: number;
   puntosTotalesHistoricos?: number;
-  puntosRecord?: number; // <<< NUEVO CAMPO AÑADIDO AQUÍ
-  nivel?: number;  biografia?: string;
+  puntosRecord?: number;
+  nivel?: number;
+  biografia?: string;
   totalHabitosCompletados?: number;
   totalDesafiosCompletados?: number;
   preferences?: BackendUserProfilePreferences;
-  fechasRangosConseguidos?: { [key: string]: string };}
+  fechasRangosConseguidos?: { [key: string]: string };
+  rangosConseguidos?: string[]; // Add this property
+}
 
-// Interfaz para la RESPUESTA DEL LOGIN que coincide con LoginResponseDTO.java
+// Definición de AuthEvent
+export interface AuthEvent {
+  type: 'LOGIN_SUCCESS' | 'LOGOUT_SUCCESS' | 'REGISTRATION_SUCCESS' | 'USER_UPDATED' | 'TOKEN_REFRESHED' | 'AUTH_ERROR';
+  payload?: any;
+}
+
+// Definición de LoginResponse (¡IMPORTANTE!)
 export interface LoginResponse {
   token: string;
-  user: User; // Asegúrate que esta 'User' coincida con la interfaz User de arriba
+  user: User;
+  // Puedes añadir más campos si tu backend los devuelve, como 'expiresIn', etc.
 }
 
 
@@ -56,54 +69,62 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080'; // URL base de tu API
-  private usersApiUrl = `${this.apiUrl}/users`; // URL específica para usuarios
+  // private backendBaseUrl = 'http://localhost:8080'; // No es necesario si apiUrl ya lo incluye
+  private apiUrl = 'http://localhost:8080/api'; // URL base para los endpoints bajo /api
+  private usersApiUrl = `${this.apiUrl}/usuarios`; // Ejemplo para otros endpoints
+
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private isBrowser: boolean;
+  private readonly isBrowser: boolean;
+  public readonly authEvents = new Subject<AuthEvent>();
   public isUserCurrentlyLoading: boolean = false;
+  private tokenRefreshSubscription?: Subscription; // Ahora Subscription está importado
+
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router
   ) {
-    this.isBrowser = isPlatformBrowser(platformId);
-    let storedUser = null;
-    if (this.isBrowser) {
-      const userJson = localStorage.getItem('currentUser');
-      if (userJson) {
-        try {
-          storedUser = JSON.parse(userJson);
-        } catch (e) {
-          console.error('Error al parsear usuario de localStorage', e);
-          localStorage.removeItem('currentUser');
-        }
-      }
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    const storedUser = this.isBrowser ? localStorage.getItem('currentUser') : null;
+    this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
+    this.currentUser = this.currentUserSubject.asObservable(); // Esta es la propiedad correcta para el observable público
+
+    if (this.currentUserValue) {
+      this.isUserCurrentlyLoading = true;
+      this.refreshCurrentUserData().subscribe({
+        complete: () => this.isUserCurrentlyLoading = false,
+        error: () => this.isUserCurrentlyLoading = false
+      });
     }
-    this.currentUserSubject = new BehaviorSubject<User | null>(storedUser);
-    this.currentUser = this.currentUserSubject.asObservable();
   }
 
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  public getIsUserLoading(): boolean {
-    return this.isUserCurrentlyLoading;
+  public get token(): string | null {
+    return this.isBrowser ? localStorage.getItem('authToken') : null;
   }
 
   loginUser(credentials: any): Observable<User> {
     this.isUserCurrentlyLoading = true;
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials)
+    const loginUrl = `${this.apiUrl}/auth/login`; // <--- ASÍ DEBE ESTAR
+    console.log('AuthService: Intentando login a URL:', loginUrl);
+    console.log('AuthService: Enviando credenciales:', JSON.stringify(credentials));
+
+    return this.http.post<LoginResponse>(loginUrl, credentials)
       .pipe(
         map((response: LoginResponse) => {
           if (response.token && response.user) {
+            console.log('Datos del usuario recibidos en login:', response.user);
             if (this.isBrowser) {
               localStorage.setItem('authToken', response.token);
               localStorage.setItem('currentUser', JSON.stringify(response.user));
             }
             this.currentUserSubject.next(response.user);
+            this.authEvents.next({ type: 'LOGIN_SUCCESS', payload: response.user });
             console.log('AuthService: Login exitoso, usuario actualizado:', response.user);
             return response.user;
           } else {
@@ -117,137 +138,178 @@ export class AuthService {
       );
   }
 
-  updateUserProfile(userId: string | number, profileData: Partial<User>): Observable<User> { // Este es para datos generales del perfil
+  registerUser(userData: any): Observable<any> {
+    const registerUrl = `${this.apiUrl}/auth/register`; // <--- ASÍ DEBE ESTAR
+    return this.http.post<any>(registerUrl, userData).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  updateUserProfile(userId: string | number, profileData: Partial<User>): Observable<User> {
     const url = `${this.usersApiUrl}/${userId}`;
     return this.http.put<User>(url, profileData).pipe(
-      tap(updatedUser => {
-        // Actualizar el usuario actual si el ID coincide
-        if (this.currentUserSubject.value && this.currentUserSubject.value.id === updatedUser.id) {
-          this.updateCurrentUserState(updatedUser);
+      tap(async updatedUser => { 
+        if (this.currentUserSubject.value && updatedUser && this.currentUserSubject.value.id === updatedUser.id) { // Añadida comprobación de updatedUser
+          await this.updateCurrentUserState(updatedUser); 
+          this.authEvents.next({ type: 'USER_UPDATED', payload: this.currentUserValue }); 
         }
       }),
       catchError(this.handleError)
     );
   }
 
-  // NUEVO MÉTODO para actualizar las preferencias de visualización del perfil
   updateUserDisplayPreferences(userId: string | number, preferencesData: BackendUserProfilePreferences): Observable<User> {
     const url = `${this.usersApiUrl}/${userId}/preferences`;
     return this.http.put<User>(url, preferencesData).pipe(
-      tap(updatedUser => {
-        // Actualizar el usuario actual si el ID coincide
-        if (this.currentUserSubject.value && this.currentUserSubject.value.id === updatedUser.id) {
-          this.updateCurrentUserState(updatedUser); // Esto actualizará el BehaviorSubject y notificará a los suscriptores
+      tap(async updatedUser => { 
+        if (this.currentUserSubject.value && updatedUser && this.currentUserSubject.value.id === updatedUser.id) { // Añadida comprobación de updatedUser
+          await this.updateCurrentUserState(updatedUser); 
+          this.authEvents.next({ type: 'USER_UPDATED', payload: this.currentUserValue }); 
         }
       }),
       catchError(this.handleError)
     );
   }
 
-  // Método para refrescar los datos del usuario actual desde el backend
   refreshCurrentUserData(): Observable<User | null> {
-    const token = this.getAuthToken(); // Verificar si hay token
-    if (!token) {
-      // No hay token, no se puede llamar a /me o el usuario no está autenticado
-      console.warn('AuthService: No hay token, no se puede refrescar datos del usuario.');
-      return of(null); 
+    const user = this.currentUserValue;
+    if (!user || !user.id) {
+      return of(null);
     }
-
-    // Utilizar el endpoint /users/me si está disponible en el backend
-    const fetchUrl = `${this.apiUrl}/users/me`; 
-
     this.isUserCurrentlyLoading = true;
-    return this.http.get<User>(fetchUrl).pipe(
-      tap(refreshedUser => {
+    // Asumiendo que la info del usuario se obtiene de /api/usuarios/:id
+    return this.http.get<User>(`${this.usersApiUrl}/${user.id}`).pipe(
+      map(updatedUser => {
+        // mergedUser.preferences = { ...user.preferences, ...updatedUser.preferences };
+        // Asegurarse de que las preferencias también se fusionen si existen en ambos
+        let mergedPreferences = { ...(user?.preferences ?? {}), ...(updatedUser?.preferences ?? {}) };
+        // Si unlockedItems existe en updatedUser.preferences, usar ese. Si no, mantener el de user.preferences
+        if (updatedUser.preferences && Array.isArray(updatedUser.preferences.unlockedItems)) {
+            mergedPreferences.unlockedItems = updatedUser.preferences.unlockedItems;
+        } else if (user?.preferences && Array.isArray(user.preferences.unlockedItems)) {
+            mergedPreferences.unlockedItems = user.preferences.unlockedItems;
+        }
+
+
+        const finalUser = { ...user, ...updatedUser, preferences: mergedPreferences };
+        
+        // No llamar a updateCurrentUserState aquí para evitar bucles o doble emisión de evento.
+        // Directamente actualizar el subject y localStorage.
+        this.currentUserSubject.next(finalUser);
         if (this.isBrowser) {
-          localStorage.setItem('currentUser', JSON.stringify(refreshedUser));
+          localStorage.setItem('currentUser', JSON.stringify(finalUser));
         }
-        this.currentUserSubject.next(refreshedUser);
-        console.log('AuthService: Datos del usuario refrescados desde /users/me:', refreshedUser);
-      }),
-      catchError(err => {
-        console.error('AuthService: Error al refrescar datos del usuario desde /users/me:', err);
-        // Si falla (ej. token inválido, 401), podrías desloguear al usuario
-        if (err.status === 401 || err.status === 403) {
-          this.logout(); // Desloguear si el token ya no es válido o no tiene permisos
-          return of(null);
-        }
-        // Para otros errores, devuelve el usuario actual para no romper la UI drásticamente
-        return of(this.currentUserValue); 
-      }),
-      finalize(() => {
+        this.authEvents.next({ type: 'USER_UPDATED', payload: finalUser });
         this.isUserCurrentlyLoading = false;
+        return finalUser;
+      }),
+      catchError(error => {
+        console.error('Error refreshing user data:', error);
+        if (error.status === 401 || error.status === 403) {
+          this.logout();
+        }
+        this.isUserCurrentlyLoading = false;
+        return of(this.currentUserValue); // Devuelve el usuario actual si hay error para no romper la UI
       })
     );
   }
 
-  // Método para actualizar el estado del usuario localmente si una operación devuelve el usuario actualizado
-  public updateCurrentUserState(updatedUser: User): void {
+  // MODIFICADO: updateCurrentUserState ahora es async y devuelve Promise<void>
+  public async updateCurrentUserState(updatedUser: User): Promise<void> {
     const currentUser = this.currentUserValue;
-    // Solo actualiza si el ID coincide, para evitar sobrescribir con datos de otro usuario
-    // si por error se llamara con un usuario incorrecto.
-    if (currentUser && currentUser.id === updatedUser.id) {
-      if (this.isBrowser) {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    let userToUpdate: User | null = null;
+
+    // Lógica de fusión (parece correcta, la mantengo)
+    if (currentUser && updatedUser && currentUser.id === updatedUser.id) {
+      userToUpdate = { ...currentUser, ...updatedUser };
+      if (currentUser.preferences && updatedUser.preferences) {
+        userToUpdate.preferences = { ...currentUser.preferences, ...updatedUser.preferences };
+      } else if (updatedUser.preferences) {
+        userToUpdate.preferences = updatedUser.preferences;
+      } else if (currentUser.preferences) { // Mantener las preferencias actuales si updatedUser no tiene
+        userToUpdate.preferences = currentUser.preferences;
       }
-      this.currentUserSubject.next(updatedUser);
-      console.log('AuthService: Estado del usuario actualizado localmente con nuevos datos:', updatedUser);
-    } else if (!currentUser && updatedUser) { // Caso donde no había usuario y ahora sí (ej. después de login)
-        if (this.isBrowser) {
-          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        }
-        this.currentUserSubject.next(updatedUser);
+    } else if (!currentUser && updatedUser) {
+      userToUpdate = updatedUser;
+    } else if (currentUser && updatedUser && currentUser.id !== updatedUser.id) {
+      console.warn('AuthService: updateCurrentUserState llamado con un ID de usuario diferente. Ignorando actualización para el subject actual.');
+      return;
+    } else if (!updatedUser) {
+        console.warn('AuthService: updateCurrentUserState llamado con updatedUser nulo o undefined.');
+        return;
     }
-  }
 
 
-  registerUser(userData: any): Observable<any> {
-    // El endpoint de registro podría no devolver el token/usuario directamente,
-    // sino un mensaje de éxito. El usuario luego haría login.
-    return this.http.post<any>(`${this.apiUrl}/auth/register`, userData).pipe(
-      catchError(this.handleError)
-    );
+    if (userToUpdate) {
+      if (this.isBrowser) {
+        localStorage.setItem('currentUser', JSON.stringify(userToUpdate));
+      }
+      this.currentUserSubject.next(userToUpdate);
+      console.log('AuthService: Estado del usuario (currentUserSubject.next) actualizado con:', userToUpdate);
+
+      try {
+        // CORRECCIÓN: Usar this.currentUser en lugar de this.currentUser$
+        // y asegurar que se emita el valor correcto después de la actualización
+        const emittedUser = await firstValueFrom(
+          this.currentUser.pipe(
+            filter(u => {
+              if (!u && !userToUpdate) return true; // ambos null
+              if (u && userToUpdate && u.id === userToUpdate.id) {
+                // Comprobación más robusta para unlockedItems
+                return JSON.stringify(u.preferences?.unlockedItems) === JSON.stringify(userToUpdate.preferences?.unlockedItems);
+              }
+              return false;
+            }),
+            take(1)
+          )
+        );
+        console.log('AuthService: currentUser ha emitido el estado esperado después de updateCurrentUserState.', emittedUser);
+      } catch (e) {
+        console.warn('AuthService: Timeout o error esperando la emisión de currentUser después de updateCurrentUserState. El subject ya fue actualizado.', e);
+      }
+    }
+    // El evento USER_UPDATED se emitirá desde el servicio que llama a updateCurrentUserState (ej. MarketService)
+    // o desde updateUserProfile/updateUserDisplayPreferences DESPUÉS de que este Promise se resuelva.
   }
 
   logout(): void {
     if (this.isBrowser) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('currentUser');
+      localStorage.removeItem('tokenExpiration'); // Si usas esto
     }
     this.currentUserSubject.next(null);
+    this.authEvents.next({ type: 'LOGOUT_SUCCESS' });
+    if (this.tokenRefreshSubscription) {
+      this.tokenRefreshSubscription.unsubscribe();
+    }
     this.router.navigate(['/login']);
   }
 
   isAuthenticated(): boolean {
-    if (!this.isBrowser) return false;
-    const token = localStorage.getItem('authToken');
-    // Aquí podrías añadir lógica para verificar la expiración del token si lo decodificas
-    return !!token;
+    return !!this.token && !!this.currentUserValue;
   }
 
   isAdmin(): boolean {
-    const user = this.currentUserValue;
-    return !!user && !!user.esAdministrador;
+    return !!this.currentUserValue && this.currentUserValue.esAdministrador === true;
   }
 
-  private handleError(error: HttpErrorResponse) {
+  private handleError(HttpErrorResponse: any) { // El tipo debería ser HttpErrorResponse
     let errorMessage = 'Ocurrió un error desconocido.';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `Error del cliente: ${error.error.message}`;
+    if (HttpErrorResponse.error instanceof ErrorEvent) {
+      errorMessage = `Error del cliente: ${HttpErrorResponse.error.message}`;
     } else {
-      if (error.status === 0) {
+      if (HttpErrorResponse.status === 0) {
         errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión.';
-      } else if (error.error && typeof error.error === 'string' && error.error.length > 0 && error.error.length < 300) {
-        // Si el backend envía un mensaje de error simple como string
-        errorMessage = error.error;
-      } else if (error.error && error.error.message) {
-        // Si el backend envía un objeto de error con una propiedad 'message'
-        errorMessage = error.error.message;
-      } else if (error.statusText && error.status !== 0) {
-        errorMessage = `Error del servidor: ${error.status} ${error.statusText}`;
+      } else if (HttpErrorResponse.error && typeof HttpErrorResponse.error === 'string' && HttpErrorResponse.error.length > 0 && HttpErrorResponse.error.length < 300) {
+        errorMessage = HttpErrorResponse.error;
+      } else if (HttpErrorResponse.error && HttpErrorResponse.error.message) {
+        errorMessage = HttpErrorResponse.error.message;
+      } else if (HttpErrorResponse.statusText && HttpErrorResponse.status !== 0) {
+        errorMessage = `Error del servidor: ${HttpErrorResponse.status} ${HttpErrorResponse.statusText}`;
       }
     }
-    console.error('AuthService Error:', errorMessage, error);
+    console.error('AuthService Error:', errorMessage, HttpErrorResponse);
     return throwError(() => new Error(errorMessage));
   }
 
@@ -256,10 +318,31 @@ export class AuthService {
     return localStorage.getItem('authToken');
   }
 
-  // getUserById ya no es necesario aquí si refreshCurrentUserData usa un endpoint /me o el ID del currentUser
-  // Si lo necesitas para otros propósitos, mantenlo.
-  // getUserById(userId: string | number): Observable<User> {
-  //   const url = `${this.apiUrl}/users/${userId}`;
-  //   return this.http.get<User>(url).pipe(catchError(this.handleError));
-  // }
+  getIsUserLoading(): boolean {
+    return this.isUserCurrentlyLoading;
+  }
+
+  // Añade estos métodos al AuthService
+  getUserProfilePreferences(userId: number): Observable<BackendUserProfilePreferences> {
+    return this.http.get<BackendUserProfilePreferences>(`${this.apiUrl}/usuarios/${userId}/preferences`);
+  }
+
+  updateUserProfilePreferences(userId: number, preferences: any): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/usuarios/${userId}/preferences`, preferences)
+      .pipe(
+        tap(updatedUser => {
+          // Actualizar el usuario actual si es el mismo que el actualizado
+          if (this.currentUserValue && this.currentUserValue.id === userId) {
+            // Crear una copia para evitar cambios inesperados
+            const updatedCurrentUser = { ...this.currentUserValue, ...updatedUser };
+            // Actualizar el observable y el localStorage
+            this.currentUserSubject.next(updatedCurrentUser);
+            if (this.isBrowser) {
+              localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
+            }
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
 }

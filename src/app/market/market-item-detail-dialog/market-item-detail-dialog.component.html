@@ -1,0 +1,39 @@
+<div class="dialog-container">
+  <!-- CORRECCIÓN: Acceder directamente a 'item' y 'currentUser' que son propiedades del componente -->
+  <h1 mat-dialog-title class="dialog-title">{{ item.nombre }}</h1>
+  <mat-dialog-content class="dialog-content">
+    <div class="item-image-container">
+      <img [src]="item.imagenUrl || item.imagenPreviewUrl || 'assets/images/default-item.png'" [alt]="item.nombre" class="item-image-large">
+    </div>
+    <p class="item-description-large">{{ item.description }}</p> <!-- CORREGIDO: de descripcion a description -->
+    <p class="item-type"><strong>Tipo:</strong> {{ item.tipoArticulo }}</p>
+    <p class="item-cost-large">
+      <mat-icon class="cost-icon">toll</mat-icon>
+      <strong>Costo:</strong> {{ item.costoPuntos | number }} Puntos de Canje
+    </p>
+
+    <div *ngIf="currentUser" class="user-points-info">
+      <mat-icon class="points-icon">stars</mat-icon>
+      Tus Puntos de Canje actuales: <strong>{{ currentUser.puntosRecord | number }}</strong>
+    </div>
+
+    <div *ngIf="currentUser && !canAfford() && !isPurchasing" class="cant-afford-dialog">
+      <mat-icon color="warn">warning_amber</mat-icon>
+      <span>No tienes suficientes Puntos de Canje para este artículo.</span>
+    </div>
+
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button
+            color="primary"
+            (click)="onPurchase()"
+            [disabled]="isPurchasing || !currentUser || !canAfford() || isItemUnlocked()"
+            class="purchase-button-dialog">
+      <span *ngIf="!isPurchasing">
+        <mat-icon>shopping_cart</mat-icon> Comprar
+      </span>
+      <mat-progress-spinner *ngIf="isPurchasing" mode="indeterminate" diameter="20" color="accent"></mat-progress-spinner>
+    </button>
+  </mat-dialog-actions>
+</div>

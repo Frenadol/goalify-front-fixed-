@@ -1,0 +1,201 @@
+/* filepath: c:\Users\Fernando\Desktop\proyecto defi\Goalify-frontend-main\src\app\market\market.component.css */
+.page-container {
+  padding: 20px;
+  background-color: var(--background-color-light, #f4f7f6);
+  min-height: calc(100vh - var(--navbar-height, 60px)); /* Ajusta según tu navbar */
+}
+
+.market-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--color-surface, #fff);
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.1));
+}
+
+.market-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.market-header h1 {
+  font-size: 2.2em;
+  color: var(--user-primary, #3f51b5);
+  margin-bottom: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.market-header h1 mat-icon {
+  font-size: 1.3em;
+}
+
+.market-header p {
+  font-size: 1.1em;
+  color: var(--color-text-secondary, #555);
+  margin-bottom: 15px;
+}
+
+.user-points-display {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: var(--user-accent, #ff4081);
+  background-color: var(--background-color-light, #f0f0f0);
+  padding: 8px 15px;
+  border-radius: var(--border-radius-md, 8px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-points-display .points-value {
+  font-weight: 700;
+}
+.user-points-display .points-icon {
+  font-size: 1.3em;
+  vertical-align: middle;
+}
+
+.loading-indicator, .error-message, .empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  margin-top: 20px;
+  border-radius: var(--border-radius-md, 8px);
+}
+.loading-indicator p, .error-message p, .empty-state p {
+  font-size: 1.1em;
+  margin-top: 15px;
+}
+.error-message { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.empty-state { background-color: #e9ecef; color: #495057; }
+.empty-state .empty-icon { font-size: 3em; color: #adb5bd; }
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.market-item-card {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-radius: var(--border-radius-md, 8px);
+  overflow: hidden; /* Para que la imagen no se salga del radio */
+}
+.market-item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.item-preview-image {
+  height: 180px;
+  object-fit: cover; /* o 'contain' si prefieres */
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+.image-placeholder {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #ccc;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+.image-placeholder mat-icon {
+  font-size: 3em;
+}
+
+
+.market-item-card mat-card-header {
+  padding-bottom: 8px;
+}
+.market-item-card mat-card-title {
+  font-size: 1.25em;
+  font-weight: 500;
+  color: var(--color-text-primary, #333);
+}
+.market-item-card mat-card-subtitle {
+  font-size: 0.85em;
+  color: var(--color-text-secondary, #666);
+}
+
+.market-item-card mat-card-content {
+  flex-grow: 1;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.item-description {
+  font-size: 0.9em;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  flex-grow: 1;
+  color: var(--color-text-secondary, #555);
+}
+
+.item-cost {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--user-primary-dark, #303f9f);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px; /* Espacio antes del coste */
+}
+.item-cost mat-icon {
+  font-size: 1.2em;
+  color: var(--color-gold, #ffc107);
+}
+
+.market-item-card mat-card-actions {
+  padding: 8px 16px 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.purchase-button, .unlocked-button {
+  width: 100%; /* Ocupa todo el ancho de las acciones */
+  font-weight: 500;
+}
+
+.unlocked-button mat-icon {
+  margin-right: 5px;
+}
+.unlocked-button {
+  color: var(--color-success, #28a745);
+  border-color: var(--color-success-light, #a3d8b3);
+}
+
+.button-spinner {
+  margin-right: 8px;
+  display: inline-block; /* Para que el spinner no ocupe todo el botón */
+  width: 20px !important; /* Forzar tamaño */
+  height: 20px !important; /* Forzar tamaño */
+}
+
+/* Clases para snackbar (puedes ponerlas en styles.css global si prefieres) */
+/* Asegúrate que estas clases no entren en conflicto con otras globales */
+::ng-deep .snackbar-success { /* Usar ::ng-deep con precaución o definir en global styles */
+  background-color: var(--color-success, #4CAF50) !important;
+  color: white !important;
+}
+::ng-deep .snackbar-success .mat-mdc-button.mat-mdc-button-base {
+  color: white !important;
+}
+
+::ng-deep .snackbar-error {
+  background-color: var(--color-danger, #f44336) !important;
+  color: white !important;
+}
+::ng-deep .snackbar-error .mat-mdc-button.mat-mdc-button-base {
+  color: white !important;
+}

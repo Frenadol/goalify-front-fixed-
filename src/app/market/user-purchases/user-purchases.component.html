@@ -1,0 +1,58 @@
+<div class="page-container">
+  <div class="user-purchases-container">
+    <header class="purchases-header">
+      <h1><span class="material-icons-outlined">shopping_bag</span> Mis Compras</h1>
+      <p>Aquí puedes ver los artículos que has adquirido en el mercado.</p>
+    </header>
+
+    <div *ngIf="isLoading" class="spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando tus compras...</p>
+    </div>
+
+    <div *ngIf="!isLoading && error" class="error-message-container">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-stroked-button color="primary" (click)="loadPurchases()">Reintentar</button>
+    </div>
+
+    <div *ngIf="!isLoading && !purchases.length && !error" class="empty-purchases-container">
+      <mat-icon class="empty-icon">sentiment_dissatisfied</mat-icon>
+      <p>No has adquirido ningún artículo todavía.</p>
+      <button mat-raised-button color="primary" routerLink="/market">Ir al Mercado</button>
+    </div>
+
+    <div class="purchases-table-container" *ngIf="!isLoading && purchases.length">
+      <table class="purchases-table">
+        <thead>
+          <tr>
+            <th class="column-id">ID Artículo</th>
+            <th class="column-image">Imagen</th>
+            <th class="column-name">Nombre</th>
+            <th class="column-type">Tipo</th>
+            <th class="column-date">Fecha de Adquisición</th>
+            <th class="column-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of purchases">
+            <td>{{ item.id }}</td>
+            <td class="item-image-cell">
+              <img [src]="item.imagenUrl || item.imagenPreviewUrl || 'assets/images/default-item.png'" 
+                   [alt]="item.nombre" 
+                   class="item-thumbnail">
+            </td>
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.tipoArticulo }}</td>
+            <td>{{ item.fechaAdquisicion | date:'dd MMM yyyy, HH:mm' }}</td>
+            <td>
+              <button mat-icon-button color="primary" (click)="viewItemDetails(item)" title="Ver detalles">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

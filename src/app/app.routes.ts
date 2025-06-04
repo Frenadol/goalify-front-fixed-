@@ -7,13 +7,16 @@ import { UserProfileDetailsComponent } from './user-profile-details/user-profile
 import { UserStatisticsComponent } from './user-statistics/user-statistics.component';
 import { AuthGuard } from './auth.guard';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
-import { adminGuard } from './admin/admin.guard';
-import { UserManagementComponent } from './admin/user-management/user-management.component';
+import { ManageMarketComponent } from './admin/manage-market/manage-market.component'; // Para admin
+import { MarketComponent } from './market/market.component'; // <--- AÑADE ESTA IMPORTACIÓN
 import { ChallengeListComponent } from './challenges/challenge-list/challenge-list.component';
 import { MyChallengesListComponent } from './challenges/my-challenges-list/my-challenges-list.component';
-
-// Importar rutas de admin para desafíos
+import { UserManagementComponent } from './admin/user-management/user-management.component';
+import { adminGuard } from './admin/admin.guard';
 import { adminChallengeRoutes } from './challenges/challenges-routing.module';
+import { UserPurchasesComponent } from './market/user-purchases/user-purchases.component'; // Importa el componente aquí
+import { MedallasDialogComponent } from './medallas-dialog/medallas-dialog.component'; // Asegúrate de importar el componente MedallasDialogComponent
+
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -27,12 +30,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'challenges', // Ruta para que los usuarios vean la lista general de desafíos
+    path: 'challenges',
     component: ChallengeListComponent,
     canActivate: [AuthGuard],
-    data: { isAdminContext: false } // <--- Para diferenciar del contexto de admin
+    data: { isAdminContext: false }
   },
-  { // NUEVA RUTA PARA "MIS DESAFÍOS"
+  {
     path: 'my-challenges',
     component: MyChallengesListComponent,
     canActivate: [AuthGuard]
@@ -44,8 +47,28 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'app/progress', // Esta es la ruta para "Mi Progreso"
-    component: UserStatisticsComponent, // Asegúrate de que aquí dice UserStatisticsComponent (sin el "2")
+    path: 'user-statistics',
+    component: UserStatisticsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile',
+    component: UserProfileDetailsComponent, // Redirige profile a user-profile
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'medallas',
+    component: MedallasDialogComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'app/progress',
+    component: UserStatisticsComponent,
+    canActivate: [AuthGuard]
+  },
+  { // <--- RUTA PARA EL MERCADO DEL USUARIO
+    path: 'market',
+    component: MarketComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -54,10 +77,15 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'users', component: UserManagementComponent },
-      // Integrar las rutas de administración de desafíos aquí
-      ...adminChallengeRoutes, // Estas rutas ya tienen sus componentes definidos
+      ...adminChallengeRoutes,
+      { path: 'market', component: ManageMarketComponent }, // Esta es la gestión de admin
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  // { path: '**', component: PageNotFoundComponent } // Considera añadir una página 404
+  {
+    path: 'mis-compras',
+    component: UserPurchasesComponent,
+    canActivate: [AuthGuard]
+  },
+  { path: '**', component: HomeComponent } // Ruta wildcard para manejar rutas desconocidas
 ];

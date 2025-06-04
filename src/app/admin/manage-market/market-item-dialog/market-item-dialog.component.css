@@ -1,0 +1,159 @@
+.full-width-field {
+  width: 100%;
+  margin-bottom: 12px; /* Ajusta según sea necesario */
+}
+
+.row-fields {
+  display: flex;
+  gap: 16px; /* Espacio entre campos en la misma fila */
+  margin-bottom: 12px;
+}
+
+.half-width-field {
+  flex: 1; /* Para que ocupen el espacio disponible equitativamente */
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.button-spinner {
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Estilos para el input de archivo y vista previa */
+.file-input-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-input-group label {
+  font-weight: 500;
+  color: rgba(0,0,0,.6); /* Color similar al de mat-label */
+  margin-bottom: 5px;
+}
+
+.upload-button {
+  width: fit-content;
+}
+
+.file-name-display {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 5px;
+}
+
+.image-preview-container {
+  margin-top: 10px;
+  border: 1px dashed #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 300px; /* O el ancho que prefieras */
+  background-color: #f9f9f9;
+}
+
+.image-preview-container p {
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
+  object-fit: contain;
+  border: 1px solid #eee;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.flex-field {
+  flex: 1;
+}
+
+.checkbox-field {
+  margin-bottom: 20px;
+  margin-top: 5px;
+}
+
+h1[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5em;
+  color: var(--admin-primary, #3f51b5);
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color-light, #eee);
+  margin-bottom: 20px;
+}
+
+h1[mat-dialog-title] mat-icon {
+  font-size: 1.3em;
+}
+
+div[mat-dialog-content] {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Para navegadores Webkit como Chrome/Safari */
+div[mat-dialog-content]::-webkit-scrollbar {
+  width: 8px;
+}
+
+div[mat-dialog-content]::-webkit-scrollbar-track {
+  background: var(--background-color-subtle, #f1f1f1);
+  border-radius: 10px;
+}
+
+div[mat-dialog-content]::-webkit-scrollbar-thumb {
+  background: var(--border-color, #ccc);
+  border-radius: 10px;
+}
+
+div[mat-dialog-content]::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary, #888);
+}
+
+
+.dialog-error-message {
+  color: var(--color-error-dark, #721c24);
+  background-color: var(--color-error-light, #f8d7da);
+  border: 1px solid var(--color-error, #f5c6cb);
+  padding: 12px 15px;
+  border-radius: var(--border-radius-md, 8px);
+  margin-top: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95em;
+}
+
+.dialog-error-message mat-icon {
+  font-size: 1.3em;
+}
+
+div[mat-dialog-actions] {
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color-light, #eee);
+  margin-top: 10px;
+}

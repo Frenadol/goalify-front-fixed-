@@ -1,0 +1,62 @@
+<div class="page-container">
+  <div class="manage-market-container">
+    <header class="component-header">
+      <h1><mat-icon>storefront</mat-icon> Gestionar Mercado de Artículos</h1>
+      <button mat-raised-button color="primary" (click)="openCreateItemDialog()">
+        <mat-icon>add_circle_outline</mat-icon>
+        Añadir Nuevo Artículo
+      </button>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+      <p>Cargando artículos del mercado...</p>
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="error-message">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button mat-stroked-button color="primary" (click)="loadMarketItems()">Reintentar</button>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="market-content">
+      <!-- Mensaje de estado vacío correcto -->
+      <p class="empty-state-placeholder" *ngIf="!isLoading && marketItems.length === 0">
+        No hay artículos configurados en el mercado todavía. ¡Añade el primero!
+      </p>
+
+      <!-- Contenedor para las tarjetas de artículos -->
+      <div class="item-cards-container" *ngIf="!isLoading && marketItems.length > 0">
+        <mat-card *ngFor="let item of marketItems" class="item-card">
+          <mat-card-header>
+            <mat-card-title>{{ item.nombre }}</mat-card-title>
+            <mat-card-subtitle>{{ item.tipoArticulo | titlecase }}</mat-card-subtitle>
+          </mat-card-header>
+          <img mat-card-image [src]="item.urlImagenPreview || 'assets/img/placeholder.png'" alt="{{ item.nombre }}" class="item-card-image">
+          <mat-card-content>
+            <p>
+              <strong>Precio:</strong> {{ item.precio }} puntos
+            </p>
+            <div class="item-status">
+              <strong>Activo:</strong>
+              <mat-slide-toggle
+                [checked]="item.activo"
+                (change)="onToggleActivo(item)"
+                color="primary"
+                aria-label="Estado activo del artículo">
+              </mat-slide-toggle>
+            </div>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-icon-button (click)="openEditItemDialog(item)" matTooltip="Editar Artículo">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="onDeleteItem(item)" matTooltip="Eliminar Artículo">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
