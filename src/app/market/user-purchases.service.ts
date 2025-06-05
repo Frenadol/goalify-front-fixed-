@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { MarketItem } from './market-item.model';
+import { environment } from '../../environments/environment';
+import { AuthService } from '../auth.service';
 
 /**
  * Estructura de la respuesta del backend para un UsuarioCompraDTO
@@ -25,9 +27,13 @@ interface UsuarioCompraDTO {
   providedIn: 'root'
 })
 export class UserPurchasesService {
-  private apiUrl = 'http://localhost:8080/api';
+  // Usa la URL del entorno para consistencia
+  private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   /**
    * Obtiene los artículos adquiridos por el usuario actual desde el backend.
@@ -35,23 +41,20 @@ export class UserPurchasesService {
   getUserPurchases(): Observable<MarketItem[]> {
     console.log('Intentando cargar Mis Compras desde el backend...');
     
-    // Agregamos explícitamente el token de autorización
-    const token = localStorage.getItem('auth_token');
-    
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
+    // Verificamos si el usuario está autenticado
+    if (!this.authService.isAuthenticated()) {
+      console.warn('Usuario no autenticado, no se cargarán compras');
+      return of([]);
     }
 
+    // IMPORTANTE: Corregir la URL a /api/usuarios/articulos-tienda/mis-compras
     return this.http.get<UsuarioCompraDTO[]>(
-      `${this.apiUrl}/usuarios/articulos-tienda/mis-compras`,
-      { headers: headers }
+      `${this.apiUrl}/api/usuarios/articulos-tienda/mis-compras`
     ).pipe(
+      tap(response => console.log('Respuesta de Mis Compras:', response)),
       map(response => {
-        console.log('Respuesta de Mis Compras:', response);
-        
         if (!Array.isArray(response)) {
-          console.error('Error: La respuesta de "mis-compras" no es un array:', response);
+          console.error('Error: La respuesta no es un array:', response);
           return [];
         }
         
@@ -66,12 +69,22 @@ export class UserPurchasesService {
           activo: item.activoArticulo
         } as MarketItem));
       }),
-      catchError(error => {
-        console.error('Error al cargar las compras del usuario:', error);
-        console.error('Estado HTTP:', error.status);
-        console.error('Mensaje:', error.error || error.message);
-        return of([]);
-      })
+      catchError(this.handleError)
     );
+  }
+
+  /**
+   * Maneja los errores HTTP de forma apropiada
+   */
+  private handleError(error: HttpErrorResponse): Observable<MarketItem[]> {
+    let errorMessage = 'Error al cargar compras del usuario.';
+    
+    if (error.status === 401 || error.status === 403) {
+      console.warn('Error de autenticación al cargar compras:', error);
+      return of([]);
+    }
+    
+    console.error('Error al cargar las compras del usuario:', error);
+    return of([]); // Siempre devolvemos array vacío en vez de un error
   }
 }

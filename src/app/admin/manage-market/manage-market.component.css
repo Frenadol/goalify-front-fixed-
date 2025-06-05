@@ -1,171 +1,597 @@
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #a0cfff;
+  --success: #28a745;
+  --success-dark: #1e7e34;
+  --success-light: #d4edda;
+  --danger: #dc3545;
+  --danger-dark: #c82333;
+  --warning: #ffc107;
+  --warning-dark: #e0a800;
+  --info: #17a2b8;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --text-muted: #555555;
+  --border-color: #d1d5db;
+  --border-focus: #007bff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  display: block;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Contenedor de página */
 .page-container {
-  padding: 20px;
-  background-color: var(--background-color-light, #f4f7f6); /* Similar a otras páginas */
-  min-height: calc(100vh - var(--navbar-height, 60px));
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.02) 0%, rgba(0, 86, 179, 0.02) 100%);
+  animation: fadeIn 0.8s ease-out;
 }
 
+/* Contenedor principal */
 .manage-market-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 25px;
-  background-color: var(--color-surface, #fff);
-  border-radius: var(--border-radius-lg, 12px);
-  box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.1));
+  max-width: 1400px;
+  width: 100%;
+  padding: 40px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.6s ease-out;
 }
 
+.manage-market-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+/* Header del componente */
 .component-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  margin-bottom: 40px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+  animation: fadeInScale 0.6s ease-out 0.2s both;
 }
 
 .component-header h1 {
-  font-size: 1.8em; /* Ajustado para consistencia */
-  color: var(--admin-primary, #3f51b5); /* Usar color primario de admin */
+  font-size: 2.2em;
+  color: var(--dark);
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  position: relative;
+}
+
+.component-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: 2px;
 }
 
 .component-header h1 mat-icon {
-  font-size: 1.5em; /* Icono un poco más grande en el título */
+  font-size: 1.2em;
+  color: var(--primary);
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 8px;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Botón de añadir */
+::ng-deep .component-header .mat-mdc-raised-button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  color: var(--white) !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  padding: 12px 24px !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: var(--transition) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .component-header .mat-mdc-raised-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+::ng-deep .component-header .mat-mdc-raised-button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+::ng-deep .component-header .mat-mdc-raised-button:hover::before {
+  left: 100%;
 }
 
 .component-header button mat-icon {
   margin-right: 8px;
-}
-
-.loading-indicator, .error-message, .empty-state-placeholder {
-  text-align: center;
-  padding: 40px 20px;
-  margin-top: 20px;
-  border-radius: var(--border-radius-md, 8px);
-}
-
-.loading-indicator p, .error-message p, .empty-state-placeholder {
   font-size: 1.1em;
-  color: var(--color-text-secondary, #555);
-  margin-top: 15px;
 }
 
+/* Estados de carga */
+.loading-indicator {
+  text-align: center;
+  padding: 80px 20px;
+  margin-top: 40px;
+  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.03) 0%, rgba(244, 247, 246, 0.5) 100%);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.loading-indicator p {
+  font-size: 1.2em;
+  color: var(--text-secondary);
+  margin-top: 20px;
+  font-weight: 500;
+}
+
+::ng-deep .loading-indicator .mat-mdc-progress-spinner {
+  animation: spin 1s linear infinite;
+}
+
+::ng-deep .loading-indicator .mat-mdc-progress-spinner circle {
+  stroke: var(--primary) !important;
+}
+
+/* Mensajes de error */
 .error-message {
-  background-color: var(--color-error-light, #f8d7da);
-  color: var(--color-error-dark, #721c24);
-  border: 1px solid var(--color-error, #f5c6cb);
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  color: var(--danger);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  margin-top: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  box-shadow: var(--shadow-sm);
+  animation: pulse 0.5s ease-out;
 }
 
 .error-message mat-icon {
-  font-size: 1.8em;
+  font-size: 2em;
+  color: var(--danger);
 }
 
+.error-message p {
+  font-size: 1.1em;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+::ng-deep .error-message .mat-mdc-outlined-button {
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  font-weight: 600 !important;
+}
+
+::ng-deep .error-message .mat-mdc-outlined-button:hover {
+  background: rgba(220, 53, 69, 0.1) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Estado vacío */
 .empty-state-placeholder {
-  background-color: var(--background-color-subtle, #e9ecef);
-  color: var(--color-text-secondary, #495057);
+  text-align: center;
+  padding: 80px 40px;
+  margin-top: 40px;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.05) 0%, rgba(244, 247, 246, 0.8) 100%);
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+  font-size: 1.2em;
+  font-weight: 500;
+  border: 2px dashed var(--border-color);
+  animation: fadeIn 0.6s ease-out;
+  position: relative;
 }
 
+.empty-state-placeholder::before {
+  content: '🛍️';
+  font-size: 3em;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+/* Contenido del mercado */
 .market-content {
-  /* Estilos para la tabla o lista de artículos aquí */
+  animation: fadeIn 0.8s ease-out 0.4s both;
 }
 
-/* Si usas MatTable, puedes añadir estilos aquí */
-/*
-.mat-elevation-z8 {
-  width: 100%;
-  margin-top: 20px;
-}
-.mat-column-actions { // Ejemplo para una columna de acciones
-  width: 120px;
-  text-align: right;
-}
-.mat-column-actions button {
-  margin-left: 8px;
-}
-*/
-
+/* Contenedor de tarjetas */
 .item-cards-container {
-  display: flex;
-  flex-wrap: wrap; /* Para que las tarjetas pasen a la siguiente línea si no caben */
-  gap: 20px; /* Espacio entre tarjetas */
-  justify-content: center; /* Centra las tarjetas si hay espacio sobrante */
-  padding-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  padding-top: 30px;
+  animation: fadeIn 0.8s ease-out 0.6s both;
 }
 
-.item-card {
-  width: 300px; /* Ancho fijo para las tarjetas, ajústalo a tu gusto */
-  display: flex;
-  flex-direction: column; /* Para que el contenido y las acciones se apilen verticalmente */
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Para la animación suave */
-  cursor: default; /* Cambia el cursor por defecto sobre la tarjeta */
+/* Tarjetas de artículos */
+::ng-deep .item-card.mat-mdc-card {
+  border-radius: var(--border-radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: var(--transition) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--white) !important;
+  position: relative !important;
+  animation: fadeInScale 0.6s ease-out !important;
 }
 
-.item-card:hover {
-  transform: translateY(-5px) scale(1.03); /* Mueve la tarjeta un poco hacia arriba y la agranda */
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Sombra más pronunciada */
+::ng-deep .item-card.mat-mdc-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
+::ng-deep .item-card.mat-mdc-card:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: var(--shadow-hover) !important;
+  border-color: var(--primary) !important;
+}
+
+::ng-deep .item-card.mat-mdc-card:hover::before {
+  opacity: 1;
+}
+
+/* Header de la tarjeta */
+::ng-deep .item-card .mat-mdc-card-header {
+  padding: 20px 20px 15px 20px !important;
+  background: linear-gradient(135deg, rgba(244, 247, 246, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%) !important;
+  border-bottom: 1px solid rgba(0, 123, 255, 0.1) !important;
+}
+
+::ng-deep .item-card .mat-mdc-card-title {
+  font-size: 1.3em !important;
+  font-weight: 700 !important;
+  color: var(--dark) !important;
+  margin-bottom: 5px !important;
+  line-height: 1.3 !important;
+}
+
+::ng-deep .item-card .mat-mdc-card-subtitle {
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.95em !important;
+  background: rgba(0, 123, 255, 0.1) !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  display: inline-block !important;
+}
+
+/* Imagen de la tarjeta */
 .item-card-image {
-  width: 100%; /* La imagen ocupa todo el ancho de la tarjeta */
-  height: 200px; /* Altura fija para la imagen, ajústala */
-  object-fit: cover; /* Para que la imagen cubra el espacio sin deformarse */
-  border-bottom: 1px solid #eee; /* Una línea sutil debajo de la imagen */
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 1px solid rgba(0, 123, 255, 0.1);
+  transition: var(--transition);
 }
 
-mat-card-content {
-  flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible antes de las acciones */
+::ng-deep .item-card:hover .item-card-image {
+  transform: scale(1.05);
 }
 
+/* Contenido de la tarjeta */
+::ng-deep .item-card .mat-mdc-card-content {
+  padding: 25px 20px !important;
+  flex-grow: 1 !important;
+  background: var(--white) !important;
+}
+
+::ng-deep .item-card .mat-mdc-card-content p {
+  margin: 0 0 15px 0 !important;
+  font-size: 1em !important;
+  color: var(--text-color) !important;
+  padding: 10px 15px !important;
+  background: rgba(0, 123, 255, 0.03) !important;
+  border-radius: var(--border-radius) !important;
+  border-left: 3px solid var(--primary) !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .item-card .mat-mdc-card-content p strong {
+  color: var(--dark) !important;
+  font-weight: 700 !important;
+}
+
+/* Estado del artículo */
 .item-status {
   display: flex;
   align-items: center;
-  gap: 8px; /* Espacio entre "Activo:" y el toggle */
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 15px;
+  padding: 12px 15px;
+  background: linear-gradient(135deg, rgba(244, 247, 246, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(0, 123, 255, 0.1);
 }
 
-mat-card-actions {
-  padding: 8px 16px !important; /* Ajusta el padding de las acciones si es necesario */
+.item-status strong {
+  color: var(--dark);
+  font-weight: 600;
 }
 
-.empty-state-placeholder {
-  text-align: center;
-  padding: 40px;
-  color: #757575;
-  font-size: 1.1em;
+::ng-deep .item-status .mat-mdc-slide-toggle {
+  margin-left: auto;
 }
 
-/* Estilos para el loading y error (ya los tenías, pero por si acaso) */
-.loading-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  gap: 16px;
+::ng-deep .item-status .mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__track {
+  background-color: var(--success) !important;
 }
 
-.error-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  border: 1px solid var(--warn-color, #f44336);
-  border-radius: 4px;
-  background-color: rgba(244, 67, 54, 0.1);
-  color: var(--warn-color, #f44336);
-  gap: 10px;
+::ng-deep .item-status .mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__handle {
+  background-color: var(--white) !important;
 }
 
-.error-message mat-icon {
-  font-size: 28px;
-  height: 28px;
-  width: 28px;
+/* Acciones de la tarjeta */
+::ng-deep .item-card .mat-mdc-card-actions {
+  padding: 15px 20px !important;
+  background: linear-gradient(135deg, rgba(248, 249, 250, 0.8) 0%, rgba(244, 247, 246, 0.8) 100%) !important;
+  border-top: 1px solid rgba(0, 123, 255, 0.1) !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+::ng-deep .item-card .mat-mdc-icon-button {
+  border-radius: 50% !important;
+  transition: var(--transition) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .item-card .mat-mdc-icon-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  transform: scale(0);
+  transition: transform 0.3s ease;
+}
+
+::ng-deep .item-card .mat-mdc-icon-button:hover::before {
+  transform: scale(1);
+}
+
+::ng-deep .item-card .mat-mdc-icon-button:hover {
+  transform: scale(1.1) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+::ng-deep .item-card .mat-mdc-icon-button mat-icon {
+  position: relative;
+  z-index: 1;
+  transition: var(--transition);
+}
+
+::ng-deep .item-card .mat-mdc-icon-button:hover mat-icon {
+  color: var(--primary) !important;
+}
+
+::ng-deep .item-card .mat-mdc-icon-button[color="warn"]:hover mat-icon {
+  color: var(--danger) !important;
+}
+
+::ng-deep .item-card .mat-mdc-icon-button[color="warn"]:hover::before {
+  background: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* Tooltips */
+::ng-deep .mat-mdc-tooltip {
+  background: var(--dark) !important;
+  color: var(--white) !important;
+  font-size: 0.85em !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .item-cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 20px 15px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  
+  .manage-market-container {
+    padding: 25px 20px;
+  }
+  
+  .component-header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .component-header h1 {
+    font-size: 1.8em;
+    justify-content: center;
+  }
+  
+  .item-cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .loading-indicator,
+  .error-message,
+  .empty-state-placeholder {
+    padding: 60px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 15px 10px;
+    padding-top: 30px;
+  }
+  
+  .manage-market-container {
+    padding: 20px 15px;
+  }
+  
+  .component-header h1 {
+    font-size: 1.6em;
+  }
+  
+  .item-cards-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .item-card-image {
+    height: 180px;
+  }
+  
+  ::ng-deep .item-card .mat-mdc-card-header {
+    padding: 15px !important;
+  }
+  
+  ::ng-deep .item-card .mat-mdc-card-content {
+    padding: 20px 15px !important;
+  }
+  
+  ::ng-deep .item-card .mat-mdc-card-actions {
+    padding: 12px 15px !important;
+  }
+}
+
+/* Animaciones de entrada para tarjetas */
+::ng-deep .item-card:nth-child(1) { animation-delay: 0.1s; }
+::ng-deep .item-card:nth-child(2) { animation-delay: 0.2s; }
+::ng-deep .item-card:nth-child(3) { animation-delay: 0.3s; }
+::ng-deep .item-card:nth-child(4) { animation-delay: 0.4s; }
+::ng-deep .item-card:nth-child(5) { animation-delay: 0.5s; }
+::ng-deep .item-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Estados de focus para accesibilidad */
+::ng-deep .mat-mdc-icon-button:focus {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+::ng-deep .mat-mdc-raised-button:focus {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+::ng-deep .mat-mdc-slide-toggle:focus {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Mejoras adicionales */
+::ng-deep .item-card .mat-mdc-card-content p:hover {
+  background: rgba(0, 123, 255, 0.08) !important;
+  transform: translateX(5px) !important;
+}
+
+.item-status:hover {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(244, 247, 246, 0.8) 100%);
+  border-color: rgba(0, 123, 255, 0.2);
 }

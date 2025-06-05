@@ -196,6 +196,204 @@
                 <div matListItemTitle class="challenge-item-title">{{ detail.nombre }}</div>
                 <div matListItemLine class="challenge-item-info">
                   <span>Finaliza: {{ detail.fechaFin | date:'dd/MM/yyyy' }}</span>
+          <div class="page-container">
+  <div class="profile-details-wrapper">
+    <!-- ESTE ES EL DIV PRINCIPAL QUE ENVUELVE EL CONTENIDO DEL PERFIL O EL ESTADO DE CARGA/ERROR -->
+    <div *ngIf="currentUser; else loadingOrError" class="profile-container">
+      <mat-card class="profile-card" [style.backgroundColor]="profileDisplayPreferences.profileCardColor">
+        <mat-card-header class="profile-card-header">
+          <img mat-card-avatar
+               [src]="currentUser.fotoPerfil || defaultAvatarUrl"
+               (error)="onImageError($event)"
+               alt="Avatar de {{ currentUser.nombre }}"
+               class="profile-avatar-img">
+          <mat-card-title class="profile-name">{{ currentUser.nombre }}</mat-card-title>
+          <mat-card-subtitle class="profile-email" *ngIf="currentUser.email">{{ currentUser.email }}</mat-card-subtitle>
+          <button mat-icon-button class="profile-settings-button" (click)="toggleSettingsPanel()" matTooltip="Personalizar vista del perfil">
+            <mat-icon>settings</mat-icon>
+          </button>
+        </mat-card-header>
+
+        <mat-card-content class="profile-card-content">
+          <!-- ... tu sección de Biografía ... -->
+          <mat-divider *ngIf="currentUser"></mat-divider>
+
+          <!-- Sección Mis Estadísticas -->
+          <div class="profile-stats-section" *ngIf="currentUser">
+            <h4>Mis Estadísticas</h4>
+            <div class="profile-info-grid">
+              <!-- Puntos Actuales -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showPoints">
+                <mat-icon class="info-icon">military_tech</mat-icon>
+                <span class="info-label">Puntos Actuales:</span>
+                <span class="info-value">{{ currentUser.puntosTotales ?? 0 | number }}</span>
+              </div>
+
+              <!-- Nivel -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showLevel">
+                <mat-icon class="info-icon">bar_chart</mat-icon>
+                <span class="info-label">Nivel:</span>
+                <span class="info-value">{{ currentUser.nivel ?? 0 | number }}</span>
+              </div>
+              
+              <!-- Puntos Récord (NUEVO) -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showRecordPoints && currentUser.puntosRecord !== undefined">
+                <mat-icon class="info-icon">leaderboard</mat-icon>
+                <span class="info-label">Puntos Récord:</span>
+                <span class="info-value">{{ currentUser.puntosRecord ?? 0 | number }}</span>
+              </div>
+
+              <!-- El bloque de Rango y Progreso YA NO ESTÁ AQUÍ -->
+
+              <!-- Desafíos Completados -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showChallengesCompleted">
+                <mat-icon class="info-icon">emoji_events</mat-icon>
+                <span class="info-label">Desafíos Completados (Total):</span>
+                <span class="info-value">{{ currentUser.totalDesafiosCompletados != null ? currentUser.totalDesafiosCompletados : 0 }}</span>
+              </div>
+
+              <!-- Hábitos Completados Hoy -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showHabitsCompletedToday && habitStats">
+                <mat-icon class="info-icon">rule</mat-icon>
+                <span class="info-label">Hábitos Completados Hoy:</span>
+                <span class="info-value">{{ habitStats.totalCompletionsToday != null ? habitStats.totalCompletionsToday : 0 }}</span>
+              </div>
+
+              <!-- Hábitos Completados (Total) -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showTotalHabitsCompleted && habitStats">
+                <mat-icon class="info-icon">done_all</mat-icon>
+                <span class="info-label">Hábitos Completados (Total):</span>
+                <span class="info-value">{{ habitStats.totalOverallCompletions != null ? habitStats.totalOverallCompletions : 0 }}</span>
+              </div>
+
+              <!-- Mejor Racha -->
+              <div class="info-item" *ngIf="profileDisplayPreferences.showBestStreak && habitStats">
+                <mat-icon class="info-icon">local_fire_department</mat-icon>
+                <span class="info-label">Mejor Racha (Hábitos):</span>
+                <span class="info-value">{{ habitStats.longestStreakOverall != null ? habitStats.longestStreakOverall : 0 }} días</span>
+              </div>
+
+              <!-- Rango y Progreso (NUEVA UBICACIÓN) -->
+              <div class="info-item-container stat-full-width" *ngIf="profileDisplayPreferences.showRank">
+                <!-- Mostrar Rango Actual -->
+                <div class="info-item"
+                     *ngIf="rangoActualDetalles"
+                     [matTooltip]="rangoActualDetalles.mensajeMotivacional || ''"
+                     matTooltipPosition="above"> <!-- AQUÍ FALTABA EL > -->
+                  <img [src]="rangoActualDetalles.icono"
+                       alt="Icono del rango {{ rangoActualDetalles.nombre }}"
+                       class="rank-icon info-icon">
+                  <span class="info-label">Rango:</span>
+                  <span class="info-value">{{ rangoActualDetalles.nombre | titlecase }}</span>
+
+                  <!-- Sección de Barra de Progreso del Rango -->
+                  <div *ngIf="currentUser" class="rank-progress-section">
+                    <div class="rank-progress-bar-container">
+                      <mat-progress-bar
+                        mode="determinate"
+                        [value]="progresoRango"
+                        aria-label="Progreso para el siguiente rango">
+                      </mat-progress-bar>
+                    </div>
+                    <div class="rank-progress-text">
+                      <span *ngIf="siguienteRangoDetalles">
+                        {{ puntosUsuario | number }} / {{ siguienteRangoDetalles.puntosMinimos | number }} Puntos para {{ siguienteRangoDetalles.nombre | titlecase }}
+                      </span>
+                      <span *ngIf="!siguienteRangoDetalles && rangoActualDetalles && rangoActualDetalles.nombre.toUpperCase() === RANGOS_DEFINIDOS[RANGOS_DEFINIDOS.length - 1].nombre.toUpperCase()">
+                        ¡Has alcanzado el rango máximo: {{ rangoActualDetalles.nombre | titlecase }}! ({{ puntosUsuario | number }} Puntos)
+                      </span>
+                      <span *ngIf="!siguienteRangoDetalles && rangoActualDetalles && rangoActualDetalles.nombre.toUpperCase() !== RANGOS_DEFINIDOS[RANGOS_DEFINIDOS.length - 1].nombre.toUpperCase() && progresoRango >= 100">
+                        {{ puntosUsuario | number }} Puntos (Progreso al siguiente rango no definido)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Fallback si rangoActualDetalles no está pero currentUser.rango sí -->
+                <div class="info-item"
+                     *ngIf="!rangoActualDetalles && currentUser?.rango"
+                     [matTooltip]="''"
+                     matTooltipPosition="above"> <!-- AQUÍ FALTABA EL > -->
+                  <img
+                    [src]="getRankImagePath(currentUser!.rango!)"
+                    alt="Icono del rango"
+                    (error)="onRankImageError($event)">
+                  <span class="info-label">Rango:</span>
+                  <span class="info-value">{{ currentUser.rango | titlecase }}</span>
+                </div>
+              </div>
+              <!-- Fin Rango y Progreso -->
+
+            </div> <!-- Cierre de profile-info-grid -->
+          </div>
+          <!-- Fin Sección Mis Estadísticas -->
+          <mat-divider *ngIf="currentUser"></mat-divider>
+
+          <!-- ...resto de tu contenido como Biografía, Desafíos, etc. ... -->
+          <div class="biography-section">
+            <div class="section-header">
+              <h3 class="section-title">Biografía</h3>
+              <button mat-icon-button (click)="toggleEditBio()" *ngIf="!isEditingBio" matTooltip="Editar biografía">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+            <div *ngIf="!isEditingBio" class="bio-text">
+              <p>{{ currentUser.biografia || 'Aún no has añadido una biografía.' }}</p>
+            </div>
+            <div *ngIf="isEditingBio" class="bio-edit-area">
+              <form [formGroup]="bioEditForm" (ngSubmit)="guardarBiografia()">
+                <mat-form-field appearance="outline" class="full-width-field">
+                  <mat-label>Edita tu biografía</mat-label>
+                  <textarea matInput formControlName="biografia" rows="4" maxlength="500"></textarea>
+                  <!-- Mostrar errores de validación si es necesario -->
+                  <mat-error *ngIf="bioEditForm.get('biografia')?.hasError('maxlength')">
+                    La biografía no puede exceder los 500 caracteres.
+                  </mat-error>
+                </mat-form-field>
+              <!-- </form> No cierres el form aquí si los botones están fuera, o muévelos dentro -->
+              <div class="bio-edit-actions">
+                <button mat-stroked-button type="button" (click)="cancelEditBio()" [disabled]="isSavingBio">Cancelar</button>
+                <button mat-flat-button color="primary" type="submit" [disabled]="isSavingBio || bioEditForm.invalid || bioEditForm.pristine">
+                  <mat-spinner *ngIf="isSavingBio" diameter="20" class="button-spinner"></mat-spinner>
+                  {{ isSavingBio ? 'Guardando...' : 'Guardar Biografía' }}
+                </button>
+              </div>
+              </form> <!-- Cierra el form aquí si los botones están dentro -->
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- SECCIÓN DE DESAFÍOS ACTUALES DEL USUARIO -->
+          <div class="user-challenges-section">
+            <h3 class="section-title">
+              <mat-icon>emoji_events</mat-icon> Mis Desafíos Actuales
+            </h3>
+            <div *ngIf="isLoadingChallenges" class="challenges-loading">
+              <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+              <p>Cargando desafíos actuales...</p>
+            </div>
+            <div *ngIf="!isLoadingChallenges && challengesError" class="challenges-error">
+              <mat-icon color="warn">error_outline</mat-icon>
+              <p>{{ challengesError }}</p>
+            </div>
+            <div *ngIf="!isLoadingChallenges && !challengesError && userChallengeDetails.length === 0" class="challenges-empty">
+              <mat-icon class="empty-icon-large">explore</mat-icon>
+              <p>No estás participando en ningún desafío actualmente.</p>
+              <a mat-stroked-button color="primary" routerLink="/challenges">Explorar Desafíos</a>
+            </div>
+
+            <mat-list *ngIf="!isLoadingChallenges && !challengesError && userChallengeDetails.length > 0" class="challenges-list">
+              <mat-list-item *ngFor="let detail of userChallengeDetails"
+                             (click)="openChallengeDetails(detail)"
+                             class="challenge-list-item interactive-item"
+                             [matTooltip]="'Ver detalles de ' + detail.nombre"
+                             matTooltipPosition="above">
+                <mat-icon matListItemIcon class="challenge-item-icon" [ngClass]="getStatusClass(detail.userChallengeData.estadoParticipacion)">
+                  {{ detail.userChallengeData.estadoParticipacion === 'COMPLETADO' ? 'check_circle' : (detail.imageUrl ? 'image' : 'emoji_events') }}
+                </mat-icon>
+                <div matListItemTitle class="challenge-item-title">{{ detail.nombre }}</div>
+                <div matListItemLine class="challenge-item-info">
+                  <span>Finaliza: {{ detail.fechaFin | date:'dd/MM/yyyy' }}</span>
                   <span class="status-tag" [ngClass]="getStatusClass(detail.userChallengeData.estadoParticipacion)">
                     {{ detail.userChallengeData.estadoParticipacion | titlecase }}
                   </span>
@@ -299,6 +497,152 @@
               </div>
             </div>
           </div>
+
+          <!-- NUEVA SECCIÓN PARA FOTO DE PERFIL -->
+          <div class="settings-section">
+            <h4>Foto de perfil</h4>
+            <button mat-raised-button color="primary" (click)="openProfilePhotoDialog()">
+              <mat-icon>photo_camera</mat-icon> Cambiar foto de perfil
+            </button>
+            <p class="settings-description">Actualiza tu imagen de perfil con una foto local o un avatar canjeado en el mercado.</p>
+          </div>
+          <!-- FIN NUEVA SECCIÓN PARA FOTO DE PERFIL -->
+          
+          <div class="settings-actions">
+            <button mat-button type="button" (click)="toggleSettingsPanel()">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="isSavingPreferences">
+              <mat-spinner *ngIf="isSavingPreferences" diameter="20" class="button-spinner"></mat-spinner>
+              <span *ngIf="!isSavingPreferences">Guardar</span>
+              <span *ngIf="isSavingPreferences">Guardando...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div> <!-- CIERRE DEL DIV *ngIf="currentUser; else loadingOrError" -->
+
+    <ng-template #loadingOrError>
+      <div *ngIf="isLoading || (authService.getIsUserLoading() && !currentUser)" class="loading-container">
+        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+        <p>Cargando perfil...</p>
+      </div>
+      <div *ngIf="!isLoading && !authService.getIsUserLoading() && !currentUser" class="loading-container">
+        <p>No se pudo cargar la información del usuario. <a routerLink="/login">Intenta iniciar sesión</a>.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>        <span class="status-tag" [ngClass]="getStatusClass(detail.userChallengeData.estadoParticipacion)">
+                    {{ detail.userChallengeData.estadoParticipacion | titlecase }}
+                  </span>
+                </div>
+                <mat-icon matListItemMeta class="chevron-icon">chevron_right</mat-icon>
+              </mat-list-item>
+            </mat-list>
+          </div>
+          <!-- FIN SECCIÓN DE DESAFÍOS ACTUALES -->
+
+          <mat-divider></mat-divider>
+
+          <!-- NUEVA SECCIÓN DE DESAFÍOS COMPLETADOS -->
+          <div class="user-challenges-section">
+            <h3 class="section-title">
+              <mat-icon>military_tech</mat-icon> Desafíos Completados
+            </h3>
+            <div *ngIf="isLoadingCompletedChallenges" class="challenges-loading">
+              <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+              <p>Cargando desafíos completados...</p>
+            </div>
+            <div *ngIf="!isLoadingCompletedChallenges && completedChallengesError" class="challenges-error">
+              <mat-icon color="warn">error_outline</mat-icon>
+              <p>{{ completedChallengesError }}</p>
+            </div>
+            <div *ngIf="!isLoadingCompletedChallenges && !completedChallengesError && completedUserChallengeDetails.length === 0" class="challenges-empty">
+              <mat-icon class="empty-icon-large">hourglass_empty</mat-icon>
+              <p>Aún no has completado ningún desafío.</p>
+            </div>
+
+            <mat-list *ngIf="!isLoadingCompletedChallenges && !completedChallengesError && completedUserChallengeDetails.length > 0" class="challenges-list">
+              <mat-list-item *ngFor="let detail of completedUserChallengeDetails"
+                             (click)="openChallengeDetails(detail)"
+                             class="challenge-list-item interactive-item completed"
+                             [matTooltip]="'Ver detalles de ' + detail.nombre"
+                             matTooltipPosition="above">
+                <mat-icon matListItemIcon class="challenge-item-icon status-completado">check_circle</mat-icon>
+                <div matListItemTitle class="challenge-item-title">{{ detail.nombre }}</div>
+                <div matListItemLine class="challenge-item-info">
+                  <span>Completado: {{ detail.userChallengeData.fechaCompletado | date:'dd/MM/yyyy' }}</span>
+                  <span class="status-tag status-completado">Completado</span>
+                </div>
+                <mat-icon matListItemMeta class="chevron-icon">chevron_right</mat-icon>
+              </mat-list-item>
+            </mat-list>
+          </div>
+          <!-- FIN NUEVA SECCIÓN DE DESAFÍOS COMPLETADOS -->
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Panel de Ajustes (Overlay y Contenido) -->
+      <div class="settings-panel-overlay" *ngIf="showSettingsPanel" (click)="toggleSettingsPanel()"></div>
+      <!-- Diálogo de Personalizar Estadísticas y Apariencia -->
+      <div class="settings-panel card-style" *ngIf="showSettingsPanel">
+        <h3>Personalizar Estadísticas y Apariencia</h3>
+        <mat-divider></mat-divider>
+        
+        <form [formGroup]="profileDisplayPreferencesForm" (ngSubmit)="saveDisplayPreferences()">
+          <div class="settings-options">
+            <!-- Conectar cada toggle al FormGroup -->
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showPoints" color="primary">Mostrar Puntos Actuales</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showLevel" color="primary">Mostrar Nivel</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showRank" color="primary">Mostrar Rango y Progreso</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showRecordPoints" color="primary">Mostrar Puntos Récord</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showChallengesCompleted" color="primary">Mostrar Desafíos Completados (Total)</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showHabitsCompletedToday" color="primary">Mostrar Hábitos Completados Hoy</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showTotalHabitsCompleted" color="primary">Mostrar Hábitos Completados (Total)</mat-slide-toggle>
+            </div>
+            
+            <div class="toggle-option">
+              <mat-slide-toggle formControlName="showBestStreak" color="primary">Mostrar Mejor Racha de Hábitos</mat-slide-toggle>
+            </div>
+
+            <!-- Nueva opción de color -->
+            <div class="color-option">
+              <span class="color-label">Color de la Tarjeta:</span>
+              <div class="color-preview-container">
+                <input type="color" formControlName="profileCardColor" class="color-picker">
+                <div class="color-preview" [style.backgroundColor]="profileDisplayPreferencesForm.get('profileCardColor')?.value"></div>
+                <span class="color-value">{{ profileDisplayPreferencesForm.get('profileCardColor')?.value }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- NUEVA SECCIÓN PARA FOTO DE PERFIL -->
+          <div class="settings-section">
+            <h4>Foto de perfil</h4>
+            <button mat-raised-button color="primary" (click)="openProfilePhotoDialog()">
+              <mat-icon>photo_camera</mat-icon> Cambiar foto de perfil
+            </button>
+            <p class="settings-description">Actualiza tu imagen de perfil con una foto local o un avatar canjeado en el mercado.</p>
+          </div>
+          <!-- FIN NUEVA SECCIÓN PARA FOTO DE PERFIL -->
           
           <div class="settings-actions">
             <button mat-button type="button" (click)="toggleSettingsPanel()">Cancelar</button>

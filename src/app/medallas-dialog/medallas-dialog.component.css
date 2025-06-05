@@ -1,344 +1,582 @@
-.dialog-title {
-  text-align: center;
-  color: #e0cda8; /* Un color crema/dorado pálido para el título */
-  font-weight: bold;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-  font-size: 1.6em;
-  font-family: 'Georgia', serif; /* Una fuente un poco más elegante */
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #a0cfff;
+  --success: #28a745;
+  --success-dark: #1e7e34;
+  --success-light: #d4edda;
+  --danger: #dc3545;
+  --danger-dark: #c82333;
+  --warning: #ffc107;
+  --warning-dark: #e0a800;
+  --info: #17a2b8;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --text-muted: #555555;
+  --border-color: #d1d5db;
+  --border-focus: #007bff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --gold: #ffd700;
+  --gold-light: #fff5cc;
+  --gold-dark: #e6c200;
+  --silver: #c0c0c0;
+  --silver-light: #f0f0f0;
+  --silver-dark: #a0a0a0;
+  --bronze: #cd7f32;
+  --bronze-light: #f3d0b5;
+  --bronze-dark: #a66529;
+  display: block;
 }
 
-.dialog-content {
-  padding-top: 10px;
-  max-height: 60vh; /* Altura máxima para el contenido scrollable */
-  overflow-y: auto;
-  padding-right: 10px; /* Espacio para el scrollbar */
-  margin-right: -10px; /* Compensar el padding para alinear el scrollbar */
-  min-width: 300px; /* Ajusta según necesidad */
-  max-width: 500px;
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Estilos para el panel principal del diálogo (aplicado a mat-dialog-container) */
-/* Asegúrate de aplicar esta clase al abrir el diálogo: panelClass: 'medallas-info-dialog-panel' */
-:host ::ng-deep .medallas-info-dialog-panel {
-  background-color: #333842; /* Un fondo oscuro y neutro */
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  max-width: 90vw;
-  width: 800px; /* Más ancho para la tabla/grid */
-  max-height: 85vh;
-  overflow: hidden; /* Para que el contenido con scroll no se salga del border-radius */
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* Título dentro de la base */
-.dialog-title {
-  text-align: center;
-  color: #e0d0b8; /* Título más brillante */
-  font-weight: 600; /* Un poco más de peso */
-  padding: 20px 15px 15px 15px;
-  margin-bottom: 0; /* El padding del content dará el espacio */
-  font-size: 1.7em;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente moderna */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.dialog-content {
-  padding: 25px;
-  max-height: calc(85vh - 140px); /* Ajustar según altura de título y acciones */
-  overflow-y: auto;
-  background-color: #2a2f36; /* Fondo ligeramente diferente para el área de contenido */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
-/* Scrollbar styles */
-.dialog-content::-webkit-scrollbar {
-  width: 10px;
-}
-.dialog-content::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.1);
-  border-radius: 5px;
-}
-.dialog-content::-webkit-scrollbar-thumb {
-  background-color: #5c677a;
-  border-radius: 5px;
-  border: 2px solid #2a2f36; /* Para que el thumb parezca flotar */
-}
-.dialog-content::-webkit-scrollbar-thumb:hover {
-  background-color: #78859b;
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
 }
 
-.medallas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Items más anchos */
-  gap: 25px; /* Más espacio */
+@keyframes shine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-.medalla-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 18px 12px;
-  border-radius: 10px;
-  background-color: #3b414c; /* Fondo de cada item */
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-              box-shadow 0.25s ease-out,
-              background-color 0.2s ease-out;
-  position: relative; /* Para el check-icon */
-  overflow: hidden; /* Para que el check no se salga si es muy grande */
-}
-
-.medalla-item:hover {
-  transform: translateY(-6px) scale(1.04);
-  background-color: #4a505c;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.medalla-icon-container {
-  position: relative;
-  margin-bottom: 12px;
-  width: 75px;
-  height: 75px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.medalla-icon {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: filter 0.3s ease, opacity 0.3s ease;
-}
-
-.medalla-item.no-conseguida .medalla-icon {
-  opacity: 0.5; /* Ejemplo: hacerla más transparente */
-  /* filter: grayscale(100%); */ /* Ejemplo: ponerla en escala de grises */
-}
-.medalla-item.no-conseguida:hover .medalla-icon {
-  filter: grayscale(80%) opacity(50%); /* Ligero cambio al hover en no conseguidas */
-}
-
-
-.medalla-item.conseguida .check-icon {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  font-size: 26px; /* Icono de check más grande */
-  color: #66bb6a; /* Verde brillante */
-  background-color: rgba(42, 47, 54, 0.7); /* Fondo semi-transparente para el check */
-  border-radius: 50%;
-  padding: 2px;
-  line-height: 1;
-  box-shadow: 0 0 5px rgba(102, 187, 106, 0.5);
-}
-
-.medalla-nombre {
-  font-size: 0.95em;
-  color: #d0d0d0;
-  font-weight: 500;
-  margin-top: 8px;
-  line-height: 1.3;
-}
-
-.medalla-item.no-conseguida .medalla-nombre {
-  color: #78808c;
-}
-
-.medalla-placeholder-text { /* Para el "???" */
-  font-size: 0.8em;
-  color: #6a707a;
-  margin-top: 4px;
-}
-
-.no-medallas-text {
-  text-align: center;
-  color: #909090;
-  font-size: 1.15em;
-  padding: 40px 0;
-  font-style: italic;
-}
-
-.dialog-actions {
-  padding: 15px 25px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: #333842; /* Mismo fondo que el panel para cohesión */
-  text-align: right;
-}
-
-.close-button {
-  background-color: #6a7383;
-  color: #ffffff;
-  border: none;
-  padding: 10px 28px;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.close-button:hover {
-  background-color: #7d8899;
-  transform: translateY(-1px);
-}
-.close-button:active {
-  transform: translateY(0px);
-}
-
-/* Estilo para el MatTooltip personalizado */
-:host ::ng-deep .medalla-tooltip {
-  background-color: #22252a;
-  color: #c0c8d8;
-  font-size: 0.9em;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px;
-  padding: 8px 12px;
-  max-width: 250px; /* Para que no sea demasiado ancho */
-}
-
+/* Contenedor principal */
 .medallas-page-container {
-  padding: 25px;
-  max-width: 1000px;
+  padding: 30px;
+  max-width: 1200px;
   margin: 0 auto;
-  font-family: var(--font-family, 'Roboto', sans-serif);
+  animation: fadeIn 0.8s ease-out;
 }
 
+/* Título de la página */
 .page-title {
   text-align: center;
   font-size: 2rem;
-  color: var(--user-primary, #3f51b5);
-  margin-bottom: 30px;
-  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 35px;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 15px;
+  animation: fadeInScale 0.6s ease-out;
 }
 
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: 2px;
+}
+
+.section-separator {
+  margin-top: 50px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Estado de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 30px;
+  text-align: center;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e5e7eb;
+  animation: fadeInScale 0.6s ease-out;
+  margin: 40px auto;
+  max-width: 400px;
+}
+
+.loading-container p {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Grid de rangos */
 .rangos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 25px;
+  animation: fadeIn 0.8s ease-out;
 }
 
+/* Tarjeta de rango */
 .rango-card {
-  background-color: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 25px;
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--transition);
   position: relative;
   overflow: hidden;
+  border: 2px solid transparent;
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.rango-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
+  opacity: 0.7;
 }
 
 .rango-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
 }
 
+/* Estilos para rangos conseguidos */
 .rango-card.conseguida {
-  border: 2px solid gold;
+  border: 2px solid var(--gold);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.02) 100%);
 }
 
+.rango-card.conseguida::before {
+  background: linear-gradient(90deg, var(--gold), var(--gold-dark));
+  opacity: 1;
+}
+
+/* Estilos para rangos bloqueados */
 .rango-card.bloqueada {
-  background-color: #f5f5f5;
-  opacity: 0.85;
+  background-color: var(--light);
+  opacity: 0.9;
 }
 
+.rango-card.bloqueada::before {
+  background: linear-gradient(90deg, var(--secondary), var(--secondary));
+  opacity: 0.5;
+}
+
+/* Contenedor de imagen de rango */
 .rango-img-container {
   position: relative;
-  width: 100px;
-  height: 100px;
-  margin-bottom: 15px;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 86, 179, 0.05) 100%);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
 }
 
+.rango-card:hover .rango-img-container {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.rango-card.conseguida .rango-img-container {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.rango-card.bloqueada .rango-img-container {
+  background: linear-gradient(135deg, rgba(200, 200, 200, 0.1) 0%, rgba(200, 200, 200, 0.05) 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Imagen de rango */
 .rango-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: filter 0.3s ease;
+  transition: var(--transition);
 }
 
-.bloqueada .rango-img {
-  filter: grayscale(100%) opacity(0.7);
+.rango-card.bloqueada .rango-img {
+  filter: grayscale(100%) opacity(0.6);
 }
 
+/* Indicador de medalla conseguida */
 .medalla-conseguida-indicator {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #4caf50;
+  background-color: var(--success);
   border-radius: 50%;
-  padding: 2px;
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--white);
+  animation: fadeInScale 0.4s ease-out 0.2s both;
 }
 
 .medalla-conseguida-indicator mat-icon {
-  font-size: 20px;
-  color: white;
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  color: var(--white);
 }
 
+/* Indicador de medalla comprada */
+.medalla-comprada-indicator {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  background-color: var(--primary);
+  color: var(--white);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--white);
+  box-shadow: var(--shadow-sm);
+  animation: fadeInScale 0.4s ease-out 0.2s both;
+}
+
+.medalla-comprada-indicator mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Título de rango */
 .rango-title {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 700;
   margin: 10px 0;
-  color: var(--user-primary, #3f51b5);
+  color: var(--dark);
   text-align: center;
+  position: relative;
+  padding-bottom: 10px;
 }
 
-.bloqueada .rango-title {
-  color: #757575;
+.rango-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: var(--transition);
 }
 
+.rango-card:hover .rango-title::after {
+  width: 60px;
+}
+
+.rango-card.conseguida .rango-title {
+  color: var(--gold-dark);
+}
+
+.rango-card.conseguida .rango-title::after {
+  background: var(--gold);
+}
+
+.rango-card.bloqueada .rango-title {
+  color: var(--text-secondary);
+}
+
+.rango-card.bloqueada .rango-title::after {
+  background: var(--secondary);
+  width: 30px;
+}
+
+/* Fecha conseguida */
 .fecha-conseguida {
-  color: #4caf50;
-  font-size: 0.85rem;
-  margin: 5px 0;
+  color: var(--success);
+  font-size: 0.9rem;
+  margin: 10px 0;
   text-align: center;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
+.fecha-conseguida::before {
+  content: '🗓️';
+  font-size: 1.1em;
+}
+
+/* Descripción de rango */
 .rango-descripcion {
   text-align: center;
-  font-size: 0.9rem;
-  color: #555;
-  line-height: 1.4;
-  margin: 10px 0;
-  min-height: 40px;
+  font-size: 1rem;
+  color: var(--text-color);
+  line-height: 1.5;
+  margin: 15px 0;
+  min-height: 60px;
 }
 
+/* Información de rango bloqueado */
 .rango-bloqueado {
   text-align: center;
-  font-size: 0.9rem;
-  color: #757575;
-  line-height: 1.4;
-  margin: 10px 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 15px 0;
 }
 
+/* Puntos necesarios */
 .puntos-necesarios {
   text-align: center;
-  font-size: 0.9rem;
-  color: #ff9800;
-  font-weight: 500;
-  margin: 10px 0;
+  font-size: 1rem;
+  color: var(--warning);
+  font-weight: 600;
+  margin: 15px 0;
+  padding: 8px 15px;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: var(--border-radius);
+  display: inline-block;
 }
 
-.dialog-actions {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-}
-
-.dialog-actions button {
-  padding: 8px 25px;
-  font-weight: 500;
-}
-
+/* Contenedores de información */
 .rango-info-container, .rango-info-bloqueado {
   width: 100%;
   text-align: center;
-  min-height: 80px;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+/* Grid de medallas compradas */
+.medallas-compradas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Mensaje de medallas vacías */
+.empty-medals-message {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 86, 179, 0.05) 100%);
+  border-radius: var(--border-radius-lg);
+  margin: 30px 0;
+  border: 1px dashed rgba(0, 123, 255, 0.3);
+  color: var(--text-secondary);
+  font-size: 1.1em;
+  font-weight: 500;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.empty-medals-message p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Acciones del diálogo */
+.dialog-actions {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.dialog-actions button {
+  padding: 10px 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+.dialog-actions button:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+}
+
+.dialog-actions button:active {
+  transform: translateY(0);
+}
+
+/* Clase para texto muted */
+.text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* Efectos especiales para medallas conseguidas */
+.rango-card.conseguida {
+  position: relative;
+  overflow: hidden;
+}
+
+.rango-card.conseguida::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shine 3s infinite linear;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .medallas-page-container {
+    padding: 20px 15px;
+  }
+  
+  .rangos-grid,
+  .medallas-compradas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .rango-img-container {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .page-title {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+  }
+  
+  .rango-title {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .medallas-page-container {
+    padding: 15px 10px;
+  }
+  
+  .rangos-grid,
+  .medallas-compradas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
+  .rango-card {
+    padding: 15px;
+  }
+  
+  .rango-img-container {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .rango-title {
+    font-size: 1.1rem;
+  }
+  
+  .rango-descripcion,
+  .rango-bloqueado {
+    font-size: 0.9rem;
+    min-height: 50px;
+  }
+  
+  .dialog-actions button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Animaciones de entrada para elementos */
+.rango-card:nth-child(1) { animation-delay: 0.1s; }
+.rango-card:nth-child(2) { animation-delay: 0.2s; }
+.rango-card:nth-child(3) { animation-delay: 0.3s; }
+.rango-card:nth-child(4) { animation-delay: 0.4s; }
+.rango-card:nth-child(5) { animation-delay: 0.5s; }
+.rango-card:nth-child(6) { animation-delay: 0.6s; }
+.rango-card:nth-child(7) { animation-delay: 0.7s; }
+.rango-card:nth-child(8) { animation-delay: 0.8s; }
+
+/* Estados de focus para accesibilidad */
+.rango-card:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.dialog-actions button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

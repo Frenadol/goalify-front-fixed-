@@ -1,160 +1,438 @@
-.admin-dashboard-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 20px auto;
-  background-color: #f4f7f6; /* Fondo suave similar a welcome */
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #a0cfff;
+  --success: #28a745;
+  --success-dark: #1e7e34;
+  --success-light: #d4edda;
+  --danger: #dc3545;
+  --danger-dark: #c82333;
+  --warning: #ffc107;
+  --warning-dark: #e0a800;
+  --info: #17a2b8;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --text-muted: #555555;
+  --border-color: #d1d5db;
+  --border-focus: #007bff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  display: block;
 }
 
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Contenedor de página - CENTRADO VERTICALMENTE */
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.02) 0%, rgba(0, 86, 179, 0.02) 100%);
+  animation: fadeIn 0.8s ease-out;
+}
+
+.admin-dashboard-container {
+  padding: 40px;
+  max-width: 1400px; /* Aumentado para acomodar 4 tarjetas en línea */
+  width: 100%;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.6s ease-out;
+}
+
+.admin-dashboard-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+/* Header del admin */
 .admin-header {
   text-align: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 40px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  animation: fadeInScale 0.6s ease-out 0.2s both;
 }
 
 .admin-header h1 {
-  color: #2c3e50; /* Color oscuro */
+  color: var(--dark);
   font-size: 2.5em;
-  margin-bottom: 0.5em;
-  font-weight: 600;
+  margin-bottom: 15px;
+  font-weight: 700;
+  position: relative;
+}
+
+.admin-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: 2px;
 }
 
 .admin-header p {
-  color: #555; /* Color secundario */
-  font-size: 1.1em;
+  color: var(--text-secondary);
+  font-size: 1.2em;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
+/* Navegación del admin */
 .admin-nav {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   text-align: center;
+  animation: fadeIn 0.8s ease-out 0.4s both;
 }
 
-.admin-nav a {
+.admin-nav a,
+.admin-nav a.nav-link {
   margin: 0 15px;
-  padding: 10px 15px;
+  padding: 12px 20px;
   text-decoration: none;
-  color: #007bff;
-  font-weight: 500;
-  border-radius: 5px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  color: var(--primary);
+  font-weight: 600;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  display: inline-block;
+  border: 2px solid var(--primary);
+  background: transparent;
 }
 
-.admin-nav a:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.admin-nav a.nav-link { /* Estilo más específico para los enlaces de navegación */
-  margin: 0 15px;
-  padding: 10px 15px;
-  text-decoration: none;
-  color: #007bff;
-  font-weight: 500;
-  border-radius: 5px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  display: inline-block; /* Para que el padding y margin funcionen bien */
-}
-
+.admin-nav a:hover,
 .admin-nav a.nav-link:hover {
-  background-color: #007bff;
-  color: white;
-  text-decoration: none; /* Quitar subrayado al pasar el mouse si lo tuviera */
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
+/* Contenido del admin */
 .admin-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  min-height: 200px; /* Para darle algo de espacio */
-  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  min-height: 200px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 123, 255, 0.1);
 }
 
+/* Grid de acciones del admin - MODIFICADO PARA 4 COLUMNAS */
 .admin-actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajusta minmax según el tamaño deseado */
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
   gap: 25px;
-  margin-top: 20px;
-  padding: 0 15px; /* Añade un poco de padding lateral si es necesario */
+  margin-top: 30px;
+  padding: 0 15px;
+  animation: fadeIn 0.8s ease-out 0.6s both;
 }
 
+/* Tarjetas de acción del admin */
 .admin-action-card {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 25px 20px;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 25px 20px; /* Reducido padding horizontal para que quepan mejor */
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: var(--transition);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.07);
-  position: relative; /* Para posicionar el spinner */
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInScale 0.6s ease-out;
+  min-height: 200px; /* Altura mínima consistente */
+}
+
+.admin-action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .admin-action-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.12); /* Sombra más pronunciada al pasar el mouse */
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--primary);
 }
 
+.admin-action-card:hover::before {
+  opacity: 1;
+}
+
+/* Icono de la tarjeta */
 .admin-action-card-icon {
-  margin-bottom: 15px;
+  margin-bottom: 15px; /* Reducido margen */
+  position: relative;
 }
 
 .admin-action-card-icon .material-icons-outlined {
-  font-size: 48px; /* Tamaño del icono */
-  color: #007bff; /* Color primario para el icono */
+  font-size: 2.5em !important; /* Reducido tamaño del icono */
+  color: var(--primary);
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 12px; /* Reducido padding */
+  transition: var(--transition);
+  animation: float 3s ease-in-out infinite;
 }
 
+.admin-action-card:hover .admin-action-card-icon .material-icons-outlined {
+  background: rgba(0, 123, 255, 0.2);
+  transform: scale(1.1);
+  color: var(--primary-dark);
+}
+
+/* Título de la tarjeta */
 .admin-action-card-title {
-  font-size: 1.25rem;
-  color: #333;
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-weight: 600;
+  font-size: 1.1rem; /* Reducido tamaño de fuente */
+  color: var(--dark);
+  margin: 0 0 12px 0; /* Reducido margen */
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 8px;
+  line-height: 1.3;
 }
 
+.admin-action-card-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px; /* Reducido ancho */
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: var(--transition);
+}
+
+.admin-action-card:hover .admin-action-card-title::after {
+  width: 45px;
+}
+
+/* Descripción de la tarjeta */
 .admin-action-card-description {
-  font-size: 0.9rem;
-  color: #666;
-  line-height: 1.5;
-  min-height: 4.5em; /* Para alinear tarjetas con descripciones de diferente longitud (3 líneas aprox) */
+  font-size: 0.9rem; /* Reducido tamaño de fuente */
+  color: var(--text-secondary);
+  line-height: 1.4;
+  min-height: 3.5em; /* Reducido altura mínima */
+  font-weight: 500;
 }
 
+/* Footer del admin */
 .admin-footer {
-  margin-top: 40px;
+  margin-top: 50px;
   text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+  padding-top: 25px;
+  border-top: 1px solid var(--border-color);
+  animation: fadeIn 0.8s ease-out 0.8s both;
 }
 
+/* Botones */
 .btn {
-  padding: 10px 20px;
+  padding: 12px 25px;
   font-size: 1em;
-  border-radius: 5px;
+  font-weight: 600;
+  border-radius: var(--border-radius);
   cursor: pointer;
   border: none;
-  transition: background-color 0.3s ease;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-danger {
-  background-color: #dc3545;
-  color: white;
+  background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+  color: var(--white);
 }
 
 .btn-danger:hover {
-  background-color: #c82333;
+  background: linear-gradient(135deg, var(--danger-dark) 0%, var(--danger) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
+.btn-danger:active {
+  transform: translateY(0);
+}
+
+/* Contenedor del spinner */
 .card-spinner-container {
   position: absolute;
-  bottom: 10px; /* Ajusta según necesites */
+  bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .admin-actions-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas medianas */
+    gap: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 20px 15px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  
+  .admin-dashboard-container {
+    padding: 25px 20px;
+  }
+  
+  .admin-header h1 {
+    font-size: 2rem;
+  }
+  
+  .admin-header p {
+    font-size: 1.1em;
+  }
+  
+  .admin-actions-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en móviles */
+    gap: 20px;
+    padding: 0 10px;
+  }
+  
+  .admin-action-card {
+    padding: 20px 15px;
+    min-height: 180px;
+  }
+  
+  .admin-nav a,
+  .admin-nav a.nav-link {
+    margin: 5px 10px;
+    padding: 10px 15px;
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 15px 10px;
+    padding-top: 30px;
+  }
+  
+  .admin-dashboard-container {
+    padding: 20px 15px;
+  }
+  
+  .admin-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .admin-actions-grid {
+    grid-template-columns: 1fr; /* 1 columna en móviles pequeños */
+    gap: 15px;
+    padding: 0 5px;
+  }
+  
+  .admin-action-card {
+    padding: 20px 15px;
+    min-height: 160px;
+  }
+  
+  .admin-action-card-icon .material-icons-outlined {
+    font-size: 2.2em !important;
+    padding: 10px;
+  }
+  
+  .admin-action-card-title {
+    font-size: 1.1rem;
+  }
+  
+  .admin-action-card-description {
+    font-size: 0.9rem;
+  }
+}
+
+/* Animaciones de entrada para tarjetas */
+.admin-action-card:nth-child(1) { animation-delay: 0.1s; }
+.admin-action-card:nth-child(2) { animation-delay: 0.2s; }
+.admin-action-card:nth-child(3) { animation-delay: 0.3s; }
+.admin-action-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Estados de focus para accesibilidad */
+.admin-action-card:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

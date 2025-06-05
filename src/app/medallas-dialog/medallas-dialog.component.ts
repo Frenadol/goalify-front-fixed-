@@ -6,6 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../auth.service';
+import { UserPurchasesService } from '../market/user-purchases.service';
+import { MarketItem } from '../market/market-item.model';
+import { map } from 'rxjs';
 
 interface Rango {
   nombre: string;
@@ -15,6 +18,15 @@ interface Rango {
   mensajeMotivacional: string;
   puntosMinimos: number;
   fechaConseguida?: string;
+}
+
+// Añadir una nueva interfaz para las medallas compradas
+interface MedallaComprada {
+  id: string;
+  nombre: string;
+  icono: string;
+  fechaAdquisicion?: string;
+  descripcion?: string;
 }
 
 @Component({
@@ -45,6 +57,9 @@ export class MedallasDialogComponent implements OnInit {
   
   // Medallas procesadas que se mostrarán en la UI
   medallas: Rango[] = [];
+  
+  // Añadir esta propiedad para guardar las medallas compradas
+  medallasCompradas: MedallaComprada[] = [];
 
   // Ruta para la imagen de medalla desconocida
   readonly MEDALLA_DESCONOCIDA_PATH = 'assets/rangos/medalladesconocida.png';
@@ -58,33 +73,41 @@ export class MedallasDialogComponent implements OnInit {
   
   isLoading: boolean = true;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userPurchasesService: UserPurchasesService
+  ) {}
 
   ngOnInit(): void {
     this.isLoading = true;
     
-    // Suscripción al usuario actual para obtener su rango y puntos reales
-    this.authService.currentUser.subscribe(user => {
-      if (user) {
-        this.usuarioRangoActual = user.rango || 'NOVATO'; // Valor por defecto si no tiene rango
-        this.usuarioPuntosActuales = user.puntosTotales || 0; // Puntos actuales
-        
-        // Cargar fechas (si existen)
-        this.fechasConseguidas = user.fechasRangosConseguidos || {};
-        
-        // Si el usuario tiene rangos conseguidos guardados, los usamos
-        this.inicializarMedallas();
-      } else {
-        // Si no hay usuario, mostramos todos los rangos como bloqueados
-        this.usuarioRangoActual = 'NOVATO';
-        this.usuarioPuntosActuales = 0;
-        this.inicializarMedallas();
+    // Cargar los rangos como ya lo hacías antes
+    this.inicializarMedallas();
+    
+    // Usar getUserPurchases
+    this.userPurchasesService.getUserPurchases().subscribe({
+      next: (compras: any[]) => {
+        // Filtrar solo los items de tipo MEDALLA
+        this.medallasCompradas = compras
+          .filter(item => item.tipoArticulo === 'MEDALLA')
+          .map(item => ({
+            id: item.id,
+            nombre: item.nombre,
+            icono: item.imagenPreviewUrl || 'assets/rangos/medalladefault.png',
+            fechaAdquisicion: item.fechaAdquisicion ? new Date(item.fechaAdquisicion).toLocaleDateString() : undefined,
+            descripcion: item.descripcion
+          }));
+          
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error cargando medallas compradas:', error);
+        this.medallasCompradas = [];
+        this.isLoading = false;
       }
-      
-      this.isLoading = false;
     });
   }
-
+  
   cargarFechasConseguidas(): void {
     // Simulación - En producción esto vendría de una API
     const fechasRangos = {
@@ -156,4 +179,14 @@ export class MedallasDialogComponent implements OnInit {
   getRangoIcono(medalla: Rango): string {
     return medalla.conseguida ? medalla.icono : this.MEDALLA_DESCONOCIDA_PATH;
   }
-}
+
+  // Método para cargar rangos del usuario
+  private cargarRangosUsuario() {
+    return this.authService.currentUser.pipe(
+      map(user => {
+        return user;
+      })
+    );
+  }
+} // Solo UNA llave de cierre aquí
+

@@ -24,6 +24,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ChallengeDetailDialogComponent } from '../shared/challenge-detail-dialog/challenge-detail-dialog.component';
 import { ProfileDisplayPreferences } from './user-profile.models';
+import { UserPurchasesService } from '../market/user-purchases.service';
+import { ProfilePhotoDialogComponent } from '../shared/profile-photo-dialog/profile-photo-dialog.component';
+import { MarketItem } from '../market/market-item.model';
 
 export interface HabitStats {
   totalCompletionsToday: number;
@@ -149,6 +152,9 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     showChallengePointsOnCard: true,
   };
 
+  // Añadir esta propiedad a la clase (si no existe ya)
+  purchasedAvatars: {id: string, url: string, nombre: string}[] = [];
+
   constructor(
     public authService: AuthService,
     private snackBar: MatSnackBar,
@@ -156,7 +162,8 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
     private habitService: HabitService,
     private dialog: MatDialog,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private userPurchasesService: UserPurchasesService
   ) {
     this.bioEditForm = this.fb.group({
       biografia: ['', [Validators.maxLength(500)]]
@@ -190,6 +197,9 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
         
         // Cargar datos del perfil (desafíos, estadísticas, etc.)
         this.fetchProfileData();
+        
+        // Cargar avatares comprados por el usuario
+        this.loadPurchasedAvatars();
       }
       this.isLoading = false;
     });
@@ -592,4 +602,89 @@ export class UserProfileDetailsComponent implements OnInit, OnDestroy {
   onRankImageError(event: Event) {
     (event.target as HTMLImageElement).src = this.defaultRankIcon;
   }
+
+  // Método para cargar los avatares comprados por el usuario
+  private loadPurchasedAvatars(): void {
+    // Solo intenta cargar si el usuario está autenticado
+    if (!this.authService.isAuthenticated()) {
+      this.purchasedAvatars = [];
+      console.log('Usuario no autenticado, no se cargarán avatares');
+      return;
+    }
+    
+    this.userPurchasesService.getUserPurchases()
+      .pipe(
+        map(purchases => purchases.filter(item => 
+          item.tipoArticulo === 'AVATAR_PERFIL' && item.activo === true
+        ))
+      )
+      .subscribe({
+        next: (avatars) => {
+          this.purchasedAvatars = avatars.map(avatar => ({
+            id: avatar.id,
+            url: avatar.imagenPreviewUrl || '',
+            nombre: avatar.nombre
+          }));
+          console.log('Avatares cargados:', this.purchasedAvatars.length);
+        },
+        error: (err) => {
+          console.error('Error al cargar los avatares comprados:', err);
+          this.purchasedAvatars = [];
+        }
+      });
+  }
+
+  // Añade este método a la clase UserProfileDetailsComponent
+  public openProfilePhotoDialog(): void {
+  // Si no hay usuario autenticado, no abras el diálogo
+  if (!this.currentUser) {
+    this.snackBar.open('Debes iniciar sesión para cambiar la foto de perfil', 'Cerrar', {
+      duration: 3000
+    });
+    return;
+  }
+  
+  // Asegúrate que purchasedAvatars esté inicializado
+  const purchasedAvatars = this.purchasedAvatars || [];
+  
+  const dialogRef = this.dialog.open(ProfilePhotoDialogComponent, {
+    width: '500px',
+    data: {
+      currentPhotoUrl: this.currentUser?.fotoPerfil,
+      purchasedAvatars: purchasedAvatars
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.updateProfilePhoto(result);
+    }
+  });
+}
+
+  private updateProfilePhoto(photoUrl: string): void {
+  if (!this.currentUser) return;
+
+  console.log('Intentando actualizar foto de perfil:', 
+    photoUrl.substring(0, 50) + '...' + 
+    (photoUrl.length > 100 ? ' (imagen base64 de ' + Math.round(photoUrl.length / 1024) + ' KB)' : ' (URL)'));
+
+  this.isLoading = true;
+  this.authService.updateUserProfilePhoto(photoUrl).subscribe({
+    next: () => {
+      console.log('Foto de perfil actualizada con éxito');
+      this.snackBar.open('Foto de perfil actualizada con éxito', 'Cerrar', {
+        duration: 3000
+      });
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error detallado al actualizar la foto de perfil:', error);
+      this.snackBar.open('Error al actualizar la foto de perfil', 'Cerrar', {
+        duration: 5000
+      });
+      this.isLoading = false;
+    }
+  });
+}
 }
