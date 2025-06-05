@@ -1,110 +1,525 @@
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #a0cfff;
+  --success: #28a745;
+  --success-dark: #1e7e34;
+  --success-light: #d4edda;
+  --danger: #dc3545;
+  --danger-dark: #c82333;
+  --warning: #ffc107;
+  --warning-dark: #e0a800;
+  --info: #17a2b8;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --text-muted: #555555;
+  --border-color: #d1d5db;
+  --border-focus: #007bff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  display: block;
+  background-color: var(--white);
+  min-height: 100vh;
+  padding: 30px 20px;
+}
+
+/* Animaciones base */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0.5; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Contenedor principal */
+.page-container {
+  background-color: var(--white);
+  min-height: 100vh;
+  animation: fadeIn 0.8s ease-out;
+}
+
 .my-challenges-container {
   max-width: 1200px;
-  margin: 30px auto;
-  padding: 25px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInScale 0.6s ease-out forwards;
 }
 
+.my-challenges-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Header profesional */
 .list-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 35px;
+  margin-bottom: 25px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 2px solid rgba(0, 123, 255, 0.1);
+  position: relative;
+  animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
-.list-header h1 {
-  font-size: 2.4em;
-  color: #2c3e50;
+.list-header h2 {
   margin: 0;
-  font-weight: 600;
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 2.4em;
+  position: relative;
+  display: inline-block;
+}
+
+.list-header h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px;
+  animation: slideUp 0.8s ease-out 0.8s both;
+}
+
+/* Subheader */
+.sub-header {
+  font-size: 1.1em;
+  color: var(--text-secondary);
+  margin: 0 0 30px 0;
+  line-height: 1.6;
+  max-width: 800px;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+  position: relative;
+}
+
+.sub-header::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 4px;
+  opacity: 0.6;
+}
+
+/* Contenedor de filtros */
+.filters-container {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.03) 0%, rgba(0, 86, 179, 0.03) 100%);
+  padding: 25px;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  animation: fadeInUp 0.6s ease-out 0.6s both;
 }
 
-.list-header h1 mat-icon {
-  font-size: 1.3em;
-  margin-right: 12px;
-  color: #007bff; /* O tu color primario */
+/* Campos de búsqueda y filtro */
+.search-field {
+  flex: 1;
+  min-width: 250px;
 }
 
-.loading-indicator, .empty-state, .error-message {
-  text-align: center;
-  padding: 50px 20px;
-  color: #6c757d;
+.filter-field {
+  width: 200px;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: var(--border-color);
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: var(--primary);
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-label {
+  color: var(--text-secondary);
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-label {
+  color: var(--primary);
+}
+
+::ng-deep .mat-input-element {
+  color: var(--text-color);
+}
+
+::ng-deep .mat-select-value {
+  color: var(--text-color);
+}
+
+::ng-deep .mat-form-field-appearance-outline:hover .mat-form-field-outline {
+  color: rgba(0, 123, 255, 0.5);
+}
+
+/* Estados de carga, error y vacío */
+.loading-indicator, .error-message, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  justify-content: center;
+  padding: 50px 30px;
   margin: 20px 0;
+  text-align: center;
+  border-radius: var(--border-radius-lg);
+  animation: fadeInUp 0.6s ease-out;
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e5e7eb;
 }
 
-.loading-indicator p, .empty-state p {
+.loading-indicator {
+  color: var(--text-muted);
+}
+
+.loading-indicator p {
+  margin-top: 20px;
   font-size: 1.2em;
-  line-height: 1.6;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .error-message {
-  background-color: #f8d7da;
-  color: #842029;
-  border: 1px solid #f5c2c7;
+  color: #721c24;
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 1px solid #f5c6cb;
+  position: relative;
 }
 
 .error-message mat-icon {
-  font-size: 1.8em;
+  font-size: 3rem !important;
+  color: var(--danger) !important;
+  margin-bottom: 15px;
+}
+
+.error-message p {
+  margin: 0 0 20px 0;
+  font-size: 1.2em;
+  font-weight: 500;
+  max-width: 500px;
+}
+
+.error-message button {
+  background: rgba(220, 53, 69, 0.1) !important;
+  color: var(--danger) !important;
+  border: 2px solid var(--danger) !important;
+  padding: 10px 20px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+}
+
+.error-message button:hover {
+  background: rgba(220, 53, 69, 0.2) !important;
+  transform: translateY(-2px);
 }
 
 .empty-state {
-  text-align: center;
-  padding: 50px 20px; /* Mantenemos un buen padding en el contenedor */
-  color: #6c757d;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  margin: 20px 0;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.02) 0%, rgba(0, 86, 179, 0.02) 100%);
+  border: 2px dashed rgba(0, 123, 255, 0.2);
+  position: relative;
 }
 
-.empty-state .empty-icon {
-  font-size: 3rem;  /* Un tamaño notable, equivalente a aprox 48px si 1rem = 16px */
-  color: #adb5bd;   /* Color actual del icono */
-  width: 3rem;      /* Ancho explícito igual al font-size */
-  height: 3rem;     /* Alto explícito igual al font-size */
-  display: flex;    /* Usar flex para centrar el contenido del icono (el glifo) */
-  align-items: center; /* Centrado vertical del glifo */
-  justify-content: center; /* Centrado horizontal del glifo */
-  line-height: 1;   /* Evita problemas de altura de línea con iconos de fuente */
-  margin-bottom: 15px; /* Espacio debajo del icono, antes del texto */
-  overflow: visible; /* Asegurar que el glifo no se corte si excede la caja (aunque no debería con flex center) */
-  /* Para depurar, puedes añadir un borde: */
-  /* border: 1px solid red; */
+.empty-icon {
+  font-size: 4rem !important;
+  color: var(--text-secondary) !important;
+  margin-bottom: 20px !important;
+  width: 4rem !important;
+  height: 4rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.empty-state p {
+  margin: 10px 0;
+  color: var(--text-secondary);
+  font-size: 1.2em;
+  line-height: 1.5;
+  max-width: 500px;
+  font-weight: 500;
 }
 
 .empty-state a {
-  color: #007bff;
+  color: var(--primary);
   text-decoration: none;
-  font-weight: 500;
-}
-.empty-state a:hover {
-  text-decoration: underline;
+  font-weight: 600;
+  transition: var(--transition);
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
 }
 
+.empty-state a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.empty-state a:hover::after {
+  width: 100%;
+}
+
+.empty-state a:hover {
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Grid de desafíos */
 .challenges-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 30px;
+  animation: fadeInUp 0.6s ease-out 0.8s both;
 }
 
-/* Estilo opcional para diferenciar las tarjetas en esta vista si es necesario */
+/* Estilos para las tarjetas de desafío */
+::ng-deep app-challenge-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.challenges-grid ::ng-deep app-challenge-card:nth-child(1) { animation-delay: 0.1s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(2) { animation-delay: 0.2s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(3) { animation-delay: 0.3s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(4) { animation-delay: 0.4s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(5) { animation-delay: 0.5s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Estilos para las tarjetas de usuario */
 .user-challenge-card {
-  /* Podrías añadir un borde o algo sutil si quieres */
-  /* border-left: 4px solid #28a745; */ /* Ejemplo de un borde verde */
+  border-left: 4px solid var(--primary);
+  transition: var(--transition);
+}
+
+.user-challenge-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :host {
+    padding: 20px 15px;
+  }
+  
+  .my-challenges-container {
+    padding: 30px 20px;
+  }
+  
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .list-header h2 {
+    font-size: 2em;
+  }
+  
+  .sub-header {
+    font-size: 1em;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+  
+  .search-field, .filter-field {
+    width: 100%;
+  }
+  
+  .challenges-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-challenges-container {
+    padding: 25px 15px;
+  }
+  
+  .list-header h2 {
+    font-size: 1.8em;
+  }
+  
+  .empty-icon {
+    font-size: 3rem !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    padding: 15px;
+  }
+  
+  .empty-state p, .error-message p, .loading-indicator p {
+    font-size: 1.1em;
+  }
+}
+
+/* Asegurando que todos los textos sean visibles */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, label, li, div {
+  color: var(--text-color);
+}
+
+/* Estados de focus para accesibilidad */
+::ng-deep .mat-form-field:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+::ng-deep .mat-button:focus,
+::ng-deep .mat-stroked-button:focus,
+::ng-deep .mat-raised-button:focus,
+::ng-deep .mat-icon-button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Efectos adicionales */
+.my-challenges-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.my-challenges-container:hover::after {
+  opacity: 1;
+}
+
+/* Mejoras para Angular Material */
+::ng-deep .mat-progress-spinner circle {
+  stroke: var(--primary) !important;
+}
+
+/* Estilos para botones de Material */
+::ng-deep .mat-stroked-button {
+  border: 2px solid var(--primary) !important;
+  color: var(--primary) !important;
+  padding: 8px 16px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+}
+
+::ng-deep .mat-stroked-button:hover {
+  background: rgba(0, 123, 255, 0.05) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .mat-raised-button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  color: var(--white) !important;
+  padding: 8px 16px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3) !important;
+}
+
+::ng-deep .mat-raised-button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #004085 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4) !important;
+}
+
+/* Estilos para iconos en botones */
+::ng-deep .mat-button .mat-icon,
+::ng-deep .mat-stroked-button .mat-icon,
+::ng-deep .mat-raised-button .mat-icon,
+::ng-deep .mat-icon-button .mat-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }

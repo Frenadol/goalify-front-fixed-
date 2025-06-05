@@ -1,72 +1,478 @@
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #a0cfff;
+  --success: #28a745;
+  --success-dark: #1e7e34;
+  --success-light: #d4edda;
+  --danger: #dc3545;
+  --danger-dark: #c82333;
+  --warning: #ffc107;
+  --warning-dark: #e0a800;
+  --info: #17a2b8;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --text-muted: #555555;
+  --border-color: #d1d5db;
+  --border-focus: #007bff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  display: block;
+  background-color: var(--white);
+  min-height: 100vh;
+  padding: 30px 20px;
+}
+
+/* Animaciones base (SIN shimmer) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+  40%, 43% { transform: translate3d(0, -8px, 0); }
+  70% { transform: translate3d(0, -4px, 0); }
+  90% { transform: translate3d(0, -2px, 0); }
+}
+
+/* Contenedor principal */
+.page-container {
+  background-color: var(--white);
+  min-height: 100vh;
+  animation: fadeIn 0.8s ease-out;
+}
 
 .challenge-list-container {
   max-width: 1200px;
-  margin: 30px auto; /* Más margen */
-  padding: 25px; /* Más padding */
-  background-color: #f8f9fa; /* Un fondo muy sutil para la sección */
-  border-radius: 12px; /* Bordes redondeados para el contenedor general */
+  margin: 0 auto;
+  padding: 40px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInScale 0.6s ease-out forwards;
 }
 
+/* Borde superior estático (SIN animación) */
+.challenge-list-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.challenge-list-container:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Header profesional */
 .list-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px; /* Espacio entre icono y título */
-  margin-bottom: 35px; /* Más espacio */
-  padding-bottom: 20px;
-  border-bottom: 1px solid #dee2e6; /* Borde más sutil */
+  margin-bottom: 40px;
+  padding-bottom: 25px;
+  border-bottom: 2px solid rgba(0, 123, 255, 0.1);
+  position: relative;
+  animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
 .list-header h1 {
-  font-size: 2.4em; /* Título más grande */
-  color: #2c3e50; /* Color oscuro principal */
   margin: 0;
-  font-weight: 600;
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 2.4em;
   display: flex;
   align-items: center;
-}
-.list-header h1 mat-icon {
-  font-size: 1.3em; /* Icono del título un poco más grande */
-  margin-right: 12px;
-  color: #007bff; /* Color primario, asegúrate que coincida con tu tema */
+  position: relative;
 }
 
-/* Indicador de carga, mensajes de error y estado vacío */
-.loading-indicator, .empty-state, .error-message {
-  text-align: center;
-  padding: 50px 20px; /* Más padding para estos estados */
-  color: #6c757d; /* Un gris más suave */
+.list-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  width: 100px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px;
+  animation: slideUp 0.8s ease-out 0.8s both;
+}
+
+.list-header h1 mat-icon {
+  font-size: 1.3em;
+  margin-right: 15px;
+  color: var(--primary);
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 12px;
+  transition: var(--transition);
+}
+
+.list-header:hover h1 mat-icon {
+  background: rgba(0, 123, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Botón crear desafío */
+.create-challenge-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  color: var(--white) !important;
+  padding: 12px 24px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3) !important;
+  border: none !important;
+}
+
+.create-challenge-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.7s ease;
+}
+
+.create-challenge-btn:hover::before {
+  left: 100%;
+}
+
+.create-challenge-btn:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #004085 100%) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4) !important;
+}
+
+/* Estados de carga, error y vacío */
+.loading-indicator, .error-message, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px; /* Más espacio entre icono y texto */
-  border-radius: 8px; /* Bordes para estos contenedores */
-  background-color: #fff; /* Fondo blanco para destacar */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Sombra sutil */
+  justify-content: center;
+  padding: 50px 30px;
   margin: 20px 0;
+  text-align: center;
+  border-radius: var(--border-radius-lg);
+  animation: fadeInUp 0.6s ease-out;
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e5e7eb;
 }
-.loading-indicator p, .empty-state p { font-size: 1.2em; line-height: 1.6; }
+
+.loading-indicator {
+  color: var(--text-muted);
+}
+
+.loading-indicator p {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
 
 .error-message {
-  background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;
+  color: #721c24;
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 1px solid #f5c6cb;
+  position: relative;
 }
-.error-message mat-icon { font-size: 1.8em; } /* Icono de error más grande */
 
-.empty-state .empty-icon {
-  font-size: 5em; /* Icono de estado vacío más grande */
-  color: #adb5bd; /* Un gris aún más suave */
-  margin-bottom: 10px;
+.error-message mat-icon {
+  font-size: 3rem !important;
+  color: var(--danger) !important;
+  margin-bottom: 15px;
+}
+
+.error-message p {
+  margin: 0 0 20px 0;
+  font-size: 1.2em;
+  font-weight: 500;
+  max-width: 500px;
+}
+
+.error-message button {
+  background: rgba(220, 53, 69, 0.1) !important;
+  color: var(--danger) !important;
+  border: 2px solid var(--danger) !important;
+  padding: 10px 20px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+}
+
+.error-message button:hover {
+  background: rgba(220, 53, 69, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+.empty-state {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.02) 0%, rgba(0, 86, 179, 0.02) 100%);
+  border: 2px dashed rgba(0, 123, 255, 0.2);
+  position: relative;
+}
+
+.empty-icon {
+  font-size: 5em !important;
+  color: var(--text-secondary) !important;
+  margin-bottom: 20px !important;
+  width: 5em !important;
+  height: 5em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.empty-state p {
+  margin: 10px 0;
+  color: var(--text-secondary);
+  font-size: 1.2em;
+  line-height: 1.5;
+  max-width: 500px;
+  font-weight: 500;
 }
 
 /* Grid de desafíos */
 .challenges-grid {
   display: grid;
-  /* Usar minmax para responsividad y auto-fill para llenar el espacio */
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); /* Ajusta minmax para el tamaño deseado de las tarjetas */
-  gap: 30px; /* Espacio entre tarjetas */
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 30px;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
 }
 
-/* Estilos para cuando solo hay una tarjeta, para centrarla (opcional) */
-.challenges-grid:has(app-challenge-card:only-child) {
-  /* grid-template-columns: minmax(340px, 500px); /* O un ancho fijo/máximo */
-  /* justify-content: center; */
+/* Estilos para las tarjetas de desafío */
+::ng-deep app-challenge-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.challenges-grid ::ng-deep app-challenge-card:nth-child(1) { animation-delay: 0.1s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(2) { animation-delay: 0.2s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(3) { animation-delay: 0.3s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(4) { animation-delay: 0.4s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(5) { animation-delay: 0.5s; }
+.challenges-grid ::ng-deep app-challenge-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  :host {
+    padding: 20px 15px;
+  }
+  
+  .challenge-list-container {
+    padding: 30px 20px;
+  }
+  
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .list-header h1 {
+    font-size: 2em;
+  }
+  
+  .create-challenge-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .challenges-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .challenge-list-container {
+    padding: 25px 15px;
+  }
+  
+  .list-header h1 {
+    font-size: 1.8em;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .list-header h1 mat-icon {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+  
+  .empty-icon {
+    font-size: 4em !important;
+    width: 4em !important;
+    height: 4em !important;
+    padding: 15px;
+  }
+  
+  .empty-state p, .error-message p, .loading-indicator p {
+    font-size: 1.1em;
+  }
+}
+
+/* Asegurando que todos los textos sean visibles */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, label, li, div {
+  color: var(--text-color);
+}
+
+/* Estados de focus para accesibilidad */
+::ng-deep .mat-button:focus,
+::ng-deep .mat-stroked-button:focus,
+::ng-deep .mat-raised-button:focus,
+::ng-deep .mat-icon-button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Mejoras para Angular Material */
+::ng-deep .mat-progress-spinner circle,
+::ng-deep .mat-spinner circle {
+  stroke: var(--primary) !important;
+}
+
+/* Estilos para botones de Material */
+::ng-deep .mat-stroked-button {
+  border: 2px solid var(--primary) !important;
+  color: var(--primary) !important;
+  padding: 8px 16px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+}
+
+::ng-deep .mat-stroked-button:hover {
+  background: rgba(0, 123, 255, 0.05) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .mat-raised-button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  color: var(--white) !important;
+  padding: 8px 16px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3) !important;
+}
+
+::ng-deep .mat-raised-button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #004085 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4) !important;
+}
+
+::ng-deep .mat-flat-button {
+  background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%) !important;
+  color: var(--white) !important;
+  padding: 8px 16px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3) !important;
+}
+
+::ng-deep .mat-flat-button:hover {
+  background: linear-gradient(135deg, var(--warning-dark) 0%, #d39e00 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4) !important;
+}
+
+/* Estilos para iconos en botones */
+::ng-deep .mat-button .mat-icon,
+::ng-deep .mat-stroked-button .mat-icon,
+::ng-deep .mat-raised-button .mat-icon,
+::ng-deep .mat-flat-button .mat-icon,
+::ng-deep .mat-icon-button .mat-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Efectos adicionales sin animación continua */
+.challenge-list-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.challenge-list-container:hover::after {
+  opacity: 1;
 }

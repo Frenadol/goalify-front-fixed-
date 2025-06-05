@@ -1,0 +1,546 @@
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --primary-light: #a0cfff;
+  --success: #28a745;
+  --success-dark: #1e7e34;
+  --success-light: #d4edda;
+  --danger: #dc3545;
+  --danger-dark: #c82333;
+  --warning: #ffc107;
+  --warning-dark: #e0a800;
+  --info: #17a2b8;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --text-muted: #555555;
+  --border-color: #d1d5db;
+  --border-focus: #007bff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  display: block;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Contenedor principal */
+:host {
+  animation: fadeInScale 0.4s ease-out;
+}
+
+/* Título del diálogo */
+::ng-deep .mat-mdc-dialog-title {
+  color: var(--dark) !important;
+  font-size: 1.5em !important;
+  font-weight: 700 !important;
+  margin: 0 0 20px 0 !important;
+  padding: 0 0 15px 0 !important;
+  border-bottom: 2px solid var(--border-color) !important;
+  position: relative;
+  text-align: center;
+}
+
+::ng-deep .mat-mdc-dialog-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+/* Contenido del diálogo */
+::ng-deep .mat-mdc-dialog-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Pestañas de navegación */
+.tabs {
+  display: flex;
+  margin-bottom: 25px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background: var(--light);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.tabs button {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 1em;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.tabs button::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.tabs button:hover {
+  background: rgba(0, 123, 255, 0.05);
+  color: var(--primary);
+}
+
+.tabs button.active {
+  background: var(--white);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.tabs button.active::before {
+  transform: scaleX(1);
+}
+
+.tabs button mat-icon {
+  font-size: 1.2em;
+  transition: var(--transition);
+}
+
+.tabs button:hover mat-icon,
+.tabs button.active mat-icon {
+  transform: scale(1.1);
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+  min-height: 350px;
+  padding: 20px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Pestaña de subida */
+.upload-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+.preview-container {
+  width: 100%;
+  max-width: 300px;
+  height: 250px;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  border: 2px dashed var(--border-color);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.02) 0%, rgba(0, 86, 179, 0.02) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition);
+  position: relative;
+}
+
+.preview-container:hover {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 86, 179, 0.05) 100%);
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  animation: fadeInScale 0.4s ease-out;
+}
+
+.no-preview {
+  color: var(--text-secondary);
+  font-size: 1.1em;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+.no-preview::before {
+  content: '📷';
+  font-size: 3em;
+  opacity: 0.5;
+}
+
+/* Contenedor de input de archivo */
+.file-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.file-input-container button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 1em;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.file-input-container button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.file-input-container button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+.file-input-container button mat-icon {
+  font-size: 1.2em;
+}
+
+.file-input-container span {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  font-weight: 500;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  padding: 10px 15px;
+  background: rgba(0, 123, 255, 0.05);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Pestaña de avatares */
+.avatars-tab {
+  padding: 0;
+}
+
+.avatars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.avatar-item {
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.avatar-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--primary);
+}
+
+.avatar-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.avatar-item img.selected {
+  border: 3px solid var(--success);
+}
+
+.avatar-item.selected {
+  border-color: var(--success);
+  background: var(--success-light);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.avatar-item.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--success);
+  color: var(--white);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: bold;
+  animation: fadeInScale 0.3s ease-out;
+}
+
+.avatar-name {
+  font-size: 0.85em;
+  font-weight: 500;
+  padding: 12px 8px;
+  color: var(--text-color);
+  background: rgba(0, 123, 255, 0.02);
+  border-top: 1px solid rgba(0, 123, 255, 0.1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.avatar-item.selected .avatar-name {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--success-dark);
+  font-weight: 600;
+}
+
+/* Estado sin avatares */
+.no-avatars {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: rgba(0, 123, 255, 0.02);
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed rgba(0, 123, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.no-avatars mat-icon {
+  font-size: 3em !important;
+  width: 3em !important;
+  height: 3em !important;
+  color: var(--text-muted) !important;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 15px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.no-avatars p {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Botones de acción */
+::ng-deep .mat-mdc-dialog-actions {
+  margin: 0 !important;
+  padding: 20px 24px !important;
+  border-top: 1px solid var(--border-color) !important;
+  background: rgba(0, 123, 255, 0.02) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions button {
+  min-width: 100px !important;
+  padding: 10px 20px !important;
+  border-radius: var(--border-radius) !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions .mat-mdc-button {
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions .mat-mdc-button:hover {
+  background: rgba(0, 123, 255, 0.05) !important;
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions .mat-mdc-raised-button {
+  background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%) !important;
+  color: var(--white) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions .mat-mdc-raised-button:hover:not([disabled]) {
+  background: linear-gradient(135deg, var(--success-dark) 0%, var(--success) 100%) !important;
+  box-shadow: var(--shadow-hover) !important;
+  transform: translateY(-2px) !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions .mat-mdc-raised-button[disabled] {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Estilos para el diálogo responsivo */
+@media (max-width: 600px) {
+  .tabs {
+    margin-bottom: 20px;
+  }
+  
+  .tabs button {
+    padding: 12px 15px;
+    font-size: 0.9em;
+  }
+  
+  .tab-content {
+    padding: 15px;
+    min-height: 300px;
+  }
+  
+  .avatars-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+  }
+  
+  .avatar-item {
+    border-radius: var(--border-radius);
+  }
+  
+  .avatar-item img {
+    height: 80px;
+  }
+  
+  .preview-container {
+    height: 200px;
+  }
+  
+  .file-input-container {
+    max-width: 100%;
+  }
+  
+  ::ng-deep .mat-mdc-dialog-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  ::ng-deep .mat-mdc-dialog-actions button {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs button {
+    padding: 10px 12px;
+    font-size: 0.85em;
+  }
+  
+  .tab-content {
+    padding: 10px;
+  }
+  
+  .avatars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .no-avatars {
+    padding: 30px 15px;
+  }
+  
+  .no-avatars mat-icon {
+    font-size: 2.5em !important;
+    width: 2.5em !important;
+    height: 2.5em !important;
+  }
+}
+
+/* Estados de focus para accesibilidad */
+.tabs button:focus,
+.avatar-item:focus,
+.file-input-container button:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Animaciones de entrada para elementos */
+.avatar-item {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.avatar-item:nth-child(1) { animation-delay: 0.1s; }
+.avatar-item:nth-child(2) { animation-delay: 0.2s; }
+.avatar-item:nth-child(3) { animation-delay: 0.3s; }
+.avatar-item:nth-child(4) { animation-delay: 0.4s; }
+.avatar-item:nth-child(5) { animation-delay: 0.5s; }
+.avatar-item:nth-child(6) { animation-delay: 0.6s; }

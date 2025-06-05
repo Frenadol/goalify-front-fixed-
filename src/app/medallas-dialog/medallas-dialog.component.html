@@ -3,9 +3,10 @@
 
   <div *ngIf="isLoading" class="loading-container">
     <mat-spinner diameter="40"></mat-spinner>
-    <p>Cargando rangos...</p>
+    <p>Cargando rangos y medallas...</p>
   </div>
 
+  <!-- Sección de rangos (ya existente) -->
   <div *ngIf="!isLoading" class="rangos-grid">
     <div class="rango-card" *ngFor="let medalla of medallas; let i = index" 
          [class.conseguida]="medalla.conseguida" 
@@ -38,6 +39,35 @@
         </p>
         <p class="puntos-necesarios">
           Necesitas {{ medalla.puntosMinimos }} puntos
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nueva sección para Medallas compradas -->
+  <h2 *ngIf="!isLoading && medallasCompradas.length > 0" class="page-title section-separator">Mis Medallas Adquiridas</h2>
+  
+  <div *ngIf="!isLoading && medallasCompradas.length === 0" class="empty-medals-message">
+    <p>No has adquirido ninguna medalla todavía. Visita el mercado para conseguir medallas exclusivas.</p>
+  </div>
+
+  <div *ngIf="!isLoading && medallasCompradas.length > 0" class="medallas-compradas-grid">
+    <div class="medalla-card conseguida" *ngFor="let medalla of medallasCompradas">
+      <div class="rango-img-container">
+        <img [src]="medalla.icono" [alt]="medalla.nombre" class="rango-img">
+        <div class="medalla-comprada-indicator">
+          <mat-icon>shopping_cart</mat-icon>
+        </div>
+      </div>
+      
+      <h3 class="rango-title">{{ medalla.nombre }}</h3>
+      
+      <div class="rango-info-container">
+        <p *ngIf="medalla.fechaAdquisicion" class="fecha-conseguida">
+          Adquirida el: {{ medalla.fechaAdquisicion }}
+        </p>
+        <p class="rango-descripcion" *ngIf="medalla.descripcion">
+          {{ medalla.descripcion }}
         </p>
       </div>
     </div>

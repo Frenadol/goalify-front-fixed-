@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Cambiar foto de perfil</h2>
+
+<mat-dialog-content>
+  <div class="tabs">
+    <button mat-button [class.active]="isUploadTab" (click)="toggleTab(true)">
+      <mat-icon>upload_file</mat-icon> Subir foto
+    </button>
+    <button mat-button [class.active]="!isUploadTab" (click)="toggleTab(false)">
+      <mat-icon>account_circle</mat-icon> Avatares comprados
+    </button>
+  </div>
+
+  <div class="tab-content">
+    <!-- Tab de subida de foto -->
+    <div *ngIf="isUploadTab" class="upload-tab">
+      <div class="preview-container">
+        <img *ngIf="previewUrl" [src]="previewUrl" alt="Vista previa" class="preview-image">
+        <div *ngIf="!previewUrl" class="no-preview">Selecciona una imagen</div>
+      </div>
+      
+      <div class="file-input-container">
+        <button mat-raised-button color="primary" (click)="fileInput.click()">
+          <mat-icon>add_photo_alternate</mat-icon> Seleccionar archivo
+        </button>
+        <input hidden type="file" #fileInput accept="image/*" (change)="onFileSelected($event)">
+        <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+      </div>
+    </div>
+
+    <!-- Tab de avatares -->
+    <div *ngIf="!isUploadTab" class="avatars-tab">
+      <div class="avatars-grid">
+        <div *ngFor="let avatar of data.purchasedAvatars" class="avatar-item">
+          <img [src]="avatar.url" 
+               [alt]="avatar.nombre"
+               [class.selected]="selectedAvatarUrl === avatar.url"
+               (click)="selectAvatar(avatar.url)">
+          <div class="avatar-name">{{ avatar.nombre }}</div>
+        </div>
+        
+        <div *ngIf="!data.purchasedAvatars?.length" class="no-avatars">
+          <mat-icon>sentiment_dissatisfied</mat-icon>
+          <p>No tienes avatares disponibles. ¡Explora el mercado para conseguir algunos!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="!selectedFile && !selectedAvatarUrl">
+    Guardar
+  </button>
+</mat-dialog-actions>

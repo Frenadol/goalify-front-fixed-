@@ -1,61 +1,112 @@
+/* Variables CSS para Angular */
+:host {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --secondary: #6c757d;
+  --light: #f4f7f6;
+  --dark: #2c3e50;
+  --white: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #64748b;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  display: block;
+}
+
+/* Animaciones base */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Estilos base mejorados */
 .landing-page-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Poppins', sans-serif; /* O la fuente que prefieras */
-  color: #333;
-  background-color: #f4f7f6; /* Fondo suave como en register */
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-color);
+  background-color: #f4f7f6;
+  animation: fadeIn 0.8s ease-out;
 }
 
+/* Header mejorado */
 .landing-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1000;
+  transition: var(--transition);
+  animation: slideUp 0.5s ease-out;
+}
+
+.landing-header:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .logo-text {
   font-size: 1.8em;
   font-weight: 600;
-  color: #007bff; /* Azul primario */
+  color: var(--primary);
   margin: 0;
+  transition: var(--transition);
+  position: relative;
 }
 
+.logo-text:hover {
+  color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+/* Navegación mejorada */
 .landing-nav .btn {
   margin-left: 15px;
   padding: 10px 20px;
   border-radius: 25px;
   font-weight: 500;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: var(--transition);
 }
 
 .landing-nav .btn-primary {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--primary);
+  color: var(--white);
   border: none;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
 .landing-nav .btn-primary:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+  background-color: var(--primary-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
 }
 
 .landing-nav .btn-secondary {
   background-color: transparent;
-  color: #007bff;
-  border: 1px solid #007bff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
 }
 
 .landing-nav .btn-secondary:hover {
-  background-color: #e9ecef; /* Un gris muy claro */
-  transform: translateY(-2px);
+  background-color: rgba(0, 123, 255, 0.05);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1);
 }
 
+/* Contenido principal mejorado */
 .landing-main-content {
   flex-grow: 1;
   display: flex;
@@ -64,50 +115,130 @@
   padding: 40px 20px;
 }
 
+/* Hero section mejorado */
 .hero-section {
   text-align: center;
   padding: 60px 20px;
   max-width: 800px;
   margin-bottom: 40px;
+  animation: slideUp 0.8s ease-out;
+}
+
+.hero-text-content {
+  animation: fadeIn 1s ease-out;
 }
 
 .hero-text-content h2 {
   font-size: 2.8em;
   font-weight: 700;
-  color: #2c3e50; /* Título oscuro como en register */
+  color: var(--dark);
   margin-bottom: 20px;
   line-height: 1.2;
+  position: relative;
+  display: inline-block;
+}
+
+.hero-text-content h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 3px;
+  animation: slideUp 1s ease-out 0.5s both;
 }
 
 .hero-text-content p {
   font-size: 1.1em;
-  color: #555;
+  color: var(--text-secondary);
   margin-bottom: 30px;
   line-height: 1.6;
+  animation: fadeIn 1s ease-out 0.3s both;
 }
 
+/* Botón hero mejorado */
 .btn-large {
   padding: 15px 30px;
   font-size: 1.1em;
   border-radius: 30px;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  font-weight: 600;
+  transition: var(--transition);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 1s ease-out 0.6s both;
 }
 
+.btn-large:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 123, 255, 0.35);
+}
+
+.btn-large:active {
+  transform: translateY(-2px);
+}
+
+/* Efecto de brillo en botón */
+.btn-large::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.7s ease;
+}
+
+.btn-large:hover::before {
+  left: 100%;
+}
+
+/* Sección de características mejorada */
 .features-section {
   width: 100%;
   max-width: 1000px;
   padding: 40px 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  animation: slideUp 1s ease-out 0.3s both;
+  transition: var(--transition);
+}
+
+.features-section:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .section-title {
   text-align: center;
   font-size: 2em;
-  color: #2c3e50;
+  color: var(--dark);
   margin-bottom: 40px;
+  position: relative;
+  animation: fadeIn 1s ease-out 0.5s both;
 }
 
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 3px;
+}
+
+/* Grid de características mejorado */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -116,82 +247,309 @@
 
 .feature-item {
   text-align: center;
-  padding: 20px;
+  padding: 30px 20px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: var(--transition);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out forwards;
+  position: relative;
+  overflow: hidden;
 }
 
+.feature-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 0;
+  background-color: var(--primary);
+  transition: height 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.feature-item:hover::before {
+  height: 100%;
+}
+
+/* Animaciones escalonadas para las características */
+.features-grid .feature-item:nth-child(1) { animation-delay: 0.7s; }
+.features-grid .feature-item:nth-child(2) { animation-delay: 0.9s; }
+.features-grid .feature-item:nth-child(3) { animation-delay: 1.1s; }
+
 .feature-icon {
-  font-size: 3em; /* Ajusta el tamaño del icono */
-  color: #007bff; /* Color primario para los iconos */
+  font-size: 3em;
+  color: var(--primary);
   margin-bottom: 15px;
+  transition: var(--transition);
+  display: inline-block;
+}
+
+.feature-item:hover .feature-icon {
+  transform: scale(1.2);
+  color: var(--primary-dark);
 }
 
 .feature-item h4 {
   font-size: 1.4em;
-  color: #333;
-  margin-bottom: 10px;
+  color: var(--dark);
+  margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.feature-item:hover h4 {
+  color: var(--primary);
 }
 
 .feature-item p {
   font-size: 0.95em;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
+/* Footer mejorado */
 .landing-footer {
   text-align: center;
-  padding: 20px;
-  background-color: #2c3e50; /* Footer oscuro */
-  color: #f4f7f6; /* Texto claro en footer */
+  padding: 30px 20px;
+  background-color: var(--dark);
+  color: var(--light);
   font-size: 0.9em;
+  position: relative;
+  animation: slideUp 0.8s ease-out;
 }
 
-/* Estilos generales para botones (puedes moverlos a styles.css si son globales) */
+.landing-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--primary);
+}
+
+/* Estilos generales para botones */
 .btn {
   cursor: pointer;
   border: none;
-  border-radius: 5px; /* Ajusta según tu diseño */
+  border-radius: 5px;
   padding: 12px 24px;
   font-weight: 500;
   text-decoration: none;
   display: inline-block;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: var(--transition);
 }
 
 .btn-primary {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--primary);
+  color: var(--white);
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-dark);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Animaciones */
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+/* Estilos específicos para la página de inicio de Goalify */
+.page-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.welcome-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 80px 20px 40px 20px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-container {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  max-width: 1300px;
+  width: 100%;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.welcome-header {
+  margin-bottom: 60px;
+}
+
+.welcome-header h1 {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  color: #1e293b;
+  margin-bottom: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  animation: fadeIn 1s ease-out 0.3s both;
+}
+
+.welcome-message {
+  font-size: 1.2rem;
+  color: #64748b;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeIn 1s ease-out 0.5s both;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.action-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.action-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.action-card-icon {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: rgba(0, 123, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.action-card:hover .action-card-icon {
+  background: rgba(0, 123, 255, 0.15);
+  transform: scale(1.1);
+}
+
+.action-card-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1e293b;
+  transition: all 0.3s ease;
+  line-height: 1.3;
+}
+
+.action-card:hover .action-card-title {
+  color: #007bff;
+}
+
+.action-card-description {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.6;
+  flex-grow: 1;
+  transition: all 0.3s ease;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+/* Asegurando que todos los textos sean visibles */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, label, li {
+  color: var(--text-color);
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+  color: var(--white);
+}
+
+.landing-footer p {
+  color: var(--light);
+}
+
+/* Estilos específicos para los elementos de la imagen */
+.material-icons-outlined {
+  color: var(--primary);
+}
+
+/* Responsive mejorado para Angular */
+@media (max-width: 768px) {
+  .landing-header {
+    padding: 15px 20px;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+  
+  .welcome-container {
+    padding: 40px 24px;
+    margin: 16px;
+    border-radius: 24px;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .action-card {
+    min-height: 240px;
+    padding: 28px 24px;
   }
 }
 
-.hero-text-content {
-  /* ... tus otros estilos para hero-text-content ... */
-  animation: fadeInScale 0.6s ease-out forwards;
+@media (max-width: 480px) {
+  .landing-nav .btn {
+    padding: 8px 16px;
+    font-size: 0.9em;
+  }
+  
+  .welcome-container {
+    padding: 30px 20px;
+    margin: 12px;
+  }
+  
+  .welcome-header h1 {
+    font-size: 2rem;
+  }
+  
+  .action-card {
+    padding: 24px 20px;
+    min-height: 220px;
+  }
 }
-
-.feature-item {
-  /* ... tus otros estilos para feature-item ... */
-  opacity: 0; /* Empieza invisible para la animación */
-  animation: fadeInScale 0.5s ease-out forwards;
-}
-
-/* Para aplicar un retraso a cada item de feature si quieres que aparezcan secuencialmente */
-.features-grid .feature-item:nth-child(1) { animation-delay: 0.2s; }
-.features-grid .feature-item:nth-child(2) { animation-delay: 0.4s; }
-.features-grid .feature-item:nth-child(3) { animation-delay: 0.6s; }

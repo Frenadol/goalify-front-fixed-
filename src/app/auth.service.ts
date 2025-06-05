@@ -345,4 +345,59 @@ export class AuthService {
         catchError(this.handleError)
       );
   }
+
+  /**
+ * Actualiza la foto de perfil del usuario actual
+ * @param photoData URL de imagen o string base64 con la nueva foto de perfil
+ * @returns Observable con el usuario actualizado
+ */
+public updateUserProfilePhoto(photoData: string): Observable<any> {
+  if (!this.currentUserValue || !this.currentUserValue.id) {
+    return throwError(() => new Error('No hay usuario autenticado'));
+  }
+
+  const userId = this.currentUserValue.id;
+  
+  // URL directa a la API sin depender de environment
+  const url = `http://localhost:8080/api/usuarios/${userId}`; 
+  
+  // Token de autorización
+  const token = localStorage.getItem('auth_token');
+  let headers = new HttpHeaders();
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  // Crear un objeto con solo los campos que necesitamos actualizar
+  const payload = {
+    fotoPerfil: photoData,
+    // Mantener los campos actuales que no queremos perder
+    biografia: this.currentUserValue.biografia || '',
+    nombre: this.currentUserValue.nombre || ''
+  };
+
+  console.log(`Enviando actualización de foto a: ${url}`);
+  
+  return this.http.put(url, payload, { headers }).pipe(
+    tap(updatedUser => {
+      console.log('Respuesta actualización de foto:', updatedUser);
+      // Actualiza el usuario actual con la nueva foto
+      const currentUser = this.currentUserValue;
+      if (currentUser) {
+        const updatedCurrentUser = {
+          ...currentUser,
+          fotoPerfil: photoData
+        };
+        
+        this.updateCurrentUserState(updatedCurrentUser);
+      }
+    }),
+    catchError(error => {
+      console.error('Error al actualizar foto de perfil:', error);
+      console.error('Estado HTTP:', error.status);
+      console.error('Mensaje:', error.error || error.message);
+      return throwError(() => new Error(error.message || 'Error al actualizar la foto de perfil'));
+    })
+  );
+}
 }

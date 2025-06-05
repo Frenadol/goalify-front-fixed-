@@ -46,13 +46,21 @@ export class UserPurchasesComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
     
+    // Verifica autenticación antes de cargar
+    if (!this.authService.isAuthenticated()) {
+      this.error = 'Debes iniciar sesión para ver tus compras';
+      this.isLoading = false;
+      return;
+    }
+    
     this.userPurchasesService.getUserPurchases().subscribe({
       next: (items) => {
         this.purchases = items;
         this.isLoading = false;
+        console.log('Compras cargadas con éxito:', items.length);
       },
       error: (err) => {
-        this.error = 'Error al cargar tus compras. Por favor, inténtalo de nuevo más tarde.';
+        this.error = 'Error al cargar tus compras. Inicia sesión nuevamente o inténtalo más tarde.';
         this.isLoading = false;
         console.error('Error cargando compras:', err);
       }
