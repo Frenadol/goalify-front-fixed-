@@ -2,9 +2,8 @@
 <div class="page-container">
   <div class="market-container">
     <header class="market-header">
-      <h1><mat-icon>storefront</mat-icon> Mercado de Recompensas</h1>
+      <h1><mat-icon class="storefront-icon">storefront</mat-icon> Mercado de Recompensas</h1>
       <p>¡Canjea tus puntos por ítems exclusivos para personalizar tu experiencia!</p>
-      <!-- CAMBIO: Mostrar puntosRecord y texto "Puntos de Canje" -->
       <div *ngIf="currentUser" class="user-points-display">
         Tus Puntos de Canje: <span class="points-value">{{ currentUser.puntosRecord | number }}</span> <mat-icon class="points-icon" matTooltip="Puntos disponibles para gastar en la tienda">stars</mat-icon>
       </div>
@@ -22,9 +21,12 @@
     </div>
 
     <div *ngIf="!isLoadingItems && !marketItems.length && !errorMessage" class="empty-market-container">
-      <mat-icon class="empty-icon">sentiment_dissatisfied</mat-icon>
-      <p *ngIf="currentUser">¡Vaya! Parece que no hay artículos disponibles para ti en este momento o ya los tienes todos.</p>
-      <p *ngIf="!currentUser">Inicia sesión para ver los artículos de la tienda.</p>
+      <div class="no-items-container">
+        <div class="icon-background-circle">
+          <span class="material-icons-outlined">sentiment_very_dissatisfied</span>
+        </div>
+        <p>¡Vaya! Parece que no hay artículos disponibles o has canjeado todos los productos</p>
+      </div>
     </div>
 
     <div class="market-grid" *ngIf="!isLoadingItems && marketItems.length">

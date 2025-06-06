@@ -66,22 +66,10 @@
   }
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { transform: translateX(100%); opacity: 0.5; }
 }
 
 /* Contenedor principal del formulario */
@@ -107,7 +95,6 @@
   height: 4px;
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-  animation: shimmer 3s ease-in-out infinite;
 }
 
 .habit-form-container.card-style:hover {
@@ -236,17 +223,19 @@
   border-radius: 4px;
 }
 
+/* GRID DE HÁBITOS - AJUSTADO PARA CORREGIR PROBLEMAS DE VISUALIZACIÓN */
 .predefined-habits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
   margin-bottom: 25px;
 }
 
+/* TARJETA DE HÁBITO - AJUSTADA PARA CORREGIR PROBLEMAS DE VISUALIZACIÓN */
 .predefined-habit-card {
   border: 2px solid transparent;
   border-radius: var(--border-radius);
-  padding: 20px 15px;
+  padding: 15px 10px;
   text-align: center;
   cursor: pointer;
   background-color: #f8f9fa;
@@ -254,6 +243,11 @@
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 140px; /* Altura fija para todas las tarjetas */
 }
 
 .predefined-habit-card::before {
@@ -289,25 +283,37 @@
   transform: scaleX(1);
 }
 
+/* IMAGEN DE LA TARJETA - AJUSTADA PARA CORREGIR PROBLEMAS DE VISUALIZACIÓN */
 .habit-card-image {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
   border-radius: var(--border-radius);
   transition: var(--transition);
+  background-color: white;
+  padding: 5px;
+  box-shadow: var(--shadow-sm);
 }
 
 .predefined-habit-card:hover .habit-card-image {
   transform: scale(1.1);
 }
 
+/* NOMBRE DE LA TARJETA - AJUSTADO PARA CORREGIR PROBLEMAS DE VISUALIZACIÓN */
 .habit-card-name {
   font-size: 0.9em;
   color: var(--text-color);
   font-weight: 600;
   margin: 0;
   line-height: 1.3;
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal; /* Permitir múltiples líneas si es necesario */
+  max-height: 2.6em; /* Aproximadamente 2 líneas */
 }
 
 /* Vista previa del hábito seleccionado */
@@ -326,6 +332,7 @@
   background-color: var(--white);
   box-shadow: var(--shadow-md);
   transition: var(--transition);
+  object-fit: contain;
 }
 
 .selected-habit-preview-image:hover {
@@ -486,6 +493,69 @@
   height: 18px;
 }
 
+/* Corregir visualización del icono de añadir ("+") */
+.add-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e6f2ff;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  overflow: visible;
+}
+
+.add-button-icon mat-icon {
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+  line-height: 24px;
+  color: #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(0);
+  margin: 0;
+}
+
+/* Asegurar que el círculo contenedor tenga suficiente espacio */
+.icon-circle {
+  background-color: #e6f2ff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 0;
+  overflow: visible;
+  box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+
+/* Corregir estilo específico para el botón de añadir */
+button.mat-icon-button.add-button {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.mat-icon-button.add-button mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   :host {
@@ -514,13 +584,13 @@
   }
   
   .predefined-habits-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
   }
   
   .habit-card-image {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
   }
   
   .form-actions {
@@ -532,6 +602,11 @@
   ::ng-deep .mat-flat-button {
     width: 100%;
     justify-content: center;
+  }
+  
+  .predefined-habit-card {
+    height: 120px;
+    padding: 10px 8px;
   }
 }
 
@@ -545,13 +620,14 @@
   }
   
   .predefined-habits-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
   }
   
   .habit-card-image {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
+    margin-bottom: 10px;
   }
   
   .habit-card-name {
@@ -561,6 +637,11 @@
   .selected-habit-preview-image {
     max-width: 100px;
     max-height: 100px;
+  }
+  
+  .predefined-habit-card {
+    height: 110px;
+    padding: 8px 5px;
   }
 }
 
@@ -589,9 +670,4 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, label, li, div {
 
 .form-group:focus-within {
   transform: translateY(-2px);
-}
-
-/* Clase mantenida para compatibilidad */
-.card-style {
-  /* Clase original mantenida */
 }

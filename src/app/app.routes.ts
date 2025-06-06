@@ -7,85 +7,103 @@ import { UserProfileDetailsComponent } from './user-profile-details/user-profile
 import { UserStatisticsComponent } from './user-statistics/user-statistics.component';
 import { AuthGuard } from './auth.guard';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
-import { ManageMarketComponent } from './admin/manage-market/manage-market.component'; // Para admin
-import { MarketComponent } from './market/market.component'; // <--- AÑADE ESTA IMPORTACIÓN
+import { ManageMarketComponent } from './admin/manage-market/manage-market.component';
+import { MarketComponent } from './market/market.component';
 import { ChallengeListComponent } from './challenges/challenge-list/challenge-list.component';
 import { MyChallengesListComponent } from './challenges/my-challenges-list/my-challenges-list.component';
 import { UserManagementComponent } from './admin/user-management/user-management.component';
 import { adminGuard } from './admin/admin.guard';
 import { adminChallengeRoutes } from './challenges/challenges-routing.module';
-import { UserPurchasesComponent } from './market/user-purchases/user-purchases.component'; // Importa el componente aquí
-import { MedallasDialogComponent } from './medallas-dialog/medallas-dialog.component'; // Asegúrate de importar el componente MedallasDialogComponent
-
+import { UserPurchasesComponent } from './market/user-purchases/user-purchases.component';
+import { MedallasDialogComponent } from './medallas-dialog/medallas-dialog.component';
 
 export const routes: Routes = [
-  { path: 'home', component: HomeComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent, data: { renderMode: 'clientSide' } },
+  { path: 'register', component: RegisterComponent, data: { renderMode: 'clientSide' } },
+  { path: 'login', component: LoginComponent, data: { renderMode: 'clientSide' } },
+  { path: '', redirectTo: '/home', pathMatch: 'full', data: { renderMode: 'clientSide' } },
 
   {
     path: 'habits',
     loadChildren: () => import('./habits/habits.module').then(m => m.HabitsModule),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { 
+      renderMode: 'clientSide' // Ya está en clientSide
+    }
   },
   {
     path: 'challenges',
     component: ChallengeListComponent,
     canActivate: [AuthGuard],
-    data: { isAdminContext: false }
+    data: { isAdminContext: false, renderMode: 'clientSide' } // Cambiado a clientSide
   },
   {
     path: 'my-challenges',
     component: MyChallengesListComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
-  { path: 'welcome', component: WelcomeComponent, canActivate: [AuthGuard] },
+  { path: 'welcome', component: WelcomeComponent, canActivate: [AuthGuard], data: { renderMode: 'clientSide' } }, // Añadido data
   {
     path: 'user-profile',
     component: UserProfileDetailsComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
   {
     path: 'user-statistics',
     component: UserStatisticsComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
   {
     path: 'profile',
-    component: UserProfileDetailsComponent, // Redirige profile a user-profile
-    canActivate: [AuthGuard]
+    component: UserProfileDetailsComponent,
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
   {
     path: 'medallas',
     component: MedallasDialogComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
   {
     path: 'app/progress',
     component: UserStatisticsComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
-  { // <--- RUTA PARA EL MERCADO DEL USUARIO
+  {
     path: 'market',
     component: MarketComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
   {
     path: 'admin',
     canActivate: [AuthGuard, adminGuard],
+    data: { renderMode: 'clientSide' }, // Ya está en clientSide
     children: [
-      { path: 'dashboard', component: AdminDashboardComponent },
-      { path: 'users', component: UserManagementComponent },
-      ...adminChallengeRoutes,
-      { path: 'market', component: ManageMarketComponent }, // Esta es la gestión de admin
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+      { path: 'dashboard', component: AdminDashboardComponent, data: { renderMode: 'clientSide' } }, // Añadido data
+      { path: 'users', component: UserManagementComponent, data: { renderMode: 'clientSide' } }, // Añadido data
+      // Ya estaba configurado correctamente para adminChallengeRoutes
+      ...adminChallengeRoutes.map(route => ({
+        ...route,
+        data: { 
+          ...(route.data || {}), 
+          renderMode: 'clientSide' 
+        }
+      })),
+      { path: 'market', component: ManageMarketComponent, data: { renderMode: 'clientSide' } }, // Añadido data
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full', data: { renderMode: 'clientSide' } } // Añadido data
     ]
   },
   {
     path: 'mis-compras',
     component: UserPurchasesComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { renderMode: 'clientSide' } // Cambiado a clientSide
   },
-  { path: '**', component: HomeComponent } // Ruta wildcard para manejar rutas desconocidas
+  { path: '**', component: HomeComponent, data: { renderMode: 'clientSide' } } // Añadido data
 ];

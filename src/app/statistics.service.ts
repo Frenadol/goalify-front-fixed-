@@ -8,7 +8,7 @@ import { StatisticEntry } from './statistics/statistic.model'; // Ajusta la ruta
   providedIn: 'root'
 })
 export class StatisticsService {
-  private apiUrl = 'http://localhost:8080/statistics'; // URL base de tu API de estadísticas
+  private apiUrl = 'http://51.20.183.5:8080/statistics'; // URL base de tu API de estadísticas
 
   constructor(private http: HttpClient) { }
 

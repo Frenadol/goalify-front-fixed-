@@ -118,10 +118,15 @@ export class HabitListComponent implements OnInit {
   }
 
   get showAllHabitsCompletedMessage(): boolean {
-    return !this.isLoading &&
-           !this.errorMessage &&
-           this.allHabits.length > 0 &&
-           this.allHabits.every(h => h.isCompletedToday === true);
+    // Esta condición verifica si:
+    // 1. Hay hábitos en total
+    // 2. No estamos cargando
+    // 3. No hay mensaje de error
+    // 4. Todos los hábitos de hoy están completados (lo que hace que displayedHabits esté vacío)
+    return this.allHabits.length > 0 && 
+           !this.isLoading && 
+           !this.errorMessage && 
+           this.displayedHabits.length === 0;
   }
 
   get showHabitsGrid(): boolean {

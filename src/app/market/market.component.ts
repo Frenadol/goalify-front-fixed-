@@ -1,7 +1,7 @@
 // filepath: c:\Users\Fernando\Desktop\proyecto defi\Goalify-frontend-main\src\app\market\market.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MarketService } from './market.service';
-import { MarketItem } from './market-item.model';
+import { MarketItem } from './market-item.model'; // Asumiendo que esta es la importación original
 import { AuthService, User } from '../auth.service';
 import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-import { finalize } from 'rxjs/operators'; // Añade esta importación
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-market',
@@ -29,15 +29,17 @@ import { finalize } from 'rxjs/operators'; // Añade esta importación
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule
+    // Si MarketItemDetailDialogComponent es standalone, también debe estar aquí.
+    // Si no, asegúrate de que el módulo que lo declara esté importado donde sea necesario.
   ],
   templateUrl: './market.component.html',
   styleUrls: ['./market.component.css']
 })
 export class MarketComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
-  marketItems: MarketItem[] = [];
+  marketItems: MarketItem[] = []; // Usando MarketItem con id: string
   isLoadingItems = true;
-  isPurchasing: { [itemId: string]: boolean } = {};
+  isPurchasing: { [itemId: string]: boolean } = {}; // itemId es string
   errorMessage: string | null = null;
 
   private userSubscription: Subscription | undefined;
@@ -53,9 +55,10 @@ export class MarketComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userSubscription = this.authService.currentUser.subscribe(user => {
       this.currentUser = user;
-      this.loadMarketItems();
+      this.loadMarketItems(); // Cargar items cuando el usuario cambie o se inicialice
     });
 
+    // Si no hay usuario al inicio (ej. carga inicial antes de que currentUser emita)
     if (!this.authService.currentUserValue) {
       this.loadMarketItems();
     }
@@ -69,9 +72,11 @@ export class MarketComponent implements OnInit, OnDestroy {
       this.itemsSubscription.unsubscribe();
     }
     
+    // getMarketItems() del servicio ahora debería devolver Observable<MarketItem[]>
+    // donde MarketItem tiene id: string y no necesariamente 'descripcion'
     this.itemsSubscription = this.marketService.getMarketItems().subscribe({
       next: (items) => {
-        this.marketItems = items;
+        this.marketItems = items; // Asignación directa si los tipos coinciden
         this.isLoadingItems = false;
       },
       error: (err) => {
@@ -82,18 +87,20 @@ export class MarketComponent implements OnInit, OnDestroy {
     });
   }
 
-  isItemUnlocked(itemId: string): boolean {
+  isItemUnlocked(itemId: string): boolean { // itemId es string
     if (!this.currentUser || !this.currentUser.preferences?.unlockedItems) {
       return false;
     }
+    // Asumiendo que unlockedItems almacena strings
     return this.currentUser.preferences.unlockedItems.includes(itemId);
   }
 
   canAfford(cost: number): boolean {
+    // Usando puntosRecord como en tu versión. Asegúrate que este campo existe y es correcto.
     return (this.currentUser?.puntosRecord ?? 0) >= cost;
   }
 
-  openItemDetailsDialog(item: MarketItem): void {
+  openItemDetailsDialog(item: MarketItem): void { // item es MarketItem
     const dialogRef = this.dialog.open(MarketItemDetailDialogComponent, {
       width: '450px',
       data: { item: item, currentUser: this.currentUser }, 
@@ -101,14 +108,16 @@ export class MarketComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        // La compra fue exitosa, recargar la lista de artículos
-        this.loadMarketItems();
+      if (result === true) { // Asumiendo que 'true' significa compra exitosa
+        this.loadMarketItems(); // Recargar para reflejar cambios (ej. item comprado)
+        if (this.authService.refreshCurrentUserData) { // Si existe el método para refrescar datos del usuario
+            this.authService.refreshCurrentUserData().subscribe();
+        }
       }
     });
   }
 
-  purchaseItem(item: MarketItem): void {
+  purchaseItem(item: MarketItem): void { // item es MarketItem
     if (!this.currentUser || !this.currentUser.id) {
       this.snackBar.open('Debes iniciar sesión para comprar.', 'Cerrar', { duration: 3000 });
       return;
@@ -119,27 +128,28 @@ export class MarketComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.isItemUnlocked(item.id)) {
+    if (this.isItemUnlocked(item.id)) { // item.id es string
       this.snackBar.open('Ya has adquirido este artículo.', 'Cerrar', { duration: 3000 });
       return;
     }
 
-    if (this.isPurchasing[item.id]) {
-      return; // Ya hay una compra en curso para este item
+    if (this.isPurchasing[item.id]) { // item.id es string
+      return; 
     }
 
-    this.isPurchasing[item.id] = true;
+    this.isPurchasing[item.id] = true; // item.id es string
+    // marketService.purchaseItem espera un string ID
     this.marketService.purchaseItem(item.id).pipe(
-      // finalize viene de rxjs/operators
       finalize(() => {
-        this.isPurchasing[item.id] = false;
+        this.isPurchasing[item.id] = false; // item.id es string
       })
     ).subscribe({
       next: (response) => {
-        // Actualizar currentUser para reflejar los puntos gastados y el item adquirido
         this.snackBar.open(`¡Has comprado "${item.nombre}"!`, 'OK', { duration: 3000, panelClass: ['snackbar-success'] });
-        this.loadMarketItems(); // Refrescar los ítems para reflejar el cambio
-        this.authService.refreshCurrentUserData().subscribe(); // Actualizar datos del usuario
+        this.loadMarketItems(); 
+        if (this.authService.refreshCurrentUserData) {
+            this.authService.refreshCurrentUserData().subscribe();
+        }
       },
       error: (err) => {
         console.error('Error al comprar:', err);

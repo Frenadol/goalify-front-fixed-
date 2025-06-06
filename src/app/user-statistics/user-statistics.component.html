@@ -55,6 +55,11 @@
       <button mat-stroked-button (click)="setViewMode('charts')" [class.active-view-button]="currentViewMode === 'charts'">
         <mat-icon>bar_chart</mat-icon> Gráficos
       </button>
+      
+      <!-- Botón de descarga de PDF añadido aquí -->
+      <button class="btn btn-outline-primary download-btn" (click)="descargarPerfilPDF()" [disabled]="generandoPDF">
+        <mat-icon>file_download</mat-icon> Descargar Perfil en PDF
+      </button>
     </div>
   </div>
 

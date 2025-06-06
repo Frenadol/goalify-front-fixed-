@@ -1,16 +1,27 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { MarketItem } from './market-item.model';
-import { AuthService, User } from '../auth.service';
-import { isPlatformBrowser } from '@angular/common';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { AuthService } from '../auth.service'; // Asegúrate que la ruta es correcta
+import { isPlatformBrowser } from '@angular/common'; // Necesario para isPlatformBrowser
 
-// Asegúrate que esta interfaz coincida con tu DTO de backend
-interface ArticuloTiendaBackend {
-  id: number;
+// Interfaz que podría haber estado en uso, causando discrepancias
+export interface MarketItem {
+  id: string; // ID como string
   nombre: string;
-  descripcion: string;
+  // 'descripcion' podría estar ausente aquí
+  costoPuntos: number;
+  imagenPreviewUrl: string;
+  tipoArticulo: string;
+  activo: boolean;
+  // Otras propiedades según tu modelo original
+}
+
+// Interfaz para el DTO del backend (puede diferir de MarketItem)
+interface ArticuloTiendaBackendDto {
+  id: any; // El backend podría enviar number o string
+  nombre: string;
+  descripcion: string; // El backend sí podría tener descripción
   tipoArticulo: string;
   valorArticulo?: string;
   costoPuntos: number;
@@ -20,9 +31,9 @@ interface ArticuloTiendaBackend {
 }
 
 export interface UsuarioArticuloTiendaResponse {
-  id: number;
-  usuarioId: number;
-  articuloTiendaId: number;
+  id: number; // o string, dependiendo de la respuesta
+  usuarioId: number; // o string
+  articuloTiendaId: any; // Puede ser number o string
   fechaAdquisicion: string;
 }
 
@@ -30,9 +41,10 @@ export interface UsuarioArticuloTiendaResponse {
   providedIn: 'root'
 })
 export class MarketService {
-  private apiUrl = 'http://localhost:8080/api/articulos-tienda';
-  private purchaseEndpoint = 'http://localhost:8080/api/usuarios/articulos-tienda/comprar';
+  private apiUrl = 'http://51.20.183.5:8080/api/articulos-tienda';
+  private purchaseEndpoint = 'http://51.20.183.5:8080/api/usuarios/articulos-tienda/comprar';
 
+  // Usando la interfaz MarketItem original
   private marketItemsInternal = new BehaviorSubject<MarketItem[]>([]);
   public marketItems$ = this.marketItemsInternal.asObservable();
 
@@ -42,85 +54,83 @@ export class MarketService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  private mapBackendToFrontend(articulo: ArticuloTiendaBackend): MarketItem | null {
-    if (!articulo) {
-      return null;
-    }
+  // Mapeo simplificado o como lo tenías antes
+  private mapToMarketItem(dto: ArticuloTiendaBackendDto): MarketItem {
     return {
-      id: articulo.id.toString(), // Convertir ID a string para que coincida con UnlockedItems
-      nombre: articulo.nombre,
-      description: articulo.descripcion,
-      tipoArticulo: articulo.tipoArticulo,
-      costoPuntos: articulo.costoPuntos,
-      imagenPreviewUrl: articulo.imagenPreviewUrl,
-      activo: articulo.activo
+      id: String(dto.id), // Convertir a string si era necesario
+      nombre: dto.nombre,
+      costoPuntos: dto.costoPuntos,
+      imagenPreviewUrl: dto.imagenPreviewUrl || 'assets/img/placeholder.png',
+      tipoArticulo: dto.tipoArticulo,
+      activo: dto.activo,
+      // Asegúrate de que las propiedades coincidan con tu MarketItem original
+      // Si 'descripcion' no estaba en MarketItem, no se mapea aquí.
     };
   }
 
   getMarketItems(): Observable<MarketItem[]> {
-    const currentUser = this.authService.currentUserValue;
-    const unlockedItemIds = new Set<string>(currentUser?.preferences?.unlockedItems || []);
+    if (!isPlatformBrowser(this.platformId)) {
+      return of([]);
+    }
+    return this.http.get<ArticuloTiendaBackendDto[]>(this.apiUrl).pipe(
+      map(backendItems => backendItems.map(item => this.mapToMarketItem(item))),
+      tap(frontendItems => this.marketItemsInternal.next(frontendItems)),
+      catchError(this.handleError)
+    );
+  }
 
-    return this.http.get<ArticuloTiendaBackend[]>(this.apiUrl).pipe(
-      map(backendItems => {
-        // Convertir los items del backend al formato del frontend
-        const frontendItems = backendItems
-          .filter(item => item.activo) // Solo mostrar items activos
-          .map(item => this.mapBackendToFrontend(item))
-          .filter((item): item is MarketItem => item !== null); // Filtrar nulls y TypeScript type guard
-
-        // Filtrar artículos que el usuario ya ha desbloqueado
-        const availableItems = frontendItems.filter(item => !unlockedItemIds.has(item.id));
-        
-        return availableItems;
-      }),
-      catchError(error => {
-        console.error('Error fetching market items:', error);
-        return throwError(() => new Error('No se pudieron cargar los artículos del mercado. Por favor, inténtalo de nuevo más tarde.'));
-      })
+  getAllMarketItemDetails(): Observable<MarketItem[]> {
+     if (!isPlatformBrowser(this.platformId)) {
+      return of([]);
+    }
+    // Asumiendo un endpoint como /all o similar
+    return this.http.get<ArticuloTiendaBackendDto[]>(`${this.apiUrl}/all-details`).pipe(
+      map(backendItems => backendItems.map(item => this.mapToMarketItem(item))),
+      catchError(this.handleError)
     );
   }
 
   getMarketItemById(id: string): Observable<MarketItem | null> {
-    return this.http.get<ArticuloTiendaBackend>(`${this.apiUrl}/${id}`).pipe(
-      map(item => this.mapBackendToFrontend(item)),
-      catchError(error => {
-        console.error(`Error fetching market item with ID ${id}:`, error);
-        return throwError(() => new Error('No se pudo cargar el artículo solicitado.'));
-      })
+    if (!isPlatformBrowser(this.platformId)) {
+      return of(null);
+    }
+    return this.http.get<ArticuloTiendaBackendDto>(`${this.apiUrl}/${id}`).pipe(
+      map(backendItem => backendItem ? this.mapToMarketItem(backendItem) : null),
+      catchError(this.handleError)
     );
   }
 
   purchaseItem(itemId: string): Observable<UsuarioArticuloTiendaResponse> {
-    return this.http.post<UsuarioArticuloTiendaResponse>(this.purchaseEndpoint, { idArticulo: itemId }).pipe(
+    // El ID aquí se espera como string, coincidiendo con MarketItem.id
+    const body = { articuloTiendaId: itemId };
+    return this.http.post<UsuarioArticuloTiendaResponse>(this.purchaseEndpoint, body).pipe(
+      tap(response => {
+        // Lógica original post-compra
+      }),
       catchError(this.handleError)
     );
   }
 
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'Ocurrió un error desconocido.';
+    console.error('Error en MarketService:', error);
+    let errorMessage = 'Ocurrió un error desconocido en el servicio del mercado.';
     if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Error: ${error.error.message}`;
+      errorMessage = `Error del cliente: ${error.error.message}`;
     } else {
-      // Error del lado del servidor
-      if (error.status === 400) {
-        errorMessage = error.error?.mensaje || 'Solicitud inválida. Verifica los datos.';
-      } else if (error.status === 401) {
-        errorMessage = 'No autorizado. Por favor, inicia sesión de nuevo.';
-      } else if (error.status === 403) {
-        errorMessage = 'No tienes permisos para realizar esta acción.';
+      if (error.status === 0) {
+        errorMessage = 'No se pudo conectar con el servidor del mercado. Inténtalo más tarde.';
       } else if (error.status === 404) {
-        errorMessage = 'El artículo solicitado no existe.';
-      } else if (error.status === 409) {
-        errorMessage = 'Ya posees este artículo.';
-      } else if (error.status === 422) {
-        errorMessage = 'No tienes suficientes puntos para comprar este artículo.';
+        errorMessage = 'Artículo no encontrado.';
+      } else if (error.status === 400 && error.error && typeof error.error === 'string') {
+        errorMessage = error.error;
+      } else if (error.status === 400 && error.error && error.error.message) {
+        errorMessage = error.error.message;
+      } else if (error.status === 401 || error.status === 403) {
+        errorMessage = 'No autorizado o sin permisos para esta acción.';
       } else {
-        errorMessage = `Error del servidor: ${error.status}. Inténtalo más tarde.`;
+        errorMessage = `Error del servidor: ${error.status}. ${error.message || 'Error desconocido.'}`;
       }
     }
-    console.error('Error en MarketService:', error);
     return throwError(() => new Error(errorMessage));
   }
 }

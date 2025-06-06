@@ -703,3 +703,105 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, label, li, div {
   margin: 0 !important;
   padding: 0 !important;
 }
+
+/* Arreglo para el icono junto al título Mis Hábitos */
+:host h1 mat-icon,
+.list-header h1 mat-icon,
+header h1 .material-icons,
+h1 .mat-icon {
+  font-size: 28px !important;
+  height: 28px !important;
+  width: 28px !important;
+  color: #0078d4 !important;
+  margin-right: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  position: relative !important;
+  vertical-align: middle !important;
+  top: -2px !important;
+}
+
+/* Arreglo específico para el icono de hábitos */
+h1 mat-icon[fonticon="format_list_bulleted"],
+h1 .material-icons-outlined,
+header h1 .mat-icon {
+  color: #0078d4 !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
+  background-color: transparent !important;
+}
+
+/* Estilos generales para encabezados con iconos */
+header h1,
+.list-header h1,
+h1 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-weight: 700 !important;
+}
+
+/* Arreglo específico para el icono SVG junto a "Mis Hábitos" */
+.list-header svg,
+h1 svg,
+header svg,
+[class*="title"] svg,
+.list-header img.icon,
+h1 img.icon {
+  width: 24px !important;
+  height: 24px !important;
+  color: #0078d4 !important;
+  fill: #0078d4 !important;
+  stroke: #0078d4 !important;
+  margin-right: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  top: -1px !important;
+}
+
+/* Iconos específicos en la cabecera */
+h1 img,
+header img,
+.list-header img,
+.title-with-icon img {
+  width: 24px !important;
+  height: 24px !important;
+  margin-right: 10px !important; 
+  vertical-align: middle !important;
+  position: relative !important;
+  top: -1px !important;
+}
+
+/* Solución para contenedores de iconos en formato SVG */
+.icon-container,
+[class*="icon-wrapper"],
+[class*="icon-container"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin-right: 10px !important;
+}
+
+/* Solución específica para el selector en la vista de "Mis Hábitos" */
+:host ::ng-deep h1:first-of-type .mat-icon,
+:host ::ng-deep h1:first-of-type svg,
+:host ::ng-deep h1:first-of-type img,
+:host ::ng-deep h1:first-of-type [class*="icon"],
+:host ::ng-deep header:first-of-type h1 .mat-icon {
+  color: #0078d4 !important;
+  fill: #0078d4 !important;
+  stroke: #0078d4 !important;
+  width: 24px !important;
+  height: 24px !important;
+  position: relative !important;
+  display: inline-flex !important;
+  vertical-align: middle !important;
+  margin-right: 12px !important;
+  transform: translateY(-1px) !important;
+}

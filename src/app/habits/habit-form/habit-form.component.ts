@@ -10,10 +10,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // <--- AÑADE ESTA LÍNEA
-import { Subscription } from 'rxjs';
+import { Subscription, EMPTY } from 'rxjs';
 import { AuthService } from '../../auth.service';
+import { catchError, finalize } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-habit-form',
@@ -27,7 +28,6 @@ import { AuthService } from '../../auth.service';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    NgxMaterialTimepickerModule,
     MatProgressSpinnerModule, // <--- AÑADE ESTO AQUÍ
     TitleCasePipe
   ],
@@ -39,6 +39,7 @@ export class HabitFormComponent implements OnInit, OnDestroy {
   isEditMode = false;
   habitId: number | null = null;
   isLoading = false;
+  isSubmitting = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
   @Output() habitCreated = new EventEmitter<Habit>();
@@ -62,7 +63,8 @@ export class HabitFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private habitService: HabitService,
     public router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {
     this.habitForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -214,6 +216,29 @@ export class HabitFormComponent implements OnInit, OnDestroy {
           }
         })
       );
+    }
+  }
+
+  formatTimeForApi(time: string): string {
+    // Asegurar que el formato es HH:MM:SS como lo espera la API
+    if (!time) return '';
+    
+    if (time.includes('AM') || time.includes('PM')) {
+      // Convertir de formato 12h a 24h
+      const [timePart, ampm] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      
+      if (ampm === 'PM' && hours < 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+    } else {
+      // Ya está en formato 24h, asegurar que tenga los segundos
+      const parts = time.split(':');
+      if (parts.length === 2) {
+        return `${parts[0]}:${parts[1]}:00`;
+      }
+      return time;
     }
   }
 

@@ -5,6 +5,7 @@ import { catchError, map, switchMap, tap, delay, finalize, filter, take } from '
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { MarketItem } from './market/market-item.model';
+import { environment } from '../environments/environment';
 
 // Interfaz para las preferencias de perfil tal como vienen/van al backend
 export interface BackendUserProfilePreferences {
@@ -69,8 +70,10 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  // private backendBaseUrl = 'http://localhost:8080'; // No es necesario si apiUrl ya lo incluye
-  private apiUrl = 'http://localhost:8080/api'; // URL base para los endpoints bajo /api
+  // private backendBaseUrl = 'http://51.20.183.5:8080'; // No es necesario si apiUrl ya lo incluye
+  //private apiUrl = 'http://51.20.183.5:8080/api'; // URL base para los endpoints bajo /api
+  private apiUrl = 'http://51.20.183.5:8080/api';
+  //private apiUrl = 'http://51.20.183.5:8080/api';
   private usersApiUrl = `${this.apiUrl}/usuarios`; // Ejemplo para otros endpoints
 
   private currentUserSubject: BehaviorSubject<User | null>;
@@ -87,7 +90,8 @@ export class AuthService {
     private router: Router
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    const storedUser = this.isBrowser ? localStorage.getItem('currentUser') : null;
+    // Cambiado a sessionStorage
+    const storedUser = this.isBrowser ? sessionStorage.getItem('currentUser') : null;
     this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
     this.currentUser = this.currentUserSubject.asObservable(); // Esta es la propiedad correcta para el observable público
 
@@ -105,7 +109,8 @@ export class AuthService {
   }
 
   public get token(): string | null {
-    return this.isBrowser ? localStorage.getItem('authToken') : null;
+    // Cambiado a sessionStorage
+    return this.isBrowser ? sessionStorage.getItem('authToken') : null;
   }
 
   loginUser(credentials: any): Observable<User> {
@@ -120,8 +125,9 @@ export class AuthService {
           if (response.token && response.user) {
             console.log('Datos del usuario recibidos en login:', response.user);
             if (this.isBrowser) {
-              localStorage.setItem('authToken', response.token);
-              localStorage.setItem('currentUser', JSON.stringify(response.user));
+              // Cambiado a sessionStorage
+              sessionStorage.setItem('authToken', response.token);
+              sessionStorage.setItem('currentUser', JSON.stringify(response.user));
             }
             this.currentUserSubject.next(response.user);
             this.authEvents.next({ type: 'LOGIN_SUCCESS', payload: response.user });
@@ -197,7 +203,8 @@ export class AuthService {
         // Directamente actualizar el subject y localStorage.
         this.currentUserSubject.next(finalUser);
         if (this.isBrowser) {
-          localStorage.setItem('currentUser', JSON.stringify(finalUser));
+          // Cambiado a sessionStorage
+          sessionStorage.setItem('currentUser', JSON.stringify(finalUser));
         }
         this.authEvents.next({ type: 'USER_UPDATED', payload: finalUser });
         this.isUserCurrentlyLoading = false;
@@ -242,7 +249,8 @@ export class AuthService {
 
     if (userToUpdate) {
       if (this.isBrowser) {
-        localStorage.setItem('currentUser', JSON.stringify(userToUpdate));
+        // Cambiado a sessionStorage
+        sessionStorage.setItem('currentUser', JSON.stringify(userToUpdate));
       }
       this.currentUserSubject.next(userToUpdate);
       console.log('AuthService: Estado del usuario (currentUserSubject.next) actualizado con:', userToUpdate);
@@ -274,9 +282,10 @@ export class AuthService {
 
   logout(): void {
     if (this.isBrowser) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('tokenExpiration'); // Si usas esto
+      // Cambiado a sessionStorage
+      sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('currentUser');
+      sessionStorage.removeItem('tokenExpiration'); // Si usas esto
     }
     this.currentUserSubject.next(null);
     this.authEvents.next({ type: 'LOGOUT_SUCCESS' });
@@ -315,7 +324,8 @@ export class AuthService {
 
   public getAuthToken(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem('authToken');
+    // Cambiado a sessionStorage
+    return sessionStorage.getItem('authToken');
   }
 
   getIsUserLoading(): boolean {
@@ -338,7 +348,8 @@ export class AuthService {
             // Actualizar el observable y el localStorage
             this.currentUserSubject.next(updatedCurrentUser);
             if (this.isBrowser) {
-              localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
+              // Cambiado a sessionStorage
+              sessionStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
             }
           }
         }),
@@ -359,10 +370,11 @@ public updateUserProfilePhoto(photoData: string): Observable<any> {
   const userId = this.currentUserValue.id;
   
   // URL directa a la API sin depender de environment
-  const url = `http://localhost:8080/api/usuarios/${userId}`; 
+  const url = `http://51.20.183.5:8080/api/usuarios/${userId}`; 
   
   // Token de autorización
-  const token = localStorage.getItem('auth_token');
+  // Cambiado a sessionStorage
+  const token = sessionStorage.getItem('auth_token');
   let headers = new HttpHeaders();
   if (token) {
     headers = headers.set('Authorization', `Bearer ${token}`);
@@ -399,5 +411,45 @@ public updateUserProfilePhoto(photoData: string): Observable<any> {
       return throwError(() => new Error(error.message || 'Error al actualizar la foto de perfil'));
     })
   );
+}
+
+/**
+ * Obtiene el token JWT almacenado localmente
+ * @returns El token JWT o una cadena vacía si no existe
+ */
+public getToken(): string {
+  // Cambiado a sessionStorage
+  return sessionStorage.getItem('authToken') || '';
+}
+
+/**
+ * Renueva el token JWT utilizando el refreshToken almacenado
+ * @returns Un Observable con el nuevo token
+ */
+public refreshToken(): Observable<string> {
+  // Cambiado a sessionStorage
+  const refreshToken = sessionStorage.getItem('refreshToken');
+  
+  if (!refreshToken) {
+    this.logout();
+    return throwError(() => new Error('No hay refresh token disponible'));
+  }
+  
+  return this.http.post<any>(`${this.apiUrl}/auth/refresh`, { refreshToken })
+    .pipe(
+      map(response => {
+        // Guardar el nuevo token usando la misma clave que en el resto de la app
+        // Cambiado a sessionStorage
+        sessionStorage.setItem('authToken', response.token);
+        if (response.refreshToken) {
+          sessionStorage.setItem('refreshToken', response.refreshToken);
+        }
+        return response.token;
+      }),
+      catchError(error => {
+        this.logout();
+        return throwError(() => error);
+      })
+    );
 }
 }

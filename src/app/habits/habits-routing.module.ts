@@ -3,8 +3,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HabitListComponent } from './habit-list/habit-list.component';
 import { HabitFormComponent } from './habit-form/habit-form.component';
-// Importa un AuthGuard si quieres proteger estas rutas
-// import { AuthGuard } from '../auth/auth.guard';
 
 const routes: Routes = [
   {
@@ -12,15 +10,18 @@ const routes: Routes = [
     children: [
       {
         path: '', // Ruta por defecto para '/habits', muestra la lista
-        component: HabitListComponent
+        component: HabitListComponent,
+        data: { renderMode: 'clientSide' }
       },
       {
         path: 'new', // Ruta para '/habits/new', muestra el formulario de creación
-        component: HabitFormComponent // <--- ESTA ES LA RUTA PARA CREAR
+        component: HabitFormComponent, // <--- ESTA ES LA RUTA PARA CREAR
+        data: { renderMode: 'clientSide' }
       },
       {
         path: 'edit/:id', // Ruta para '/habits/edit/:id', muestra el formulario de edición
-        component: HabitFormComponent
+        component: HabitFormComponent,
+        data: { renderMode: 'clientSide' } // <-- Se añadió esta línea
       }
     ]
   }

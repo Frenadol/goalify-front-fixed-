@@ -343,6 +343,41 @@
   left: 100%;
 }
 
+/* Mejorar el espaciado entre el rango y la barra de progreso */
+.user-rank-container {
+  margin-bottom: 40px !important; /* Aumentado significativamente */
+  padding-bottom: 20px !important; /* Duplicado el padding */
+}
+
+/* Añadir estilos específicos para la tarjeta de rango en el perfil */
+.user-profile-card .rango-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px !important; /* Espacio entre elementos dentro del contenedor */
+}
+
+/* Estilos específicos para la etiqueta del rango */
+.rango-text {
+  margin-bottom: 30px !important; /* Espacio considerable debajo del texto del rango */
+}
+
+/* Ajuste específico para la estructura de rango que vemos en la imagen */
+.profile-card .user-rank {
+  display: flex;
+  flex-direction: column;
+  gap: 35px !important; /* Espacio vertical entre elementos */
+}
+
+/* Estilo para cualquier elemento con la clase que contiene 'rango' */
+[class*="rango"] {
+  margin-bottom: 30px !important; /* Espacio adicional para elementos con 'rango' en su clase */
+}
+
+/* Estilo para cualquier elemento con la clase que contiene 'punto' */
+[class*="punto"] {
+  margin-top: 30px !important; /* Espacio adicional antes de elementos con 'punto' en su clase */
+}
+
 /* Estados responsivos */
 @media (max-width: 768px) {
   .user-profile-container {

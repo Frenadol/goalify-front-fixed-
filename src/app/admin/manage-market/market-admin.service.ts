@@ -24,7 +24,7 @@ interface BackendArticuloTienda {
   providedIn: 'root'
 })
 export class MarketAdminService {
-  private apiUrl = 'http://localhost:8080/api/admin/articulos-tienda';
+  private apiUrl = 'http://51.20.183.5:8080/api/admin/articulos-tienda';
   private isBrowser: boolean;
 
   constructor(

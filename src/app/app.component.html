@@ -30,12 +30,30 @@
       <li>
         <a routerLink="/habits" routerLinkActive="active">Mis Hábitos</a>
       </li>
-      <li> <!-- ENLACE PARA DESAFÍOS GENERALES -->
-        <a routerLink="/challenges" routerLinkActive="active">Desafíos</a>
+      <li> <!-- NUEVO: Crear Hábito -->
+        <a routerLink="/habits/new" routerLinkActive="active">Crear Hábito</a> <!-- Corregido de /habits/create a /habits/new -->
+      </li>
+      <li> <!-- ENLACE PARA DESAFÍOS GENERALES (Explorar Desafíos) -->
+        <a routerLink="/challenges" routerLinkActive="active">Explorar Desafíos</a>
       </li>
       <!-- NUEVO ENLACE PARA "MIS DESAFÍOS" (solo usuarios no admin) -->
       <li *ngIf="!user.esAdministrador">
-        <a routerLink="/my-challenges" routerLinkActive="active">Mis Desafíos</a>
+        <a routerLink="/my-challenges" routerLinkActive="active">Mis Desafíos</a> <!-- Corregido de /challenges/my-challenges -->
+      </li>
+      <li> <!-- NUEVO: Mi Progreso -->
+        <a routerLink="/user-statistics" routerLinkActive="active">Mi Progreso</a> <!-- Corregido de /statistics, usando /user-statistics de tus rutas -->
+      </li>
+      <li> <!-- NUEVO: Mi Perfil (página dedicada) -->
+        <a routerLink="/profile" routerLinkActive="active">Mi Perfil</a> <!-- /profile está definido en tus rutas -->
+      </li>
+      <li> <!-- NUEVO: Mis Medallas -->
+        <a routerLink="/medallas" routerLinkActive="active">Mis Medallas</a> <!-- Corregido de /achievements -->
+      </li>
+      <li> <!-- NUEVO: Mercado de Recompensas -->
+        <a routerLink="/market" routerLinkActive="active">Mercado</a>
+      </li>
+      <li> <!-- NUEVO: Mis Compras -->
+        <a routerLink="/mis-compras" routerLinkActive="active">Mis Compras</a> <!-- Corregido de /market/my-purchases -->
       </li>
     </ng-container>
 

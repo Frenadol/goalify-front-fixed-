@@ -157,6 +157,28 @@
   animation: float 3s ease-in-out infinite;
 }
 
+.market-header h1 mat-icon.storefront-icon {
+  font-size: 36px; /* Aumentar tamaño */
+  height: 36px; /* Garantizar altura adecuada */
+  width: 36px; /* Garantizar anchura adecuada */
+  display: flex; /* Asegurar display correcto */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  padding: 8px; /* Reducir padding para mostrar icono completo */
+  margin-right: 5px;
+  animation: float 3s ease-in-out infinite;
+  overflow: visible; /* Asegurar que no se recorte */
+}
+
+/* Asegurar que el maticon se muestra correctamente */
+.storefront-icon {
+  line-height: normal;
+  vertical-align: middle;
+  transform: translateY(-1px); /* Ajuste fino para alineación vertical */
+}
+
 .market-header p {
   font-size: 1.2em;
   color: var(--text-secondary);
@@ -590,4 +612,34 @@
 ::ng-deep .market-item-card .mat-mdc-card-actions button:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Asegúrate de que el nombre de la clase coincida con tu HTML */
+.icon-background-circle { /* O la clase que uses para el círculo azul */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Puede que ya tengas aquí estilos para el tamaño, color de fondo, border-radius, etc. */
+  /* Ejemplo de estilos existentes que podrías tener: */
+  /* width: 100px; */
+  /* height: 100px; */
+  /* background-color: #e0f2fe; */ /* Un azul claro similar al de la imagen */
+  /* border-radius: 50%; */
+  /* margin: 0 auto 20px; */ /* Para centrar el círculo y darle espacio abajo */
+}
+
+.icon-background-circle .material-icons-outlined { /* O la clase de tu icono */
+  font-size: 48px; /* Ajusta el tamaño del icono si es necesario */
+  color: #3b82f6; /* Un color azul para el icono, similar al de la imagen */
+  /* Elimina márgenes o paddings que puedan estar desalineándolo */
+  margin: 0;
+  padding: 0;
+  line-height: 1; /* Ayuda a centrar verticalmente iconos de fuente */
+}
+
+/* Si tienes un contenedor general para el mensaje de "no hay artículos" */
+.no-items-container {
+  text-align: center; /* Para centrar el texto debajo del icono */
+  padding: 20px;
+  /* ... otros estilos que puedas tener ... */
 }

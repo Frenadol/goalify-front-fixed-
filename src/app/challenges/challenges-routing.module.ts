@@ -40,15 +40,9 @@ export const adminChallengeRoutes: Routes = [
   {
     path: 'challenges/edit/:id',
     component: ChallengeFormComponent,
-    canActivate: [AuthGuard, adminGuard]
+    canActivate: [AuthGuard, adminGuard],
+    data: { renderMode: 'clientSide' } // <-- Se añadió renderMode aquí
   },
-  // Podrías añadir una lista de desafíos para admin aquí si es diferente a la de usuario
-  // y si quieres que tenga su propia ruta, por ejemplo:
-  // {
-  //   path: 'challenges', // Se accedería como '/admin/challenges'
-  //   component: AdminChallengeManagementListComponent, // Necesitarías crear este componente
-  //   canActivate: [AuthGuard, adminGuard]
-  // }
 ];
 
 @NgModule({
