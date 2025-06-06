@@ -80,21 +80,36 @@
 
       <div class="form-row date-range-fields">
         <mat-form-field appearance="outline" class="flex-field">
-          <mat-label>Fecha de Inicio</mat-label>
-          <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" required>
-          <mat-hint>DD/MM/YYYY</mat-hint>
+          <mat-label>Fecha de Inicio*</mat-label>
+          <input matInput
+                 [matDatepicker]="pickerInicio"
+                 formControlName="fechaInicio"
+                 placeholder="Selecciona fecha de inicio"
+                 required
+                 [min]="minStartDate">
           <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
           <mat-datepicker #pickerInicio></mat-datepicker>
-          <mat-error *ngIf="challengeForm.get('fechaInicio')?.hasError('required')">La fecha de inicio es requerida.</mat-error>
+          <mat-error *ngIf="challengeForm.get('fechaInicio')?.hasError('required') && challengeForm.get('fechaInicio')?.touched">
+            La fecha de inicio es requerida.
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="flex-field">
-          <mat-label>Fecha de Fin</mat-label>
-          <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" required>
-          <mat-hint>DD/MM/YYYY</mat-hint>
+          <mat-label>Fecha de Fin*</mat-label>
+          <input matInput
+                 [matDatepicker]="pickerFin"
+                 formControlName="fechaFin"
+                 placeholder="Selecciona fecha de fin"
+                 required
+                 [min]="minEndDate">
           <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
           <mat-datepicker #pickerFin></mat-datepicker>
-          <mat-error *ngIf="challengeForm.get('fechaFin')?.hasError('required')">La fecha de fin es requerida.</mat-error>
+          <mat-error *ngIf="challengeForm.get('fechaFin')?.hasError('required') && challengeForm.get('fechaFin')?.touched">
+            La fecha de fin es requerida.
+          </mat-error>
+          <mat-error *ngIf="challengeForm.get('fechaFin')?.hasError('matDatepickerMin') && challengeForm.get('fechaFin')?.touched">
+            La fecha de fin debe ser posterior a la fecha de inicio.
+          </mat-error>
         </mat-form-field>
       </div>
 

@@ -101,11 +101,26 @@ export class MarketService {
   }
 
   purchaseItem(itemId: string): Observable<UsuarioArticuloTiendaResponse> {
-    // El ID aquí se espera como string, coincidiendo con MarketItem.id
-    const body = { articuloTiendaId: itemId };
-    return this.http.post<UsuarioArticuloTiendaResponse>(this.purchaseEndpoint, body).pipe(
+    const userId = this.authService.currentUserValue?.id;
+    if (!userId) {
+      return throwError(() => new Error('Usuario no autenticado para realizar la compra.'));
+    }
+
+    const payload = {
+      idArticulo: parseInt(itemId, 10)
+    };
+
+    if (isNaN(payload.idArticulo)) {
+      console.error('Error: itemId no es un número válido:', itemId);
+      return throwError(() => new Error('ID de artículo inválido.'));
+    }
+
+    return this.http.post<UsuarioArticuloTiendaResponse>(this.purchaseEndpoint, payload).pipe(
       tap(response => {
-        // Lógica original post-compra
+        console.log('Compra exitosa en el servicio:', response);
+        // Considera refrescar los datos del usuario aquí si es necesario (puntos, etc.)
+        // Por ejemplo, llamando a un método en AuthService:
+        this.authService.refreshCurrentUserData(); // CORREGIDO: Usar el nombre correcto del método
       }),
       catchError(this.handleError)
     );

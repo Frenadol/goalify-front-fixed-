@@ -44,6 +44,9 @@ export class ChallengeFormComponent implements OnInit {
   tipoOptions: string[] = ['individual', 'global', 'equipo'];
   categoriaOptions: string[] = ['Salud y Bienestar', 'Aprendizaje', 'Productividad', 'Creatividad', 'Social', 'Finanzas', 'Otro'];
 
+  minStartDate: Date;
+  minEndDate: Date | null = null;
+
 
   constructor(
     private fb: FormBuilder,
@@ -51,6 +54,8 @@ export class ChallengeFormComponent implements OnInit {
     private route: ActivatedRoute,
     public router: Router // Hazlo público si lo usas en el template directamente
   ) {
+    this.minStartDate = new Date(); // La fecha de inicio no puede ser anterior a hoy
+
     this.challengeForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(255)]],
       descripcion: [''],
@@ -65,29 +70,72 @@ export class ChallengeFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscribeToStartDateChanges(); // Suscribirse a los cambios de fecha de inicio
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEditMode = true;
       this.challengeId = +idParam;
       this.loadChallengeData(this.challengeId);
+    } else {
+      // Para nuevos desafíos, si fechaInicio tuviera un valor por defecto, actualizar minEndDate
+      const initialStartDate = this.challengeForm.get('fechaInicio')?.value;
+      if (initialStartDate) {
+        this.updateMinEndDate(new Date(initialStartDate));
+      }
     }
   }
+
+  private subscribeToStartDateChanges(): void {
+    const startDateControl = this.challengeForm.get('fechaInicio');
+    if (startDateControl) {
+      startDateControl.valueChanges.subscribe((selectedStartDate: Date | null) => {
+        if (selectedStartDate) {
+          this.updateMinEndDate(new Date(selectedStartDate)); // Asegurar que es un objeto Date
+          // Opcional: si la fecha de fin actual es anterior a la nueva fecha de inicio, resetea la fecha de fin
+          const endDateControl = this.challengeForm.get('fechaFin');
+          if (endDateControl && endDateControl.value && new Date(endDateControl.value) < selectedStartDate) {
+            endDateControl.setValue(null); // O selectedStartDate para que sea igual
+          }
+        } else {
+          this.minEndDate = null; // Si no hay fecha de inicio, no hay restricción para la de fin (aparte de minStartDate)
+        }
+      });
+    }
+  }
+
+  private updateMinEndDate(startDate: Date): void {
+    // La fecha de fin no puede ser anterior o igual a la fecha de inicio.
+    // Creamos una nueva instancia de Date para el día siguiente a la fecha de inicio.
+    const nextDay = new Date(startDate);
+    nextDay.setDate(startDate.getDate() + 1);
+    this.minEndDate = nextDay;
+  }
+
 
   loadChallengeData(id: number): void {
     this.isLoading = true;
     this.challengeService.getChallengeById(id).subscribe({
       next: (challenge: Challenge) => {
+        const fechaInicio = challenge.fechaInicio ? new Date(challenge.fechaInicio) : null;
+        const fechaFin = challenge.fechaFin ? new Date(challenge.fechaFin) : null;
+
         this.challengeForm.patchValue({
           nombre: challenge.nombre,
           descripcion: challenge.descripcion,
           puntosRecompensa: challenge.puntosRecompensa,
-          fechaInicio: challenge.fechaInicio ? new Date(challenge.fechaInicio) : null,
-          fechaFin: challenge.fechaFin ? new Date(challenge.fechaFin) : null,
+          fechaInicio: fechaInicio,
+          fechaFin: fechaFin,
           estado: challenge.estado,
           tipo: challenge.tipo,
           categoria: challenge.categoria
           // No se parchea 'imageUrl' al formulario
         });
+
+        if (fechaInicio) {
+          this.updateMinEndDate(fechaInicio); // Actualizar minEndDate después de cargar los datos
+        }
+
         this.existingImageUrl = challenge.imageUrl || null;
         // Si hay una imagen existente y no se ha seleccionado una nueva, se puede mostrar en imagePreview
         if (this.existingImageUrl && !this.selectedFileName) {
@@ -131,6 +179,13 @@ export class ChallengeFormComponent implements OnInit {
       Object.values(this.challengeForm.controls).forEach(control => {
         control.markAsTouched();
       });
+      // Comprobación adicional para fechas si el formulario es inválido por otras razones pero las fechas son el problema
+      const fechaInicioCtrl = this.challengeForm.get('fechaInicio');
+      const fechaFinCtrl = this.challengeForm.get('fechaFin');
+      if (fechaInicioCtrl?.value && fechaFinCtrl?.value && fechaFinCtrl.value <= fechaInicioCtrl.value) {
+        this.errorMessage = "La fecha de fin debe ser posterior a la fecha de inicio.";
+        fechaFinCtrl.setErrors({ ...fechaFinCtrl.errors, 'matDatepickerMin': true });
+      }
       return;
     }
 
