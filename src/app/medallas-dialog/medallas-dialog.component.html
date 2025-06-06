@@ -47,9 +47,9 @@
   <!-- Nueva sección para Medallas compradas -->
   <h2 *ngIf="!isLoading && medallasCompradas.length > 0" class="page-title section-separator">Mis Medallas Adquiridas</h2>
   
-  <div *ngIf="!isLoading && medallasCompradas.length === 0" class="empty-medals-message">
-    <p>No has adquirido ninguna medalla todavía. Visita el mercado para conseguir medallas exclusivas.</p>
-  </div>
+  <!-- <div *ngIf="!isLoading && medallasCompradas.length === 0" class="empty-medals-message"> -->
+    <!-- <p>No has adquirido ninguna medalla todavía. Visita el mercado para conseguir medallas exclusivas.</p> -->
+  <!-- </div> -->
 
   <div *ngIf="!isLoading && medallasCompradas.length > 0" class="medallas-compradas-grid">
     <div class="medalla-card conseguida" *ngFor="let medalla of medallasCompradas">

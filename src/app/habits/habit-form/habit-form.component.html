@@ -43,12 +43,20 @@
       <mat-error *ngIf="habitForm.get('frecuencia')?.hasError('required')">La frecuencia es requerida.</mat-error>
     </mat-form-field>
 
+    <!-- Comenta esta sección completa -->
+    <!--
     <mat-form-field appearance="outline" class="full-width-field">
-      <mat-label>Hora Programada (opcional)</mat-label>
-      <input matInput [ngxTimepicker]="timepicker" formControlName="horaProgramada" id="horaProgramada" readonly>
-      <mat-icon matSuffix (click)="timepicker.open()">watch_later</mat-icon>
-      <ngx-material-timepicker #timepicker [format]="24"></ngx-material-timepicker>
+      <mat-label>Hora Programada (Opcional)</mat-label>
+      <input matInput formControlName="horaProgramada" [ngxTimepicker]="picker" placeholder="HH:mm" readonly>
+      <ngx-material-timepicker #picker></ngx-material-timepicker>
+      <button type="button" mat-icon-button matSuffix (click)="picker.open()" *ngIf="!habitForm.get('horaProgramada')?.value">
+        <mat-icon>access_time</mat-icon>
+      </button>
+      <button type="button" mat-icon-button matSuffix (click)="clearTime()" *ngIf="habitForm.get('horaProgramada')?.value">
+        <mat-icon>clear</mat-icon>
+      </button>
     </mat-form-field>
+    -->
 
     <mat-form-field appearance="outline" class="full-width-field">
       <mat-label>Estado</mat-label>

@@ -9,8 +9,8 @@ import { UserChallenge } from './user-challenge.model'; // Asegúrate que esta i
   providedIn: 'root'
 })
 export class ChallengeService {
-  private apiUrl = 'http://localhost:8080/challenges';
-  private userChallengesApiUrl = 'http://localhost:8080/user-challenges'; // URL para operaciones de UsuarioDesafio
+  private apiUrl = 'http://51.20.183.5:8080/challenges';
+  private userChallengesApiUrl = 'http://51.20.183.5:8080/user-challenges'; // URL para operaciones de UsuarioDesafio
 
   constructor(private http: HttpClient) { }
 

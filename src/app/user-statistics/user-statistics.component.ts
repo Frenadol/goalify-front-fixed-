@@ -15,6 +15,8 @@ import { NgxChartsModule, LegendPosition } from '@swimlane/ngx-charts'; // Legen
 import { Subject, forkJoin, of } from 'rxjs';
 import { catchError, takeUntil, map, finalize } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 import { StatisticEntry } from '../statistics/statistic.model';
 // Asegúrate que esta es la importación correcta para UserChallengeDetail
@@ -91,6 +93,7 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   completedChallengesErrorMessage: string | null = null;
   habitsErrorMessage: string | null = null;
+  generandoPDF: boolean = false;
 
   // Filtros
   selectedCategory: string = 'all';
@@ -528,4 +531,462 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
     });
   }
 
-} // LLAVE DE CIERRE DE LA CLASE UserStatisticsComponent
+  // Método para descargar PDF
+  descargarPerfilPDF(): void {
+    this.generandoPDF = true;
+    
+    setTimeout(() => {
+      this.generarPDF();
+    }, 500);
+  }
+
+  private async generarPDF(): Promise<void> {
+  try {
+    this.snackBar.open('Generando PDF visual, por favor espera...', '', { duration: 3000 });
+    
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    
+    // Colores de marca
+    const colorPrimario = [83, 109, 254]; // RGB: #536DFE (azul)
+    const colorSecundario = [255, 64, 129]; // RGB: #FF4081 (rosa)
+    const colorExito = [76, 175, 80]; // RGB: #4CAF50 (verde)
+    const colorInfo = [3, 169, 244]; // RGB: #03A9F4 (azul claro)
+    const colorGris = [158, 158, 158]; // RGB: #9E9E9E
+    
+    // ENCABEZADO CON ESTILO
+    // Fondo de encabezado
+    pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+    pdf.rect(0, 0, pageWidth, 40, 'F');
+    
+    // Título
+    pdf.setTextColor(255, 255, 255); // Texto blanco
+    pdf.setFontSize(22);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Mi Progreso y Estadísticas en Goalify', pageWidth / 2, 20, { align: 'center' });
+    
+    // Fecha
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    const fechaActual = new Date().toLocaleDateString();
+    pdf.text(`Generado el ${fechaActual}`, pageWidth / 2, 30, { align: 'center' });
+    
+    let posY = 50; // Posición inicial después del encabezado
+    
+    // Inicializar valores para el perfil de usuario
+    const nombreUsuario = 'xusma'; // Puedes reemplazar esto con el nombre de usuario real si lo tienes disponible
+    const puntosActuales = this.calcularPuntosTotales();
+    const nivelUsuario = this.calcularNivel();
+    const puntosRecord = this.calcularPuntosRecord();
+    const habitosCompletadosHoy = this.contarHabitosCompletadosHoy();
+    const rangoUsuario = this.determinarRango(puntosActuales);
+    
+    // SECCIÓN DE PERFIL DE USUARIO CON ESTILO VISUAL
+    // Título de la sección con fondo
+    pdf.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+    pdf.rect(10, posY - 7, pageWidth - 20, 10, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('PERFIL DE USUARIO', pageWidth / 2, posY, { align: 'center' });
+    posY += 15;
+    
+    // Datos del perfil con iconos simulados
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(11);
+    pdf.setDrawColor(colorGris[0], colorGris[1], colorGris[2]);
+    pdf.setLineWidth(0.1);
+    
+    // Marco para el perfil
+    pdf.roundedRect(15, posY - 5, pageWidth - 30, 85, 3, 3, 'S');
+    
+    // Creamos una estructura de datos para todos los campos del perfil
+    const perfilData = [
+      { label: "Usuario:", value: nombreUsuario, color: colorInfo },
+      { label: "Puntos Actuales:", value: puntosActuales.toString(), color: colorPrimario },
+      { label: "Nivel:", value: nivelUsuario.toString(), color: colorExito },
+      { label: "Puntos Récord:", value: puntosRecord.toString(), color: colorSecundario },
+      { label: "Desafíos Completados:", value: this.completedChallenges.length.toString(), color: colorInfo },
+      { label: "Hábitos Completados Hoy:", value: habitosCompletadosHoy.toString(), color: colorPrimario },
+      { label: "Total de Hábitos Completados:", value: this.displayedStatistics.length.toString(), color: colorExito },
+      { label: "Rango:", value: rangoUsuario, color: colorSecundario }
+    ];
+    
+    // Calculamos el ancho máximo de las etiquetas para alinear los valores
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(11);
+    let maxLabelWidth = 0;
+    perfilData.forEach(item => {
+      const labelWidth = pdf.getTextWidth(item.label);
+      maxLabelWidth = Math.max(maxLabelWidth, labelWidth);
+    });
+    
+    // Añadimos un poco de espacio después de la etiqueta más larga
+    const labelPadding = 5;
+    const startX = 30;
+    const valueX = startX + maxLabelWidth + labelPadding;
+    
+    // Ahora dibujamos cada fila con el círculo, la etiqueta y el valor alineado
+    perfilData.forEach((item, index) => {
+      const rowY = posY + (index * 10);
+      
+      // Círculo de color
+      pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
+      pdf.circle(22, rowY + 2, 3, 'F');
+      
+      // Etiqueta en negrita
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(item.label, startX, rowY);
+      
+      // Valor en texto normal
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(item.value, valueX, rowY);
+    });
+    
+    // Actualizamos la posición Y para después de la tabla
+    posY += 80;
+    
+    // Barra de progreso horizontal con estilo mejorado
+    pdf.setDrawColor(220, 220, 220);
+    pdf.setFillColor(245, 245, 245);
+    pdf.roundedRect(30, posY, pageWidth - 60, 8, 4, 4, 'FD');
+
+    // Calcular porcentaje de progreso (máx 20,000 puntos)
+    const porcentajeProgreso = Math.min((puntosActuales / 20000) * 100, 100);
+    const anchoProgreso = ((pageWidth - 60) * porcentajeProgreso) / 100;
+
+    // Dibujar barra de progreso llena
+    pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+    pdf.roundedRect(30, posY, anchoProgreso, 8, 4, 4, 'F');
+
+    // Texto de progreso centrado
+    pdf.setTextColor(0);
+    pdf.setFontSize(8);
+    pdf.text(`${Math.round(porcentajeProgreso)}% (${puntosActuales}/20000 pts)`, pageWidth / 2, posY + 5, { align: 'center' });
+
+    posY += 15;
+    
+    // SECCIÓN DE RESUMEN DE ACTIVIDAD
+    // Título con fondo
+    pdf.setFillColor(colorInfo[0], colorInfo[1], colorInfo[2]);
+    pdf.rect(10, posY - 7, pageWidth - 20, 10, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('RESUMEN DE ACTIVIDAD', pageWidth / 2, posY, { align: 'center' });
+    posY += 15;
+    
+    // Tarjetas de resumen en una fila
+    pdf.setTextColor(0, 0, 0);
+    const cardWidth = (pageWidth - 40) / 3;
+    
+    // Tarjeta 1: Total de hábitos
+    pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorSecundario[2], 0.1); // Color con transparencia
+    pdf.roundedRect(15, posY, cardWidth, 30, 2, 2, 'F');
+    pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+    pdf.rect(15, posY, cardWidth, 7, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(8);
+    pdf.text('TOTAL HÁBITOS', 15 + cardWidth/2, posY + 5, { align: 'center' });
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(`${this.allHabits.length}`, 15 + cardWidth/2, posY + 20, { align: 'center' });
+    
+    // Tarjeta 2: Registros totales
+    pdf.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2], 0.1);
+    pdf.roundedRect(25 + cardWidth, posY, cardWidth, 30, 2, 2, 'F');
+    pdf.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+    pdf.rect(25 + cardWidth, posY, cardWidth, 7, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(8);
+    pdf.text('REGISTROS', 25 + cardWidth + cardWidth/2, posY + 5, { align: 'center' });
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(16);
+    pdf.text(`${this.displayedStatistics.length}`, 25 + cardWidth + cardWidth/2, posY + 20, { align: 'center' });
+    
+    // Tarjeta 3: Desafíos completados
+    pdf.setFillColor(colorExito[0], colorExito[1], colorExito[2], 0.1);
+    pdf.roundedRect(35 + 2*cardWidth, posY, cardWidth, 30, 2, 2, 'F');
+    pdf.setFillColor(colorExito[0], colorExito[1], colorExito[2]);
+    pdf.rect(35 + 2*cardWidth, posY, cardWidth, 7, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(8);
+    pdf.text('DESAFÍOS', 35 + 2*cardWidth + cardWidth/2, posY + 5, { align: 'center' });
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(16);
+    pdf.text(`${this.completedChallenges.length}`, 35 + 2*cardWidth + cardWidth/2, posY + 20, { align: 'center' });
+    
+    posY += 40;
+    
+    // TABLA DE HÁBITOS MÁS REALIZADOS
+    if (this.habitPerformanceChart.length > 0) {
+      if (posY > pageHeight - 80) {
+        pdf.addPage();
+        posY = 20;
+      }
+      
+      // Cabecera de tabla con color
+      pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+      pdf.rect(10, posY - 7, pageWidth - 20, 10, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('HÁBITOS MÁS REALIZADOS', pageWidth / 2, posY, { align: 'center' });
+      posY += 15;
+      
+      // Fondo para la tabla
+      pdf.setFillColor(245, 245, 245); // Color gris claro
+      pdf.rect(15, posY - 5, pageWidth - 30, 8 + (Math.min(this.habitPerformanceChart.length, 8) * 8), 'F');
+      
+      // Cabecera de columnas
+      pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2], 0.7);
+      pdf.rect(15, posY - 5, pageWidth - 30, 8, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(10);
+      pdf.text('HÁBITO', 30, posY);
+      pdf.text('COMPLETADOS', pageWidth - 40, posY);
+      posY += 8;
+      
+      // Filas de datos
+      const sortedHabits = [...this.habitPerformanceChart].sort((a, b) => b.value - a.value);
+      pdf.setTextColor(50, 50, 50);
+      
+      // Alternar colores para las filas
+      sortedHabits.slice(0, 8).forEach((habit, idx) => {
+        if (idx % 2 === 0) {
+          pdf.setFillColor(240, 240, 240);
+        } else {
+          pdf.setFillColor(255, 255, 255);
+        }
+        pdf.rect(15, posY - 4, pageWidth - 30, 8, 'F');
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(habit.name.toString().slice(0, 30), 30, posY);
+        
+        // Añadir una pequeña barra de visualización
+        const maxValue = Math.max(...sortedHabits.map(h => h.value));
+        const barWidth = Math.max(5, (habit.value / maxValue) * 50);
+        pdf.setFillColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+        pdf.rect(pageWidth - 70, posY - 3, barWidth, 5, 'F');
+        
+        pdf.text(habit.value.toString(), pageWidth - 40, posY);
+        posY += 8;
+      });
+      posY += 10;
+    }
+    
+    // GRÁFICO VISUAL DE PUNTOS POR HÁBITO
+    if (this.pointsByHabitChart.length > 0) {
+      if (posY > pageHeight - 90) {
+        pdf.addPage();
+        posY = 20;
+      }
+      
+      // Cabecera con color
+      pdf.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+      pdf.rect(10, posY - 7, pageWidth - 20, 10, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('PUNTOS ACUMULADOS POR HÁBITO', pageWidth / 2, posY, { align: 'center' });
+      posY += 15;
+      
+      // Fondo para la tabla
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(15, posY - 5, pageWidth - 30, 8 + (Math.min(this.pointsByHabitChart.length, 8) * 8), 'F');
+      
+      // Cabecera de columnas
+      pdf.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2], 0.7);
+      pdf.rect(15, posY - 5, pageWidth - 30, 8, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(10);
+      pdf.text('HÁBITO', 30, posY);
+      pdf.text('PUNTOS', pageWidth - 40, posY);
+      posY += 8;
+      
+      // Filas con barras de progreso
+      const sortedPoints = [...this.pointsByHabitChart].sort((a, b) => b.value - a.value);
+      const maxPoints = Math.max(...sortedPoints.map(p => p.value));
+      
+      sortedPoints.slice(0, 8).forEach((point, idx) => {
+        if (idx % 2 === 0) {
+          pdf.setFillColor(240, 240, 240);
+        } else {
+          pdf.setFillColor(255, 255, 255);
+        }
+        pdf.rect(15, posY - 4, pageWidth - 30, 8, 'F');
+        
+        pdf.setTextColor(50, 50, 50);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(point.name.toString().slice(0, 30), 30, posY);
+        
+        // Calcular ancho de barra basado en porcentaje del máximo
+        const barWidth = Math.max(5, (point.value / maxPoints) * 50);
+        pdf.setFillColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+        pdf.rect(pageWidth - 70, posY - 3, barWidth, 5, 'F');
+        
+        pdf.text(point.value.toString(), pageWidth - 40, posY);
+        posY += 8;
+      });
+      posY += 10;
+    }
+    
+    // DESAFÍOS COMPLETADOS
+    if (this.completedChallenges.length > 0) {
+      if (posY > pageHeight - 80) {
+        pdf.addPage();
+        posY = 20;
+      }
+      
+      // Cabecera de sección
+      pdf.setFillColor(colorExito[0], colorExito[1], colorExito[2]);
+      pdf.rect(10, posY - 7, pageWidth - 20, 10, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('DESAFÍOS COMPLETADOS', pageWidth / 2, posY, { align: 'center' });
+      posY += 15;
+      
+      // Fondo para la tabla
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(15, posY - 5, pageWidth - 30, 8 + (Math.min(this.completedChallenges.length, 5) * 10), 'F');
+      
+      // Cabecera de columnas
+      pdf.setFillColor(colorExito[0], colorExito[1], colorExito[2], 0.7);
+      pdf.rect(15, posY - 5, pageWidth - 30, 8, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(10);
+      pdf.text('NOMBRE', 25, posY);
+      pdf.text('PUNTOS', pageWidth - 60, posY);
+      pdf.text('FECHA', pageWidth - 30, posY);
+      posY += 8;
+      
+      pdf.setTextColor(50, 50, 50);
+      this.completedChallenges.slice(0, 5).forEach((challenge, idx) => {
+        if (idx % 2 === 0) {
+          pdf.setFillColor(240, 240, 240);
+        } else {
+          pdf.setFillColor(255, 255, 255);
+        }
+        pdf.rect(15, posY - 4, pageWidth - 30, 10, 'F');
+        
+        // Icono desafío (simulado con un círculo)
+        pdf.setFillColor(colorExito[0], colorExito[1], colorExito[2]);
+        pdf.circle(20, posY + 2, 2, 'F');
+        
+        pdf.setFont('helvetica', 'normal');
+        // Nombre con truncado seguro
+        const nombreDesafio = challenge.nombre || 'Sin nombre';
+        pdf.text(nombreDesafio.slice(0, 25) + (nombreDesafio.length > 25 ? '...' : ''), 25, posY);
+        
+        // Puntos con color destacado
+        const puntosDesafio = challenge.puntosRecompensa?.toString() || '0';
+        pdf.setTextColor(colorExito[0], colorExito[1], colorExito[2]);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(puntosDesafio, pageWidth - 60, posY);
+        
+        // Fecha
+        pdf.setTextColor(100, 100, 100);
+        pdf.setFont('helvetica', 'normal');
+        const fechaStr = challenge.userChallengeData?.fechaCompletado 
+          ? new Date(challenge.userChallengeData.fechaCompletado).toLocaleDateString()
+          : 'N/A';
+        pdf.text(fechaStr, pageWidth - 30, posY);
+        
+        posY += 10;
+      });
+    }
+    
+    // Pie de página en todas las páginas
+    const totalPages = pdf.internal.pages.length - 1;
+    
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      
+      // Línea decorativa en pie de página
+      pdf.setDrawColor(colorGris[0], colorGris[1], colorGris[2]);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, pageHeight - 15, pageWidth - 15, pageHeight - 15);
+      
+      // Texto de pie de página
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Página ${i} de ${totalPages}`, 15, pageHeight - 8);
+      pdf.text('Goalify - Tu aplicación de hábitos y metas', pageWidth / 2, pageHeight - 8, { align: 'center' });
+      pdf.text(fechaActual, pageWidth - 15, pageHeight - 8, { align: 'right' });
+    }
+    
+    // Guardar con un nombre descriptivo
+    const nombreArchivo = `Goalify-Estadisticas-${fechaActual.replace(/\//g, '-')}.pdf`;
+    pdf.save(nombreArchivo);
+    
+    this.snackBar.open('¡PDF visual generado con éxito!', 'Cerrar', { duration: 3000 });
+  } catch (error) {
+    console.error('Error al generar el PDF visual:', error);
+    this.snackBar.open('Error al generar el PDF. Por favor intenta de nuevo.', 'Cerrar', { duration: 4000 });
+  } finally {
+    this.generandoPDF = false;
+    this.cdr.detectChanges();
+  }
+}
+
+// Métodos auxiliares para el perfil de usuario
+private calcularPuntosTotales(): number {
+  let total = 0;
+  
+  // Suma de puntos por hábitos completados
+  this.displayedStatistics.forEach(stat => {
+    total += stat.puntosGanados || 0;
+  });
+  
+  // Suma de puntos por desafíos completados
+  this.completedChallenges.forEach(challenge => {
+    total += challenge.puntosRecompensa || 0;
+  });
+  
+  return total;
+}
+
+private calcularNivel(): number {
+  const puntosTotales = this.calcularPuntosTotales();
+  
+  // Ejemplo de cálculo básico de nivel (personaliza según tu lógica de negocio)
+  return Math.floor(puntosTotales / 1000);
+}
+
+private calcularPuntosRecord(): number {
+  // Aquí podrías implementar lógica para obtener el máximo histórico
+  // Por ahora, simplemente devolvemos los puntos actuales
+  return this.calcularPuntosTotales();
+}
+
+private contarHabitosCompletadosHoy(): number {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  
+  return this.displayedStatistics.filter(stat => {
+    const fechaHabito = new Date(stat.fecha);
+    fechaHabito.setHours(0, 0, 0, 0);
+    return fechaHabito.getTime() === hoy.getTime();
+  }).length;
+}
+
+private calcularMejorRacha(): number {
+  if (!this.allHabits || this.allHabits.length === 0) return 0;
+  
+  // Encontrar la mejor racha entre todos los hábitos
+  return Math.max(...this.allHabits.map(habit => habit.rachaActual || 0));
+}
+
+private determinarRango(puntos: number): string {
+  // Ejemplo de lógica para determinar el rango basado en puntos
+  if (puntos >= 10000) return 'Dedicado';
+  if (puntos >= 5000) return 'Experto';
+  if (puntos >= 2000) return 'Avanzado';
+  if (puntos >= 500) return 'Intermedio';
+  return 'Principiante';
+}
+}

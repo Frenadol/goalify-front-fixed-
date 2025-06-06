@@ -491,6 +491,38 @@
   opacity: 0.5;
 }
 
+/* Acciones de medallas */
+.medallas-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+.medallas-actions button {
+  margin: 0 5px;
+}
+
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilos para indicar que se está generando el PDF */
+button:disabled mat-icon {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ocultar elementos para PDF */
+[id$="-content"] {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .medallas-page-container {

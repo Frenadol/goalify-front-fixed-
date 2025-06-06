@@ -30,7 +30,7 @@ export interface RandomAssignmentResponse {
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:8080/api/admin';
+  private apiUrl = 'http://51.20.183.5:8080/api/admin';
 
   constructor(private http: HttpClient) { }
 

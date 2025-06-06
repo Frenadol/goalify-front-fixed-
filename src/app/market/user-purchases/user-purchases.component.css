@@ -350,6 +350,7 @@
 .column-actions {
   width: 100px;
   text-align: center;
+  padding: 0 10px;
 }
 
 /* Celda de imagen */
@@ -391,6 +392,55 @@
 
 .purchases-table button[mat-icon-button] mat-icon {
   font-size: 1.2em !important;
+}
+
+/* Corregir el icono de visualización en la tabla de compras */
+.view-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 123, 255, 0.1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  overflow: visible;
+}
+
+.view-button mat-icon {
+  color: #007bff;
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+  display: block; /* Usar block en lugar de flex */
+  text-align: center;
+  line-height: 24px;
+  margin: 0;
+  transform: none; /* Eliminar cualquier transformación */
+}
+
+/* Mejorar el hover del botón de vista */
+.view-button:hover {
+  background-color: rgba(0, 123, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Asegurar que los iconos de Material se muestren correctamente */
+.mat-icon {
+  font-family: 'Material Icons' !important;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Responsive - Vista de tarjetas para móviles */

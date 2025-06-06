@@ -20,7 +20,7 @@ export interface PendingNotification {
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:8080/api/notifications'; // Ajusta si tu URL base es diferente
+  private apiUrl = 'http://51.20.183.5:8080/api/notifications'; // Ajusta si tu URL base es diferente
 
   constructor(private http: HttpClient) { }
 
